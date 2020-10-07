@@ -1,9 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 
-namespace tetris_optimization.blocks
+namespace TetrisOptimization.Blocks
 {
-    public static class Blocks
+    public static class TetrisBlocks
     {
         // Tetris blocks
         // https://www.quora.com/What-are-the-different-blocks-in-Tetris-called-Is-there-a-specific-name-for-each-block
