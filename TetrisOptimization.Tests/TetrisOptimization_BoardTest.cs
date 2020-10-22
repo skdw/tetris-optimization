@@ -1,4 +1,5 @@
 using NUnit.Framework;
+using System;
 using TetrisOptimization.Blocks;
 
 namespace TetrisOptimization.UnitTests
@@ -14,13 +15,13 @@ namespace TetrisOptimization.UnitTests
         public void TestBoard()
         {
             Board board = new Board(15, 20);
-            board.Add(5, 3, TetrisBlocks.GetBlock());
-            board.Add(10, 2, TetrisBlocks.GetBlock());
-            board.Add(8, 7, TetrisBlocks.GetBlock());
-            board.Add(5, 13, TetrisBlocks.GetBlock());
-            board.Add(10, 16, TetrisBlocks.GetBlock());
-            board.Add(0, 0, new bool[,] {{true}});
-            Assert.True(board[0, 0]);
+            board.Add(5, 3, TetrisBlocks.GetColorBlock());
+            board.Add(10, 2, TetrisBlocks.GetColorBlock());
+            board.Add(8, 7, TetrisBlocks.GetColorBlock());
+            board.Add(5, 13, TetrisBlocks.GetColorBlock());
+            board.Add(10, 16, TetrisBlocks.GetColorBlock());
+            board.Add(0, 0, new ConsoleColor?[,] {{ConsoleColor.Green}});
+            Assert.AreEqual(board[0, 0], ConsoleColor.Green);
         }
     }
 }

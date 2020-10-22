@@ -6,12 +6,12 @@ namespace TetrisOptimization
     {
         public Board(int x, int y)
         {
-            B = new bool[x, y];
+            B = new ConsoleColor?[x, y];
         }
 
-        readonly bool[,] B;
+        readonly ConsoleColor?[,] B;
 
-        public bool this[int i, int j]
+        public ConsoleColor? this[int i, int j]
         {
             get { return B[i, j]; }
             set { B[i, j] = value; }
@@ -23,21 +23,23 @@ namespace TetrisOptimization
             {
                 Console.Write("|");
                 for (int j = 0; j < B.GetLength(1); ++j)
-                    if (B[i, j])
-                        Console.Write("#");
-                    else
-                        Console.Write(" ");
+                {
+                    if (B[i, j].HasValue)
+                        Console.BackgroundColor = B[i,j].Value;
+                    Console.Write(" ");
+                    Console.ResetColor();
+                }
                 Console.Write("|\n");
             }
         }
 
-        public void Add(int x, int y, bool[,] block)
+        public void Add(int x, int y, ConsoleColor?[,] block)
         {
             for (int i = 0; i < block.GetLength(0); ++i)
                 for (int j = 0; j < block.GetLength(1); ++j)
                     if ((x + i >= B.GetLength(0)) || (y + j >= B.GetLength(1)))
                         Console.Error.WriteLine("Out of the board");
-                    else if (B[x + i, y + j] == true && block[i, j] == true)
+                    else if (B[x + i, y + j].HasValue && block[i, j].HasValue)
                         Console.Error.WriteLine("Trying to override the block");
                     else
                         B[x + i, y + j] = block[i, j];
