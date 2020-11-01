@@ -7,7 +7,7 @@ namespace TetrisOptimization
     public class Block
     {
         public bool[,] matrix{get;}
-        public (int, int) size { get; }
+        public (int x, int y) size { get; }
 
         public Block(bool[,] matrix, (int, int) size)
         {
@@ -21,7 +21,7 @@ namespace TetrisOptimization
         static readonly bool[,] I_m = {
             { true, true, true, true , true}
         };
-        static Block I = new Block(I_m, (1, 5));
+        static Block I = new Block(I_m, (5, 1));
 
         // 1000
         // 1111
@@ -29,7 +29,7 @@ namespace TetrisOptimization
             { true, false, false, false},
             { true, true, true, true}
         };
-        static Block L1 = new Block(L1_m, (2, 4));
+        static Block L1 = new Block(L1_m, (4, 2));
 
         // 0001
         // 1111
@@ -37,7 +37,7 @@ namespace TetrisOptimization
             { false, false, false, true},
             { true, true, true, true}
         };
-        static Block L2 = new Block(L2_m, (2, 4));
+        static Block L2 = new Block(L2_m, (4, 2));
 
         // 100
         // 100
@@ -91,42 +91,42 @@ namespace TetrisOptimization
             { true, true, false, false},
             { false, true, true, true}
         };
-        static Block N1 = new Block(N1_m, (2, 4));
+        static Block N1 = new Block(N1_m, (4, 2));
         // 0011
         // 1110
         static readonly bool[,] N2_m = {
             { false, false,true, true },
             { true, true, true, false}
         };
-        static Block N2 = new Block(N2_m, (2, 4));
+        static Block N2 = new Block(N2_m, (4, 2));
         // 0100
         // 1111
         static readonly bool[,] F1_m = {
             { false, true, false, false},
             { true, true, true, true}
         };
-        static Block F1 = new Block(F1_m, (2, 4));
+        static Block F1 = new Block(F1_m, (4, 2));
         // 0010
         // 1111
         static readonly bool[,] F2_m = {
             { false, false,true, false },
             { true, true, true, true}
         };
-        static Block F2 = new Block(F2_m, (2, 4));
+        static Block F2 = new Block(F2_m, (4, 2));
         // 110
         // 111
         static readonly bool[,] P1_m = {
             { true, true, false },
             { true, true, true }
         };
-        static Block P1 = new Block(P1_m, (2, 3));
+        static Block P1 = new Block(P1_m, (3, 2));
         // 111
         // 110
         static readonly bool[,] P2_m = {
             { true, true, true },
             { true, true, false }
         };
-        static Block P2 = new Block(P2_m, (2, 3));
+        static Block P2 = new Block(P2_m, (3, 2));
         // 010
         // 111
         // 010
@@ -151,7 +151,7 @@ namespace TetrisOptimization
             { true, false, true },
             { true, true, true }
         };
-        static Block U = new Block(U_m, (2, 3));
+        static Block U = new Block(U_m, (3, 2));
         // 010
         // 010
         // 111
