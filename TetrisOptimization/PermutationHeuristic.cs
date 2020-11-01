@@ -7,10 +7,10 @@ namespace TetrisOptimization
 {
     class PermutationHeuristic
     {
-        int numPermutation;
-        int numBlock = 0;
-        List<(int, Block)> blocks;
-        List<List<Block>> permutrationBlock = new List<List<Block>>();
+        public int numPermutation;
+        public int numBlock = 0;
+        public List<(int, Block)> blocks;
+        public List<List<Block>> permutrationBlock = new List<List<Block>>();
 
         public PermutationHeuristic(int numPermutation, List<(int, Block)> blocks)
         {            
