@@ -1,7 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Text;
-using System.Threading.Tasks.Dataflow;
 
 namespace TetrisOptimization
 {
@@ -212,7 +210,6 @@ namespace TetrisOptimization
 
         public static ConsoleColor GetRandomColor() => (ConsoleColor)(random.Next(14) + 1);
 
-        //static readonly List<Block>() FiveTetris= new List<Block>() { }
         public static ConsoleColor?[,] GetRandomColorBlock() =>
             GetRandomBlock().GetColorMatrix(GetRandomColor());
     }
