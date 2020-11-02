@@ -34,11 +34,11 @@ namespace TetrisOptimization
         /// <returns>List of permutations</returns>
         public static IEnumerable<IEnumerable<T>> GetPermutations<T>(IEnumerable<T> list, int length)
         {
-            if(length == 1)
-                return list.Select(t => new T[] {t});
-            return GetPermutations(list, length-1)
+            if (length == 1)
+                return list.Select(t => new T[] { t });
+            return GetPermutations(list, length - 1)
                     .SelectMany(t => list.Where(e => !t.Contains(e)),
-                    (t1, t2) => t1.Concat(new T[] {t2}));
+                    (t1, t2) => t1.Concat(new T[] { t2 }));
         }
 
         public static List<int> CountBlocks(List<List<Block>> blocks) =>
@@ -47,12 +47,15 @@ namespace TetrisOptimization
         public static List<int> DecodeVariation(List<int> counts, int code)
         {
             List<int> result = new List<int>();
-            for(int i = 0; i < counts.Count; ++i)
+            for (int i = 0; i < counts.Count; ++i)
             {
                 result.Add(code % counts[i]);
                 code /= counts[i];
             }
             return result;
         }
+
+        public static (int, int) DecodeCoords(int code, int a) =>
+            (code / a, code % a);
     }
 }

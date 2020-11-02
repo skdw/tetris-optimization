@@ -28,6 +28,18 @@ namespace TetrisOptimization
             return new Block(rot, (size.Item2, size.Item1));
         }
 
+        public ConsoleColor?[,] GetColorMatrix(ConsoleColor color)
+        {
+            ConsoleColor?[,] color_block = new ConsoleColor?[size.Item1, size.Item2];
+            for (int i = 0; i < size.Item1; ++i)
+                for (int j = 0; j < size.Item2; ++j)
+                    if (matrix[i, j])
+                        color_block[i, j] = color;
+                    else
+                        color_block[i, j] = null;
+            return color_block;
+        }
+
         public override bool Equals(object obj)
         {
             Block block = (Block)obj;
@@ -195,22 +207,12 @@ namespace TetrisOptimization
 
         static int GetBlockId() => random.Next(blocks.Count);
 
-        public static bool[,] GetMatrix() => blocks[GetBlockId()].matrix;
-        //static readonly List<Block>() FiveTetris= new List<Block>() { }
-        public static ConsoleColor?[,] GetColorBlock()
-        {
-            ConsoleColor color = (ConsoleColor)(random.Next(14) + 1);
-            bool[,] block = GetMatrix();
-            ConsoleColor?[,] color_block = new ConsoleColor?[block.GetLength(0), block.GetLength(1)];
-            for (int i = 0; i < block.GetLength(0); ++i)
-                for (int j = 0; j < block.GetLength(1); ++j)
-                    if (block[i, j])
-                        color_block[i, j] = color;
-                    else
-                        color_block[i, j] = null;
-            return color_block;
-        }
-
         public static Block GetRandomBlock() => blocks[GetBlockId()];
+
+        public static ConsoleColor GetRandomColor() => (ConsoleColor)(random.Next(14) + 1);
+
+        //static readonly List<Block>() FiveTetris= new List<Block>() { }
+        public static ConsoleColor?[,] GetRandomColorBlock() =>
+            GetRandomBlock().GetColorMatrix(GetRandomColor());
     }
 }

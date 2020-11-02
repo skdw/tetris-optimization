@@ -8,9 +8,9 @@ namespace TetrisOptimization
     /// <summary>
     /// Precise solver for square board
     /// </summary>
-    public class PreciseSquareSolver: BlocksSolver
+    public class PreciseSquareSolver : BlocksSolver
     {
-        public PreciseSquareSolver() {}
+        public PreciseSquareSolver() { }
         protected override Board InternalSolve(List<List<Block>> blocks, int block_size)
         {
             // Count the number of rotations of each block
@@ -23,32 +23,60 @@ namespace TetrisOptimization
             int a_min = (int)Math.Ceiling(Math.Sqrt(blocks.Count * block_size));
 
             // Sum of the long boxes edges
-            int a_max = Enumerable.Sum(blocks.Select(bls => {
+            int a_max = Enumerable.Sum(blocks.Select(bls =>
+            {
                 var b0s = bls[0].size;
-                if(b0s.Item1 > b0s.Item2)
+                if (b0s.Item1 > b0s.Item2)
                     return b0s.Item1;
                 return b0s.Item2;
             }));
 
             // Iterate over square sizes
-            for(int a = a_min; a < a_max; ++a)
+            for (int a = a_min; a <= a_max; ++a)
             {
-                Board board = new Board(a, a);
                 var board_indexes = Enumerable.Range(0, a * a - 1);
-                var permutations = CommonMethods.GetPermutations(board_indexes, a * a);
+                var permutations = CommonMethods
+                    .GetPermutations(board_indexes, a * a)
+                    .Select(perm => perm.Take(blocks.Count))
+                    .Distinct();
 
                 // Permutate over board positions
-                foreach(var permutation in permutations)
+                foreach (var permutation in permutations)
                 {
                     // Iterate over blocks variations
-                    for(int i = 0; i < counts_product; ++i)
+                    for (int i = 0; i < counts_product; ++i)
                     {
                         var variation = CommonMethods.DecodeVariation(counts, i);
-                        // ...
+                        var blocks_choose = blocks.Zip(variation, (block, ind) => block[ind]);
+                        var perm_block = permutation.Zip(blocks_choose, Tuple.Create);
+                        var board = TryToCreateBoard(perm_block, a);
+                        if(board != null)
+                            return board;
                     }
                 }
             }
-            throw new System.NotImplementedException();
+            throw new System.OperationCanceledException("A board should be returned before");
         }
+
+        #nullable enable
+        /// <summary>
+        /// Tries to create square board of size a*a with blocks on specified positions
+        /// </summary>
+        /// <param name="perm_block"></param>
+        /// <param name="a"></param>
+        /// <returns></returns>
+        private Board? TryToCreateBoard(IEnumerable<Tuple<int, Block>> perm_block, int a)
+        {
+            Board board = new Board(a, a);
+            foreach ((int index, Block block) in perm_block)
+            {
+                var coords = CommonMethods.DecodeCoords(index, a);
+                bool failure = board.TryToAdd(coords.Item1, coords.Item2, block);
+                if (failure)
+                    return null;
+            }
+            return board;
+        }
+        #nullable disable
     }
 }
