@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Text;
 
 namespace TetrisOptimization
 {
@@ -202,7 +201,7 @@ namespace TetrisOptimization
         static Block T = new Block(T_m, (3, 3));
 
         static readonly List<Block> blocks = new List<Block> { I, L1, L2, V, S1, S2, R1, R2, F1, F2, X, W, U, T};
-
+        public static Block GetBlock(int i) => blocks[i];
         static readonly Random random = new Random();
 
         static int GetBlockId() => random.Next(blocks.Count);
@@ -211,7 +210,6 @@ namespace TetrisOptimization
 
         public static ConsoleColor GetRandomColor() => (ConsoleColor)(random.Next(14) + 1);
 
-        //static readonly List<Block>() FiveTetris= new List<Block>() { }
         public static ConsoleColor?[,] GetRandomColorBlock() =>
             GetRandomBlock().GetColorMatrix(GetRandomColor());
     }
