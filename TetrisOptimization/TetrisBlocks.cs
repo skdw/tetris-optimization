@@ -61,6 +61,8 @@ namespace TetrisOptimization.Blocks
 
         static readonly Random random = new Random();
 
+       
+
         static int GetBlockId() => random.Next(blocks.Count);
 
         public static bool[,] GetBlock() => blocks[GetBlockId()];

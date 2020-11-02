@@ -11,6 +11,11 @@ namespace TetrisOptimization
 
         readonly ConsoleColor?[,] B;
 
+        public ConsoleColor?[,] GetBoard()
+        {
+            return B;
+        }
+
         public ConsoleColor? this[int i, int j]
         {
             get { return B[i, j]; }
