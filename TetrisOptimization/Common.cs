@@ -40,5 +40,19 @@ namespace TetrisOptimization
                     .SelectMany(t => list.Where(e => !t.Contains(e)),
                     (t1, t2) => t1.Concat(new T[] {t2}));
         }
+
+        public static List<int> CountBlocks(List<List<Block>> blocks) =>
+            blocks.Select(bl => bl.Count).ToList();
+
+        public static List<int> DecodeVariation(List<int> counts, int code)
+        {
+            List<int> result = new List<int>();
+            for(int i = 0; i < counts.Count; ++i)
+            {
+                result.Add(code % counts[i]);
+                code /= counts[i];
+            }
+            return result;
+        }
     }
 }
