@@ -33,16 +33,31 @@ namespace TetrisOptimization
             }
         }
 
-        public void Add(int x, int y, ConsoleColor?[,] block)
+        /// <summary>
+        /// Tries to add block to the board
+        /// </summary>
+        /// <param name="x"></param>
+        /// <param name="y"></param>
+        /// <param name="color_matrix"></param>
+        /// <returns></returns>
+        public bool TryToAdd(int x, int y, Block block)
         {
-            for (int i = 0; i < block.GetLength(0); ++i)
-                for (int j = 0; j < block.GetLength(1); ++j)
+            var color_matrix = block.GetColorMatrix(FiveBlocks.GetRandomColor());
+            for (int i = 0; i < color_matrix.GetLength(0); ++i)
+                for (int j = 0; j < color_matrix.GetLength(1); ++j)
                     if ((x + i >= B.GetLength(0)) || (y + j >= B.GetLength(1)))
-                        Console.Error.WriteLine("Out of the board");
-                    else if (B[x + i, y + j].HasValue && block[i, j].HasValue)
-                        Console.Error.WriteLine("Trying to override the block");
+                    {
+                        //Console.Error.WriteLine("Out of the board");
+                        return true;
+                    }
+                    else if (B[x + i, y + j].HasValue && color_matrix[i, j].HasValue)
+                    {
+                        //Console.Error.WriteLine("Trying to override the block");
+                        return true;
+                    }
                     else
-                        B[x + i, y + j] = block[i, j];
+                        B[x + i, y + j] = color_matrix[i, j];
+            return false;
         }
     }
 }
