@@ -8,12 +8,12 @@ namespace TetrisOptimization
         static void Main(string[] args)
         {
             Board board = new Board(15, 20);
-            board.Add(0, 0, TetrisBlocks.GetColorBlock());
-            board.Add(5, 3, TetrisBlocks.GetColorBlock());
-            board.Add(10, 2, TetrisBlocks.GetColorBlock());
-            board.Add(8, 7, TetrisBlocks.GetColorBlock());
-            board.Add(5, 13, TetrisBlocks.GetColorBlock());
-            board.Add(10, 16, TetrisBlocks.GetColorBlock());
+            board.Add(0, 0, FiveBlocks.GetColorBlock());
+            board.Add(5, 3, FiveBlocks.GetColorBlock());
+            board.Add(10, 2, FiveBlocks.GetColorBlock());
+            board.Add(8, 7, FiveBlocks.GetColorBlock());
+            board.Add(5, 13, FiveBlocks.GetColorBlock());
+            board.Add(10, 16, FiveBlocks.GetColorBlock());
             board.Print();
         }
     }
