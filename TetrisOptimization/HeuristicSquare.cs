@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Drawing;
+using System.Dynamic;
 using System.Runtime.InteropServices;
 using System.Text;
 using TetrisOptimization.Blocks;
@@ -11,8 +12,15 @@ namespace TetrisOptimization
 {
     class TetrisList
     {
-        List<(int, int)> tetris_list = new List<(int, int)>();
-        int min_achvied_size;
+        public List<(int, int)> tetris_list { get; }
+
+        public TetrisList(List<(int, int)> tetris_list)
+        {
+            this.tetris_list = tetris_list;
+        }
+
+        public int achviedSize { get; set; }
+
     }
     class HeuristicSquare
     {
@@ -29,7 +37,7 @@ namespace TetrisOptimization
         int maxSquareSize=0;
 
         PermutationHeuristic permutation;
-        List<List<(int, int)>> EvolutionList = new List<List<(int, int)>>();
+        List<TetrisList> EvolutionList = new List<TetrisList>();
         public HeuristicSquare(List<(int,Block)> blocks, int blockSize, int numLists, double procentage, int numPermutation)
         {
             this.blocks = blocks;
@@ -37,12 +45,8 @@ namespace TetrisOptimization
             this.procentage = procentage;
             this.permutation=new PermutationHeuristic(numPermutation, blocks);
             this.numBlocks = this.permutation.numBlock;
-            //Console.WriteLine(blocks);
-            //Console.WriteLine(numLists);
-            //Console.WriteLine(numBlocks);
             Sizes();
             this.minSquareSize = CommonMethods.MinSqareSize(numBlocks, blockSize);
-            //Console.WriteLine(maxSquareSize);
             generate_list();            
         }       
         private void Sizes()
@@ -56,6 +60,7 @@ namespace TetrisOptimization
             }
         }
 
+
         public void generate_list()
         {            
             Random r = new Random();
@@ -65,17 +70,18 @@ namespace TetrisOptimization
                 for(int j=0;j< numBlocks; j++)
                 {
                     tmp_list.Add((r.Next(0, maxSquareSize-maxBlockSize), r.Next(0, 3)));
-                }                
-                 EvolutionList.Add(tmp_list);
+                } 
+                
+                 EvolutionList.Add(new TetrisList(tmp_list));
             }
-            foreach (var l in EvolutionList)
-            {
-                Console.WriteLine();
-                foreach (var t in l)
-                {
-                    Console.Write("(" + t.Item1 + " + " + t.Item2 + ")");
-                }
-            }
+            //foreach (var l in EvolutionList)
+            //{
+            //    Console.WriteLine();
+            //    foreach (var t in l)
+            //    {
+            //        Console.Write("(" + t.Item1 + " + " + t.Item2 + ")");
+            //    }
+            //}
 
         }
         public int tetris(List<(int,int)> arrange , List<Block> blocks)
@@ -104,7 +110,7 @@ namespace TetrisOptimization
                 
             }
             int size = Math.Max(x2 - x1, y2 -1);
-            board.Print();
+            
             if (size < minimalAchivedSize)
             {
                 minimalAchivedSize = size;
@@ -114,16 +120,21 @@ namespace TetrisOptimization
         }
         public Board algorithm()
         {
-            foreach (var perm in permutation.permutrationBlock)
-            {
-               
-                foreach (var list in EvolutionList)
+            //while (EvolutionList.Count > 1)
+            //{
+                foreach (var perm in permutation.permutrationBlock)
                 {
-                    int size = tetris(list, perm);
-                    if (size == minSquareSize)
-                        return bestBoard;
+                    foreach (var tlist in EvolutionList)
+                    {
+                        tlist.achviedSize = tetris(tlist.tetris_list, perm);
+                        if (tlist.achviedSize == minSquareSize)
+                            return bestBoard;
+                    }
                 }
-            }
+
+            //    List<List<(int, int)>> tmp = new List<List<(int, int)>>();
+
+            //}
             return bestBoard;
         }
 
