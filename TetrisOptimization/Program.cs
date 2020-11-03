@@ -18,7 +18,7 @@ namespace TetrisOptimization
             //board.Print();
 
             List<(int, Block)> blocks = new List<(int, Block)>() { (2, FiveBlocks.GetBlock(1)) ,(3,FiveBlocks.GetBlock(3)),(1,FiveBlocks.GetBlock(6))};
-            HeuristicSquare heuristicSquare=new HeuristicSquare(blocks, 5, 24, 0.2, 1);
+            HeuristicSquare heuristicSquare=new HeuristicSquare(blocks, 5, 600, 0.4, 1);
             heuristicSquare.algorithm().Print();
             Console.WriteLine("minimal square calculaed by heuristic algorithm is : " + heuristicSquare.minimalAchivedSize);
 

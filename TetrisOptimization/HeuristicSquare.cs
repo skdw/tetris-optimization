@@ -35,7 +35,7 @@ namespace TetrisOptimization
         List<(int, int)> bestEvolutionList;
         List<(int num, Block b)> blocks;
         int maxSquareSize=0;
-
+        Random r = new Random();
         PermutationHeuristic permutation;
         List<TetrisList> EvolutionList = new List<TetrisList>();
         public HeuristicSquare(List<(int,Block)> blocks, int blockSize, int numLists, double procentage, int numPermutation)
@@ -63,7 +63,7 @@ namespace TetrisOptimization
 
         public void generate_list()
         {            
-            Random r = new Random();
+           
             for(int i=0; i< numLists;i++)
             {
                 List<(int x, int rot)> tmp_list = new List<(int, int)>();
@@ -74,14 +74,6 @@ namespace TetrisOptimization
                 
                  EvolutionList.Add(new TetrisList(tmp_list));
             }
-            //foreach (var l in EvolutionList)
-            //{
-            //    Console.WriteLine();
-            //    foreach (var t in l)
-            //    {
-            //        Console.Write("(" + t.Item1 + " + " + t.Item2 + ")");
-            //    }
-            //}
 
         }
         public int tetris(List<(int,int)> arrange , List<Block> blocks)
@@ -120,8 +112,8 @@ namespace TetrisOptimization
         }
         public Board algorithm()
         {
-            //while (EvolutionList.Count > 1)
-            //{
+            while (EvolutionList.Count > 1)
+            {
                 foreach (var perm in permutation.permutrationBlock)
                 {
                     foreach (var tlist in EvolutionList)
@@ -131,13 +123,31 @@ namespace TetrisOptimization
                             return bestBoard;
                     }
                 }
-
-            //    List<List<(int, int)>> tmp = new List<List<(int, int)>>();
-
-            //}
+                EvolutionList.Sort((e1, e2) => e2.achviedSize.CompareTo(e1.achviedSize));
+                EvolutionList.RemoveRange(0, (int)Math.Floor(EvolutionList.Count * (1 - procentage)));
+             
+                
+                if (EvolutionList.Count > 1)
+                {
+                    int randomNum = r.Next(1, numBlocks - 1);
+                    List<TetrisList> tmp = new List<TetrisList>();
+                    for (int i = 0; i < EvolutionList.Count - 1; i++)
+                    {
+                        
+                            List<(int, int)> list1 = new List<(int, int)>();
+                            List<(int, int)> list2 = new List<(int, int)>();
+                            list1=EvolutionList[i].tetris_list.GetRange(0, randomNum);
+                            list2= EvolutionList[i+1].tetris_list.GetRange(0, randomNum);
+                            list1.AddRange(EvolutionList[i+1].tetris_list.GetRange(randomNum, numBlocks - randomNum));
+                            list2.AddRange(EvolutionList[i].tetris_list.GetRange(randomNum, numBlocks - randomNum));
+                            tmp.Add(new TetrisList(list1));
+                        
+                    }
+                    EvolutionList = tmp;
+                }
+                
+            }
             return bestBoard;
         }
-
-
     }
 }
