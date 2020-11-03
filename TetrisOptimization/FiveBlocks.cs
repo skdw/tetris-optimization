@@ -16,6 +16,7 @@ namespace TetrisOptimization
 
         /// <summary>
         /// Rotates block by 90 degrees
+        /// macierz jest wierszami więc iterujemy: matrix[y,x]
         /// </summary>
         /// <returns>Rotated block (deep copy)</returns>
         public Block Rotate()

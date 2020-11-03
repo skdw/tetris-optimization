@@ -25,7 +25,12 @@ namespace TetrisOptimization
             List<Block> rotations = new List<Block>() { rot0, rot1, rot2, rot3 };
             return rotations.Distinct().ToList();
         }
-
+        /// <summary>
+        /// Ratates block by specyfic degree
+        /// </summary>
+        /// <param name="block">Block to rotate</param>
+        /// <param name="rot">How many 90 degrees shoud be rotated</param>
+        /// <returns>Return rotated block</returns>
         public static Block GetSpecyficRotation(Block block, int rot)
         {
             if (rot == 0)

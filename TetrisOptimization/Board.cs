@@ -26,7 +26,7 @@ namespace TetrisOptimization
                 {
                     if (B[i, j].HasValue)
                         Console.BackgroundColor = B[i,j].Value;
-                    Console.Write(" ");
+                    Console.Write("  ");
                     Console.ResetColor();
                 }
                 Console.Write("|\n");
@@ -47,12 +47,12 @@ namespace TetrisOptimization
                 for (int cx = 0; cx < color_matrix.GetLength(1); ++cx)//x
                     if ((y + cy >= B.GetLength(0)) || (x + cx >= B.GetLength(1)))
                     {
-                        //Console.Error.WriteLine("Out of the board");
+                        //"Out of the board"
                         return true;
                     }
                     else if (B[y + cy, x + cx].HasValue && color_matrix[cy, cx].HasValue)
                     {
-                        //Console.Error.WriteLine("Trying to override the block");
+                        //"Trying to override the block"
                         return true;
                     }
             for (int cy = 0; cy < color_matrix.GetLength(0); ++cy)//y

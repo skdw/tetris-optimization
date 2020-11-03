@@ -31,13 +31,19 @@ namespace TetrisOptimization
         int minSquareSize;
         public int minimalAchivedSize=int.MaxValue;
         Board bestBoard;
-        List<Block> best_permutation;
-        List<(int, int)> bestEvolutionList;
         List<(int num, Block b)> blocks;
         int maxSquareSize=0;
         Random r = new Random();
         PermutationHeuristic permutation;
         List<TetrisList> EvolutionList = new List<TetrisList>();
+        /// <summary>
+        /// Heuristic square algorithm class
+        /// </summary>
+        /// <param name="blocks"> Blocks list</param>
+        /// <param name="blockSize">Size of  block</param>
+        /// <param name="numLists">Number of list</param>
+        /// <param name="procentage">Procentage of block which remain</param>
+        /// <param name="numPermutation">Number of permutations of block</param>
         public HeuristicSquare(List<(int,Block)> blocks, int blockSize, int numLists, double procentage, int numPermutation)
         {
             this.blocks = blocks;
@@ -49,6 +55,10 @@ namespace TetrisOptimization
             this.minSquareSize = CommonMethods.MinSqareSize(numBlocks, blockSize);
             generate_list();            
         }       
+        /// <summary>
+        /// Count Board size which is maximal Sqaure size,
+        /// Count maximal block size
+        /// </summary>
         private void Sizes()
         {
             foreach (var t in blocks)
@@ -60,7 +70,9 @@ namespace TetrisOptimization
             }
         }
 
-
+        /// <summary>
+        /// Generate Evolution List, which is List of Tetris Lists
+        /// </summary>
         public void generate_list()
         {            
            
@@ -76,6 +88,13 @@ namespace TetrisOptimization
             }
 
         }
+        /// <summary>
+        /// Put blocks one by one on Board correspondingly with arrange 
+        /// 
+        /// </summary>
+        /// <param name="arrange">list of where and with what rotation put the each block</param>
+        /// <param name="blocks">list of blocks</param>
+        /// <returns></returns>
         public int tetris(List<(int,int)> arrange , List<Block> blocks)
         {
             Board board = new Board(maxSquareSize, maxSquareSize);
@@ -86,7 +105,7 @@ namespace TetrisOptimization
             {
                 int x = arrange[i].Item1;
                 Block b = CommonMethods.GetSpecyficRotation(blocks[i], arrange[i].Item2);
-                bool flag = false;
+                bool flag = true;
                 int y = 0;
                 do
                 {
@@ -110,6 +129,13 @@ namespace TetrisOptimization
             }
             return size;
         }
+        
+        /// <summary>
+        /// The main part of algorithm, takes each permutation, each evolution list 
+        /// and cout achived square size by tetris
+        /// Reduce and shuffle evolution lists.
+        /// </summary>
+        /// <returns>Return the best Board</returns>
         public Board algorithm()
         {
             while (EvolutionList.Count > 1)
@@ -125,8 +151,6 @@ namespace TetrisOptimization
                 }
                 EvolutionList.Sort((e1, e2) => e2.achviedSize.CompareTo(e1.achviedSize));
                 EvolutionList.RemoveRange(0, (int)Math.Floor(EvolutionList.Count * (1 - procentage)));
-             
-                
                 if (EvolutionList.Count > 1)
                 {
                     int randomNum = r.Next(1, numBlocks - 1);
@@ -144,8 +168,7 @@ namespace TetrisOptimization
                         
                     }
                     EvolutionList = tmp;
-                }
-                
+                }                
             }
             return bestBoard;
         }
