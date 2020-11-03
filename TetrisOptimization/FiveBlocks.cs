@@ -20,18 +20,18 @@ namespace TetrisOptimization
         /// <returns>Rotated block (deep copy)</returns>
         public Block Rotate()
         {
-            bool[,] rot = new bool[size.Item2, size.Item1];
-            for (int i = 0; i < size.Item2; ++i)
-                for (int j = 0; j < size.Item1; ++j)
-                    rot[i, j] = matrix[size.Item1 - j - 1, i];
-            return new Block(rot, (size.Item2, size.Item1));
+            bool[,] rot = new bool[size.x, size.y];
+            for (int i = 0; i < size.y; ++i)
+                for (int j = 0; j < size.x; ++j)
+                    rot[j, i] = matrix[size.y - i - 1, j];
+            return new Block(rot, (size.y, size.x));
         }
 
         public ConsoleColor?[,] GetColorMatrix(ConsoleColor color)
         {
-            ConsoleColor?[,] color_block = new ConsoleColor?[size.Item1, size.Item2];
-            for (int i = 0; i < size.Item1; ++i)
-                for (int j = 0; j < size.Item2; ++j)
+            ConsoleColor?[,] color_block = new ConsoleColor?[size.y, size.x];
+            for (int i = 0; i < size.y; ++i)
+                for (int j = 0; j < size.x; ++j)
                     if (matrix[i, j])
                         color_block[i, j] = color;
                     else

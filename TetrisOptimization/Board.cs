@@ -43,20 +43,22 @@ namespace TetrisOptimization
         public bool TryToAdd(int x, int y, Block block)
         {
             var color_matrix = block.GetColorMatrix(FiveBlocks.GetRandomColor());
-            for (int i = 0; i < color_matrix.GetLength(0); ++i)
-                for (int j = 0; j < color_matrix.GetLength(1); ++j)
-                    if ((x + i >= B.GetLength(0)) || (y + j >= B.GetLength(1)))
+            for (int cy = 0; cy < color_matrix.GetLength(0); ++cy)//y
+                for (int cx = 0; cx < color_matrix.GetLength(1); ++cx)//x
+                    if ((y + cy >= B.GetLength(0)) || (x + cx >= B.GetLength(1)))
                     {
                         //Console.Error.WriteLine("Out of the board");
                         return true;
                     }
-                    else if (B[x + i, y + j].HasValue && color_matrix[i, j].HasValue)
+                    else if (B[y + cy, x + cx].HasValue && color_matrix[cy, cx].HasValue)
                     {
                         //Console.Error.WriteLine("Trying to override the block");
                         return true;
                     }
-                    else
-                        B[x + i, y + j] = color_matrix[i, j];
+            for (int cy = 0; cy < color_matrix.GetLength(0); ++cy)//y
+                for (int cx = 0; cx < color_matrix.GetLength(1); ++cx)
+                    if(color_matrix[cy,cx].HasValue)
+                        B[y + cy, x + cx] = color_matrix[cy, cx];
             return false;
         }
     }

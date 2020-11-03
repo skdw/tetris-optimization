@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -23,6 +24,22 @@ namespace TetrisOptimization
             var rot3 = rot2.Rotate();
             List<Block> rotations = new List<Block>() { rot0, rot1, rot2, rot3 };
             return rotations.Distinct().ToList();
+        }
+
+        public static Block GetSpecyficRotation(Block block, int rot)
+        {
+            if (rot == 0)
+                return block;
+            else if (rot == 1)
+                return block.Rotate();
+            else if (rot == 2)
+                return block.Rotate().Rotate();
+            else
+                return block.Rotate().Rotate().Rotate();
+        }
+        public static int MinSqareSize(int num_block, int size)
+        {
+            return (int)Math.Ceiling(Math.Sqrt(num_block*size));
         }
 
         /// <summary>
