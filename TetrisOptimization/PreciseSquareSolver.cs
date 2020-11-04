@@ -10,8 +10,25 @@ namespace TetrisOptimization
     /// </summary>
     public class PreciseSquareSolver : BlocksSolver
     {
-        public PreciseSquareSolver() { }
-        protected override Board InternalSolve(List<List<Block>> blocks, int block_size)
+        private List<List<Block>> blocks_rot;
+
+        public PreciseSquareSolver(List<(int, Block)> _blocks, int _blockSize) : base(_blocks, _blockSize)
+        {
+            var block_rotations = CommonMethods.GetRotations(blocks.Select(b => b.Item2).ToList());
+            var zipp = blocks.Zip(block_rotations, (bl1, bl2) => (bl1.Item1, bl2));
+
+            blocks_rot = new List<List<Block>>();
+            foreach(var (count, block) in zipp)
+                for(int i = 0; i < count; ++i)
+                    blocks_rot.Add(block);
+        }
+
+        public override Board Solve()
+        {
+            return InternalSolve(blocks_rot, blockSize);
+        }
+
+        private Board InternalSolve(List<List<Block>> blocks, int block_size)
         {
             // Count the number of rotations of each block
             var counts = CommonMethods.CountBlocks(blocks);
@@ -35,10 +52,7 @@ namespace TetrisOptimization
             for (int a = a_min; a <= a_max; ++a)
             {
                 var board_indexes = Enumerable.Range(0, a * a - 1);
-                var permutations = CommonMethods
-                    .GetPermutations(board_indexes, a * a)
-                    .Select(perm => perm.Take(blocks.Count))
-                    .Distinct();
+                var permutations = CommonMethods.GetCombinations(board_indexes, blocks.Count);
 
                 // Permutate over board positions
                 foreach (var permutation in permutations)

@@ -26,7 +26,7 @@ namespace TetrisOptimization
                 {
                     if (B[i, j].HasValue)
                         Console.BackgroundColor = B[i,j].Value;
-                    Console.Write(" ");
+                    Console.Write("  ");
                     Console.ResetColor();
                 }
                 Console.Write("|\n");

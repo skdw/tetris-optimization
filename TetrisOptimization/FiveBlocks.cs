@@ -42,7 +42,7 @@ namespace TetrisOptimization
         public override bool Equals(object obj)
         {
             Block block = (Block)obj;
-            if(size != block.size)
+            if(size.x != block.size.x || size.y != block.size.y)
                 return false;
             for(int i = 0; i < size.Item1; ++i)
                 for(int j = 0; j < size.Item2; ++j)

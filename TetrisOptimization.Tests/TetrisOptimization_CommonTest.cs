@@ -29,7 +29,7 @@ namespace TetrisOptimization.UnitTests
         {
             int len = 5;
             var input = Enumerable.Range(1, len);
-            var result = CommonMethods.GetPermutations(input, len);
+            var result = CommonMethods.GetCombinations(input, len);
             Assert.AreEqual(result.First(), Enumerable.Range(1, len));
             Assert.AreEqual(result.Last(), Enumerable.Range(1, 5).Reverse());
         }
