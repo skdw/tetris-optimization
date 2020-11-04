@@ -5,7 +5,7 @@ namespace TetrisOptimization
 {
     public class Block
     {
-        public bool[,] matrix{get;}
+        public bool[,] matrix { get; }
         public (int x, int y) size { get; }
 
         public Block(bool[,] matrix, (int, int) size)
@@ -42,11 +42,11 @@ namespace TetrisOptimization
         public override bool Equals(object obj)
         {
             Block block = (Block)obj;
-            if(size.x != block.size.x || size.y != block.size.y)
+            if (size.x != block.size.x || size.y != block.size.y)
                 return false;
-            for(int i = 0; i < size.Item1; ++i)
-                for(int j = 0; j < size.Item2; ++j)
-                    if(matrix[i,j] != block.matrix[i,j])
+            for (int i = 0; i < size.y; ++i)
+                for (int j = 0; j < size.x; ++j)
+                    if (matrix[i, j] != block.matrix[i, j])
                         return false;
             return true;
         }
@@ -55,7 +55,7 @@ namespace TetrisOptimization
     }
     public class FiveBlocks
     {
-        
+
         static readonly bool[,] I_m = {
             { true, true, true, true , true}
         };
@@ -168,7 +168,7 @@ namespace TetrisOptimization
         // 010
         // 111
         // 010
-        static readonly bool[,] X_m= {
+        static readonly bool[,] X_m = {
             { false, true, false },
             { true, true, true },
             { false, true, false }
@@ -185,7 +185,7 @@ namespace TetrisOptimization
         static Block W = new Block(W_m, (3, 3));
         // 101
         // 111
-        static readonly bool[,] U_m= {
+        static readonly bool[,] U_m = {
             { true, false, true },
             { true, true, true }
         };
@@ -200,7 +200,7 @@ namespace TetrisOptimization
         };
         static Block T = new Block(T_m, (3, 3));
 
-        static readonly List<Block> blocks = new List<Block> { I, L1, L2, V, S1, S2, R1, R2, F1, F2, X, W, U, T};
+        static readonly List<Block> blocks = new List<Block> { I, L1, L2, V, S1, S2, R1, R2, F1, F2, X, W, U, T };
         public static Block GetBlock(int i) => blocks[i];
         static readonly Random random = new Random();
 
