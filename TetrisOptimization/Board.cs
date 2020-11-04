@@ -8,8 +8,13 @@ namespace TetrisOptimization
         {
             B = new ConsoleColor?[x, y];
         }
+        public Board(Board b)
+        {
+            this.B = b.B;
 
-        readonly ConsoleColor?[,] B;
+        }
+
+        public readonly ConsoleColor?[,] B;
 
         public ConsoleColor? this[int i, int j]
         {
