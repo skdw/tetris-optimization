@@ -20,12 +20,11 @@ namespace TetrisOptimization
             List<(int, Block)> blocks = new List<(int, Block)>() { (2, FiveBlocks.GetBlock(1)), (1, FiveBlocks.GetBlock(3)), (1, FiveBlocks.GetBlock(6)) };
             int blockSize = 5;
             HeuristicSquare heuristicSquare = new HeuristicSquare(blocks, blockSize, 600, 0.4, 1);
-            heuristicSquare.Solve().Print();
+            heuristicSquare.Solve().Print(true);
             Console.WriteLine("Minimal square calculated by heuristic algorithm: " + heuristicSquare.minimalAchivedSize);
 
-            List<(int, Block)> blocks2 = new List<(int, Block)>() { (2, FiveBlocks.GetBlock(1)), (3, FiveBlocks.GetBlock(3)) };
             PreciseSquareSolver squareSolver = new PreciseSquareSolver(blocks, blockSize);
-            squareSolver.Solve().Print();
+            squareSolver.Solve().Print(true);
         }
     }
 }

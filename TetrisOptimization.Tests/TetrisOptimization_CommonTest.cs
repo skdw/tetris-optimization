@@ -7,9 +7,7 @@ namespace TetrisOptimization.UnitTests
     public class TestCommon
     {
         [SetUp]
-        public void Setup()
-        {
-        }
+        public void Setup() { }
 
         [Test]
         public void TestRotations()
@@ -18,7 +16,7 @@ namespace TetrisOptimization.UnitTests
                         .Range(0, 10)
                         .Select(_ => FiveBlocks.GetRandomBlock())
                         .ToList();
-            
+
             var rotations = CommonMethods.GetRotations(blocks);
             var rot4 = blocks[0].Rotate().Rotate().Rotate().Rotate();
             Assert.AreEqual(blocks[0], rot4);

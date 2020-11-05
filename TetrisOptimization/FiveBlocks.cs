@@ -162,7 +162,7 @@ namespace TetrisOptimization
         };
         static Block T = new Block(T_m, (3, 3));
 
-        static readonly Dictionary<int, Block> blocks = new Dictionary<int, Block>() 
+        static readonly Dictionary<int, Block> blocks = new Dictionary<int, Block>()
         {
             {1, I},
             {2, R1},
@@ -191,9 +191,8 @@ namespace TetrisOptimization
 
         public static Block GetRandomBlock() => blocks[GetBlockId() + 1];
 
+        static int lastColor;
+        public static ConsoleColor GetNextColor() => (ConsoleColor)((lastColor += 2) % 15 + 1);
         public static ConsoleColor GetRandomColor() => (ConsoleColor)(random.Next(14) + 1);
-
-        public static ConsoleColor?[,] GetRandomColorBlock() =>
-            GetRandomBlock().GetColorMatrix(GetRandomColor());
     }
 }
