@@ -1,14 +1,21 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Runtime.CompilerServices;
 using System.Text;
 
 namespace TetrisOptimization
 {
     public class Gap
     {
-        bool[,] matrix;
-        (int x, int y) size;
-        (int x, int y) position;
+        public bool[,] matrix { get; set; }
+        public (int x, int y) size { get; set; }
+        public (int x, int y) position { get; set; }
+        public Gap(Gap gap)
+        {
+            matrix = gap.matrix;
+            size = gap.size;
+            position = gap.position;
+        }
 
         public Gap(bool[,] matrix, (int x, int y) size, (int x, int y) position)
         {
@@ -53,11 +60,57 @@ namespace TetrisOptimization
                 {
                     if(!board.B[x,y].HasValue)
                     {
-                        //rekurencyjne wyszukiwanie 4rek pustych
+                        bool[,] matrix = new bool[1, 1];
+                        matrix[1, 1] = true;
+                        Gap gap = new Gap(matrix, (1, 1), (x, y));
+
+                        gaps.Add(Req(board, frame, (x, y), gap));                        
                     }
                 }
             }
+
             return gaps;
+        }
+        private static Gap Req(Board board, (int x0, int x1, int y0, int y1) frame, (int x, int y) position, Gap gap)
+        {
+            board.B[position.x, position.y] = ConsoleColor.Red;
+            if(position.x-1<frame.x0||board[position.x-1,position.y].HasValue)
+            {
+                if (position.x + 1 > frame.x1 || board[position.x + 1, position.y].HasValue)
+                {
+                    if (position.y - 1 > frame.y1 || board[position.x, position.y - 1].HasValue)
+                    {
+                        if (position.y + 1 > frame.x1 || board[position.x, position.y + 1].HasValue)
+                        {
+                            return gap;
+                        }
+                    }
+                }
+            }
+            Gap gapTmp = new Gap(gap);
+            if (position.x - 1 >= frame.x0 &&  !board[position.x - 1, position.y].HasValue)
+            {
+                
+            }
+            if (position.x + 1 >= frame.x0 && !board[position.x + 1, position.y].HasValue)
+            {
+
+            }
+            if (position.y - 1 >= frame.y0 && !board[position.x, position.y - 1].HasValue)
+            {
+                
+
+            }
+            if (position.y + 1 >= frame.y1 && !board[position.x - 1, position.y +1].HasValue)
+            {
+                bool[,] newMatrix = new bool[gapTmp.size.x, gapTmp.size.y + 1];
+
+                (int x, int y) newSize = (gapTmp.size.x, gapTmp.size.y + 1);
+                (int x, int y) newPosition = (gapTmp.size.x, gapTmp.size.y);
+                Gap newGap = new Gap(newMatrix, newSize, newPosition);
+                gapTmp = Req(board, frame, (position.x, position.y + 1), newGap);
+            }
+            return gapTmp;
         }
 
     }
