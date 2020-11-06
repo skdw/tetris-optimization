@@ -22,6 +22,13 @@ namespace TetrisOptimization
             heuristicSquare.algorithm().Print();
             Console.WriteLine("minimal square calculaed by heuristic algorithm is : " + heuristicSquare.minimalAchivedSize);
 
+            Board board = new Board(6, 5);
+            board.TryToAdd(0, 0, FiveBlocks.GetBlock(2));
+            board.TryToAdd(2, 3, FiveBlocks.GetBlock(4));
+            board.TryToAdd(0, 2, FiveBlocks.GetBlock(6));
+            board.Print();
+            CuttingRectangle.Cutting(board, (6, 5), (0, 6), (0, 5));
+
         }
     }
 }
