@@ -1,14 +1,18 @@
 using System.Collections.Generic;
+using System.Linq;
 
 namespace TetrisOptimization
 {
     public abstract class BlocksSolver
     {
-        public Board Solve(List<Block> blocks, int block_size)
+        protected List<(int, Block)> blocks;
+        protected int blockSize;
+
+        public BlocksSolver(List<(int, Block)> _blocks, int _blockSize)
         {
-            var block_rotations = CommonMethods.GetRotations(blocks);
-            return InternalSolve(block_rotations, block_size);
+            blocks = _blocks;
+            blockSize = _blockSize;
         }
-        protected abstract Board InternalSolve(List<List<Block>> blocks, int block_size);
+        public abstract Board Solve();
     }
 }
