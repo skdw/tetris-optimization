@@ -43,18 +43,18 @@ namespace TetrisOptimization
         }
 
         /// <summary>
-        /// Gets all permutations from a list
+        /// Gets all combinations from a list of a given length
         /// </summary>
         /// <param name="list">Input list</param>
-        /// <param name="length">Input list length</param>
+        /// <param name="length">Given combination length</param>
         /// <typeparam name="T">List element type</typeparam>
         /// <returns>List of permutations</returns>
-        public static IEnumerable<IEnumerable<T>> GetPermutations<T>(IEnumerable<T> list, int length)
+        public static IEnumerable<IEnumerable<T>> GetCombinations<T>(IEnumerable<T> list, int length) where T : IComparable
         {
             if (length == 1)
                 return list.Select(t => new T[] { t });
-            return GetPermutations(list, length - 1)
-                    .SelectMany(t => list.Where(e => !t.Contains(e)),
+            return GetCombinations(list, length - 1)
+                .SelectMany(t => list.Where(e => !t.Contains(e)),
                     (t1, t2) => t1.Concat(new T[] { t2 }));
         }
 

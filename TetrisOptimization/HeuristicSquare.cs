@@ -22,7 +22,7 @@ namespace TetrisOptimization
         public int achviedSize { get; set; }
 
     }
-    class HeuristicSquare
+    class HeuristicSquare : BlocksSolver
     {
         int numBlocks;
         int numLists;
@@ -33,14 +33,12 @@ namespace TetrisOptimization
         Board bestBoard;
         List<Block> best_permutation;
         List<(int, int)> bestEvolutionList;
-        List<(int num, Block b)> blocks;
         int maxSquareSize=0;
         Random r = new Random();
         PermutationHeuristic permutation;
         List<TetrisList> EvolutionList = new List<TetrisList>();
-        public HeuristicSquare(List<(int,Block)> blocks, int blockSize, int numLists, double procentage, int numPermutation)
+        public HeuristicSquare(List<(int,Block)> _blocks, int _blockSize, int numLists, double procentage, int numPermutation) : base(_blocks, _blockSize)
         {
-            this.blocks = blocks;
             this.numLists = numLists;
             this.procentage = procentage;
             this.permutation=new PermutationHeuristic(numPermutation, blocks);
@@ -110,7 +108,7 @@ namespace TetrisOptimization
             }
             return size;
         }
-        public Board algorithm()
+        public override Board Solve()
         {
             while (EvolutionList.Count > 1)
             {
