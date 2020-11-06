@@ -48,7 +48,8 @@ namespace TetrisOptimization
         private static int CountCuttingLine(Board board,(int x0,int x1,int y0,int y1) frame, (int x0, int x1) x, (int y0, int y1) y)
         {
             List<Gap> gaps = FindingGaps(board, frame);
-            //trying to fill gaps maby heurictic way
+            //int l = LengthCut(board, frame, x, y, gaps);
+            //trying to fill gaps maby ++ way
             return 0;
         }
         private static List<Gap> FindingGaps(Board board, (int x0, int x1, int y0, int y1) frame)
