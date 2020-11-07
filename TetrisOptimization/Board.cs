@@ -6,11 +6,11 @@ namespace TetrisOptimization
     {
         public Board(int x, int y)
         {
-            B = new ConsoleColor?[x, y];
+            B = new ConsoleColor?[y, x];
         }
         public Board(Board b)
         {
-            this.B = b.B;
+            this.B=b.B.Clone() as ConsoleColor?[,];
 
         }
 
@@ -21,7 +21,28 @@ namespace TetrisOptimization
             set { B[i, j] = value; }
         }
 
-
+        public void PrintBoard()
+        {
+            for (int i =0; i < B.GetLength(0); ++i)
+            {
+                Console.Write("|");
+                for (int j = 0; j < B.GetLength(1); ++j)
+                {
+                    try
+                    {
+                        if (B[i, j].HasValue)
+                            Console.BackgroundColor = B[i, j].Value;
+                    }
+                    catch (System.IndexOutOfRangeException)
+                    {
+                        Console.BackgroundColor = ConsoleColor.Black;
+                    }
+                    Console.Write("  ");
+                    Console.ResetColor();
+                }
+                Console.Write("|\n");
+            }
+        }
         /// <summary>
         /// Print the board
         /// </summary>
