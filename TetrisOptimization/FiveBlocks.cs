@@ -1,14 +1,13 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 
 namespace TetrisOptimization
 {
-    public class FiveBlocks
+    public static class FiveBlocks
     {
         static readonly bool[,] I_m = {
-            { true, true, true, true , true}
+            { true, true, true, true, true}
         };
-        static Block I = new Block(I_m, (5, 1));
+        //static FiveBlock I = new FiveBlock(I_m, (5, 1));
 
         // 1000
         // 1111
@@ -16,7 +15,6 @@ namespace TetrisOptimization
             { true, false, false, false},
             { true, true, true, true}
         };
-        static Block L1 = new Block(L1_m, (4, 2));
 
         // 0001
         // 1111
@@ -24,7 +22,6 @@ namespace TetrisOptimization
             { false, false, false, true},
             { true, true, true, true}
         };
-        static Block L2 = new Block(L2_m, (4, 2));
 
         // 100
         // 100
@@ -34,7 +31,6 @@ namespace TetrisOptimization
             { true, false, false},
             { true, true, true}
         };
-        static Block V = new Block(V_m, (3, 3));
 
         // 011
         // 010
@@ -44,7 +40,6 @@ namespace TetrisOptimization
             { false, true, false},
             { true, true, false}
         };
-        static Block S1 = new Block(S1_m, (3, 3));
 
         // 110
         // 010
@@ -54,7 +49,6 @@ namespace TetrisOptimization
             { false, true, false},
             { false, true, true}
         };
-        static Block S2 = new Block(S2_m, (3, 3));
 
         // 011
         // 110
@@ -64,7 +58,6 @@ namespace TetrisOptimization
             { true, true, false},
             { false, true, false}
         };
-        static Block R1 = new Block(R1_m, (3, 3));
 
         // 110
         // 011
@@ -74,7 +67,6 @@ namespace TetrisOptimization
             { false, true, true},
             { false, true, false}
         };
-        static Block R2 = new Block(R2_m, (3, 3));
 
         // 1100
         // 0111
@@ -82,15 +74,13 @@ namespace TetrisOptimization
             { true, true, false, false},
             { false, true, true, true}
         };
-        static Block N1 = new Block(N1_m, (4, 2));
 
         // 0011
         // 1110
         static readonly bool[,] N2_m = {
-            { false, false,true, true },
+            { false, false, true, true },
             { true, true, true, false}
         };
-        static Block N2 = new Block(N2_m, (4, 2));
 
         // 0100
         // 1111
@@ -98,7 +88,6 @@ namespace TetrisOptimization
             { false, true, false, false},
             { true, true, true, true}
         };
-        static Block F1 = new Block(F1_m, (4, 2));
 
         // 0010
         // 1111
@@ -106,7 +95,6 @@ namespace TetrisOptimization
             { false, false,true, false },
             { true, true, true, true}
         };
-        static Block F2 = new Block(F2_m, (4, 2));
 
         // 110
         // 111
@@ -114,7 +102,6 @@ namespace TetrisOptimization
             { true, true, false },
             { true, true, true }
         };
-        static Block P1 = new Block(P1_m, (3, 2));
 
         // 111
         // 110
@@ -122,7 +109,6 @@ namespace TetrisOptimization
             { true, true, true },
             { true, true, false }
         };
-        static Block P2 = new Block(P2_m, (3, 2));
 
         // 010
         // 111
@@ -132,7 +118,6 @@ namespace TetrisOptimization
             { true, true, true },
             { false, true, false }
         };
-        static Block X = new Block(X_m, (3, 3));
 
         // 001
         // 011
@@ -142,7 +127,6 @@ namespace TetrisOptimization
             { false, true, true },
             { true, true, false }
         };
-        static Block W = new Block(W_m, (3, 3));
 
         // 101
         // 111
@@ -150,7 +134,6 @@ namespace TetrisOptimization
             { true, false, true },
             { true, true, true }
         };
-        static Block U = new Block(U_m, (3, 2));
 
         // 010
         // 010
@@ -160,39 +143,27 @@ namespace TetrisOptimization
             { false, true,  false},
             { true, true, true }
         };
-        static Block T = new Block(T_m, (3, 3));
 
-        static readonly Dictionary<int, Block> blocks = new Dictionary<int, Block>()
+        public static Dictionary<int, bool[,]> Blocks = new Dictionary<int, bool[,]>()
         {
-            {1, I},
-            {2, R1},
-            {3, R2},
-            {4, L1},
-            {5, L2},
-            {6, P2},
-            {7, P1},
-            {8, N1},
-            {9, N2},
-            {10, T},
-            {11, U},
-            {12, V},
-            {13, W},
-            {14, X},
-            {15, F2},
-            {16, F1},
-            {17, S1},
-            {18, S2}
+            {1, I_m},
+            {2, R1_m},
+            {3, R2_m},
+            {4, L1_m},
+            {5, L2_m},
+            {6, P2_m},
+            {7, P1_m},
+            {8, N1_m},
+            {9, N2_m},
+            {10, T_m},
+            {11, U_m},
+            {12, V_m},
+            {13, W_m},
+            {14, X_m},
+            {15, F2_m},
+            {16, F1_m},
+            {17, S1_m},
+            {18, S2_m}
         };
-
-        public static Block GetBlock(int i) => blocks[i + 1];
-        static readonly Random random = new Random();
-
-        static int GetBlockId() => random.Next(blocks.Count);
-
-        public static Block GetRandomBlock() => blocks[GetBlockId() + 1];
-
-        static int lastColor;
-        public static ConsoleColor GetNextColor() => (ConsoleColor)((lastColor += 2) % 15 + 1);
-        public static ConsoleColor GetRandomColor() => (ConsoleColor)(random.Next(14) + 1);
     }
 }

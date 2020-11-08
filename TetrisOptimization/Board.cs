@@ -6,22 +6,36 @@ namespace TetrisOptimization
     {
         public Board(int x, int y)
         {
-            B = new ConsoleColor?[y, x];
+            B = new int?[y, x];
         }
         public Board(Board b)
         {
-            this.B = b.B.Clone() as ConsoleColor?[,];
+            this.B = b.B.Clone() as int?[,];
         }
 
-        public readonly ConsoleColor?[,] B;
-        public ConsoleColor? this[int i, int j]
+        public readonly int?[,] B;
+        public int? this[int i, int j]
         {
             get { return B[i, j]; }
             set { B[i, j] = value; }
         }
 
+        static int _colorID;
+
+        static int ColorID
+        {
+            get => ++_colorID;
+        }
+
         /// <summary>
-        /// Prints the size of the board
+        /// Get ConsoleColor for printing blocks
+        /// </summary>
+        /// <param name="colorID">integer ID of color</param>
+        /// <returns>console color</returns>
+        static ConsoleColor GetColor(int colorID) => (ConsoleColor)((colorID * 2) % 15 + 1);
+
+        /// <summary>
+        /// Print the size of the board
         /// </summary>
         void PrintSize(bool forceSquare, (int, int, int, int) bounds)
         {
@@ -50,7 +64,7 @@ namespace TetrisOptimization
                     try
                     {
                         if (B[i, j].HasValue)
-                            Console.BackgroundColor = B[i, j].Value;
+                            Console.BackgroundColor = GetColor(B[i, j].Value);
                     }
                     catch (System.IndexOutOfRangeException)
                     {
@@ -133,7 +147,7 @@ namespace TetrisOptimization
         }
 
         /// <summary>
-        /// Tries to add block to the board
+        /// Try to add block to the board
         /// </summary>
         /// <param name="x"></param>
         /// <param name="y"></param>
@@ -141,7 +155,7 @@ namespace TetrisOptimization
         /// <returns>True if an error occurs</returns>
         public bool TryToAdd(int x, int y, Block block)
         {
-            var color_matrix = block.GetColorMatrix(FiveBlocks.GetNextColor());
+            var color_matrix = block.GetColorMatrix(ColorID);
             for (int cy = 0; cy < color_matrix.GetLength(0); ++cy)//y
                 for (int cx = 0; cx < color_matrix.GetLength(1); ++cx)//x
                     if ((y + cy >= B.GetLength(0)) || (x + cx >= B.GetLength(1)))

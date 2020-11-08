@@ -87,7 +87,8 @@ namespace TetrisOptimization
         static int[,] nMatrix;
         private static Gap Req((int x0, int x1, int y0, int y1) frame, (int x, int y) position, Gap gap)
         {
-            changedBoard[position.y, position.x] = ConsoleColor.Red;
+            int color = 12;
+            changedBoard[position.y, position.x] = color;
             gap.fields.Add((position.x, position.y));
             if (position.x - 1 < frame.x0 || changedBoard[position.y, position.x - 1].HasValue)
             {

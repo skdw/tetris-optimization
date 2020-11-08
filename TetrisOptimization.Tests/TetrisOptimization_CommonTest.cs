@@ -14,7 +14,7 @@ namespace TetrisOptimization.UnitTests
         {
             var blocks = Enumerable
                         .Range(0, 10)
-                        .Select(_ => FiveBlocks.GetRandomBlock())
+                        .Select(_ => new FiveBlock() as Block)
                         .ToList();
 
             var rotations = CommonMethods.GetRotations(blocks);
