@@ -11,7 +11,7 @@ namespace TetrisOptimization
     public class Heuristic_rectangle
     {
         //lista wejsciowa z obrotami
-        List<List<Block>> blocks;
+        List<(int,Block)> blocks;
         //xmin, xmax, ymin, ymax, current - aktualna figura na boardzie, temp - ostatnio kladziony blok
         public int[] currentFigure,tempFigure;
 
@@ -21,7 +21,7 @@ namespace TetrisOptimization
 
         //aktualny kat zegara
         double currentAngle;
-        public Heuristic_rectangle(List<List<Block>> list)
+        public Heuristic_rectangle(List<(int, Block)> list)
         {
             blocks = list;
             currentFigure =new int[4];
@@ -43,7 +43,8 @@ namespace TetrisOptimization
             //bierzemy liste permutacji klockow
             //var list = GetPermutatedList();
             //narazie jedna permutacja wejsciowa, bo nie wiem o co chodzi w permutationHeuristic
-            List<List<Block>> list = blocks;
+            var ph = new PermutationHeuristic(5, blocks);
+            List<List<Block>> list = ph.permutrationBlock;
 
             //tworzymy plaszczyzne planszy - np. 10 * wieksze wymiary niz prostokat, takie ze nie wyjdziemy za nie
             //zakladamy ze poczatkowo ramka prostokata ktora bedziemy ruszac znajduje sie na srodku planszy
@@ -97,11 +98,19 @@ namespace TetrisOptimization
         }
         public (int,int) GetMainRectangleDim()
         {
+            List<Block> firstList = new List<Block>();
+            foreach (var t in blocks)
+            {
+                for (int i = 0; i < t.Item1; i++)
+                {
+                    firstList.Add(t.Item2);
+                }
+            }
             int howManyOnes = 0;
-            foreach(var block in blocks)
-                for (int i = 0; i < block[0].matrix.GetLength(0); ++i)
-                    for (int j = 0; j < block[0].matrix.GetLength(1); ++j)
-                        if (block[0].matrix[i, j])
+            foreach(Block block in firstList)
+                for (int i = 0; i < block.matrix.GetLength(0); ++i)
+                    for (int j = 0; j < block.matrix.GetLength(1); ++j)
+                        if (block.matrix[i, j])
                             howManyOnes++;
             var divs = GetDivisors(howManyOnes);
             if(divs.Count%2==1)

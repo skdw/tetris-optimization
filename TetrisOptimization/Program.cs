@@ -27,8 +27,10 @@ namespace TetrisOptimization
                 FiveBlocks.GetBlock(4),
                 FiveBlocks.GetBlock(3)
             };
-
+            //to
             List < List < Block >> blocksRotated = CommonMethods.GetRotations(blocks);
+            //czy to i permutacje?
+            //var blocks = List<(int, Block)> blocks2 = new List<(int, Block)>() { (2, FiveBlocks.GetBlock(1)), (3, FiveBlocks.GetBlock(3)), (1, FiveBlocks.GetBlock(6)) };
             var recH = new Heuristic_rectangle(blocksRotated);
             var alg = recH.Algorithm();
             Console.WriteLine($"Arrangement for the first permutation of {blocks.Count} different blocks:");
