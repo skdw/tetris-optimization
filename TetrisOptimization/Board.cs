@@ -6,23 +6,42 @@ namespace TetrisOptimization
     {
         public Board(int x, int y)
         {
-            B = new ConsoleColor?[x, y];
+            B = new ConsoleColor?[y, x];
+        }
+        public Board(Board b)
+        {
+            this.B=b.B.Clone() as ConsoleColor?[,];
+
         }
 
-        readonly ConsoleColor?[,] B;
+        public readonly ConsoleColor?[,] B;
+        public ConsoleColor? this[int i,int j]
+        {
+            get { return B[i, j]; }
+            set { B[i, j] = value; }
+        }
 
         /// <summary>
-        /// Print the board
+        /// Prints the size of the board
         /// </summary>
-        /// <param name="forceSquare">Force the board to be a square</param>
-        public void Print(bool forceSquare = false)
+        void PrintSize(bool forceSquare, (int, int, int, int) bounds)
         {
-            var bounds = GetBounds(forceSquare);
             var size = GetSize(bounds);
             if(forceSquare)
                 Console.WriteLine($"\nPrinting square of side: {size.h}");
             else
                 Console.WriteLine($"\nPrinting rectangle of size: h={size.h} w={size.w}");
+        }
+
+        /// <summary>
+        /// Print the board
+        /// </summary>
+        /// <param name="cutBounds">Cuts the board's bounds</param>
+        /// <param name="forceSquare">Force the board to be a square</param>
+        public void Print(bool cutBounds = true, bool forceSquare = false)
+        {
+            var bounds = GetBounds(cutBounds, forceSquare);
+            PrintSize(forceSquare, bounds);
 
             for (int i = bounds.minY; i < bounds.maxY; ++i)
             {
@@ -81,8 +100,11 @@ namespace TetrisOptimization
             return -1;
         }
 
-        (int minY, int maxY, int minX, int maxX) GetBounds(bool forceSquare)
+        (int minY, int maxY, int minX, int maxX) GetBounds(bool cutBounds, bool forceSquare)
         {
+            if(cutBounds == false)
+                return (0, B.GetLength(0), 0, B.GetLength(1));
+
             int minY = GetMinYFilled();
             int maxY = GetMaxYFilled();
             int minX = GetMinXFilled();
