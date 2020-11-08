@@ -1,30 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Runtime.CompilerServices;
+using System.Runtime.ExceptionServices;
 using System.Security.Cryptography.X509Certificates;
 using System.Text;
 
 namespace TetrisOptimization
 {
-    public class Gap
-    {
-        public ConsoleColor?[,] matrix { get; set; }
-        public (int x, int y) size { get; set; }
-        public (int x, int y) position { get; set; }
-        public Gap(Gap gap)
-        {
-            matrix = gap.matrix;
-            size = gap.size;
-            position = gap.position;
-        }
-
-        public Gap(ConsoleColor?[,] matrix, (int x, int y) size, (int x, int y) position)
-        {
-            this.matrix = matrix.Clone() as ConsoleColor?[,];
-            this.size = size;
-            this.position = position;
-        }
-    }
     public static class CuttingRectangle
     {
         public static Board baseBoard;
@@ -67,40 +49,46 @@ namespace TetrisOptimization
                 {
                     if(!changedBoard[y,x].HasValue)
                     {
-                        ConsoleColor?[,] matrix = new ConsoleColor?[1, 1];
-                        matrix[0, 0] = null;
+                        int[,] matrix = new int[1, 1];
+                        matrix[0, 0] = 1;
                         nMatrix = matrix;
-                        Gap gap = new Gap(nMatrix, (1, 1), (x, y));
-                        
-                        gaps.Add(Req(frame, (x, y), gap));     
+                        List<(int x, int y)> fieldlist = new List<(int x, int y)>();
+                        //fieldlist.Add((x, y));
+                        Gap gap = new Gap(nMatrix, (1, 1), (x, y),fieldlist);
+                        Gap gapTmp = Req(frame, (x, y), gap);
+                        gapTmp.matrix = prepareMatrix(gapTmp.size,gapTmp.position, gapTmp.fields);
+                        gaps.Add(gapTmp);     
                         
                     }
                 }
             }
-           foreach(var g in gaps)
-            {
+           //foreach(var g in gaps)
+           // {
 
-                for (int i = 0; i < g.matrix.GetLength(0); ++i)
-                {
-                    Console.Write("|");
-                    for (int j = 0; j < g.matrix.GetLength(1); ++j)
-                    {
-                        if (g.matrix[i, j].HasValue)
-                            Console.BackgroundColor = g.matrix[i, j].Value;
-                        Console.Write("  ");
-                        Console.ResetColor();
-                    }
-                    Console.Write("|\n");
-                }
-                Console.Write("\n");
-            }
+           //     for (int i = 0; i < g.matrix.GetLength(0); ++i)
+           //     {
+           //         Console.Write("|");
+           //         for (int j = 0; j < g.matrix.GetLength(1); ++j)
+           //         {
+           //             if (g.matrix[i, j] == 0)
+           //                 Console.BackgroundColor = ConsoleColor.Red;
+           //             else
+           //                 Console.BackgroundColor = ConsoleColor.Black;
+           //             Console.Write("  ");
+           //             Console.ResetColor();
+           //         }
+           //         Console.Write("|\n");
+           //     }
+           //     Console.Write("\n");
+           // }
             return gaps;
         }
         static Gap ngap;
-        static ConsoleColor?[,] nMatrix;
+        static int[,] nMatrix;
         private static Gap Req( (int x0, int x1, int y0, int y1) frame, (int x, int y) position, Gap gap)
         {
             changedBoard[position.y, position.x] = ConsoleColor.Red;
+            gap.fields.Add((position.x, position.y));
             if(position.x-1<frame.x0|| changedBoard[position.y,position.x - 1].HasValue)
             {
                 if (position.x + 1 >= frame.x1 || changedBoard[position.y, position.x + 1].HasValue)
@@ -117,9 +105,10 @@ namespace TetrisOptimization
             Gap gapTmp = new Gap(gap);
             if (position.x - 1 >= frame.x0 &&  !changedBoard[position.y, position.x-1].HasValue)
             {
+                //gapTmp.fields.Add((position.x - 1, position.y));
                 if (position.x - 1 < gapTmp.position.x)
                 {
-                    ConsoleColor?[,] newMatrix = new ConsoleColor?[gapTmp.size.y, gapTmp.size.x+1];
+                    int[,] newMatrix = new int[gapTmp.size.y, gapTmp.size.x+1];
 
                     (int x, int y) newSize = (gapTmp.size.x + 1, gapTmp.size.y);
                     (int x, int y) newPosition = (gapTmp.position.x - 1, gapTmp.position.y);
@@ -127,38 +116,39 @@ namespace TetrisOptimization
                     {
                         for (int y = newPosition.y; y < newPosition.y + newSize.y; y++)
                         {
-                            if (baseBoard[y, x] != null)
-                                newMatrix[ y - newPosition.y, x - newPosition.x] = baseBoard[y, x].Value;
+                            if (baseBoard[y, x] == null)
+                                newMatrix[ y - newPosition.y, x - newPosition.x] = 1;
                         }
                     }
                     nMatrix = newMatrix;
-                    Gap newGap = new Gap(nMatrix, newSize, newPosition);
+                    Gap newGap = new Gap(nMatrix, newSize, newPosition,gapTmp.fields);
                     gapTmp = Req(frame, (position.x-1, position.y), newGap);
                 }
                 else
                 {
+                    
                     gapTmp = Req(frame, (position.x - 1, position.y), gapTmp);
                 }
 
             }
             if (position.x + 1 < frame.x1 && !changedBoard[position.y, position.x+1].HasValue)
             {
-                
+                //gapTmp.fields.Add((position.x + 1, position.y));
                 if (position.x + 1 >= gapTmp.position.x + gapTmp.size.x)
                 {
-                    ConsoleColor?[,] newMatrix = new ConsoleColor?[gapTmp.size.y, gapTmp.size.x+1];
+                    int[,] newMatrix = new int[gapTmp.size.y, gapTmp.size.x+1];
                     (int x, int y)  newSize = (gapTmp.size.x + 1, gapTmp.size.y);
                     (int x, int y) newPosition = gapTmp.position;
                     for (int x = newPosition.x; x < newPosition.x + newSize.x; x++)
                     {
                         for (int y = newPosition.y; y < newPosition.y + newSize.y; y++)
                         {
-                            if (baseBoard[y, x] != null)
-                                newMatrix[ y - newPosition.y, x - newPosition.x] = baseBoard[y, x].Value;
+                            if (baseBoard[y, x] == null)
+                                newMatrix[ y - newPosition.y, x - newPosition.x] = 1;
                         }
                     }
                     nMatrix = newMatrix;
-                    Gap newGap = new Gap(nMatrix, newSize, newPosition);
+                    Gap newGap = new Gap(nMatrix, newSize, newPosition,gapTmp.fields);
                     gapTmp = Req( frame, (position.x + 1, position.y), newGap);
 
                 }
@@ -171,9 +161,10 @@ namespace TetrisOptimization
             }
             if (position.y - 1 >= frame.y0 && !changedBoard[position.y-1, position.x].HasValue)
             {
+                //gapTmp.fields.Add((position.x, position.y - 1));
                 if (position.y- 1 < gapTmp.position.y)
                 {
-                    ConsoleColor?[,] newMatrix = new ConsoleColor?[gapTmp.size.y+1 , gapTmp.size.x];
+                    int[,] newMatrix = new int[gapTmp.size.y+1 , gapTmp.size.x];
 
                     (int x, int y) newSize = (gapTmp.size.x, gapTmp.size.y+1);
                     (int x, int y) newPosition = (gapTmp.position.x, gapTmp.position.y-1);
@@ -181,12 +172,12 @@ namespace TetrisOptimization
                     {
                         for (int y = newPosition.y; y < newPosition.y + newSize.y; y++)
                         {
-                            if(baseBoard[y,x]!=null)
-                                newMatrix[y - newPosition.y, x - newPosition.x] = baseBoard[y, x].Value;
+                            if(baseBoard[y,x]==null)
+                                newMatrix[y - newPosition.y, x - newPosition.x] =1;
                         }
                     }
                     nMatrix = newMatrix;
-                    Gap newGap = new Gap(nMatrix, newSize, newPosition);
+                    Gap newGap = new Gap(nMatrix, newSize, newPosition,gapTmp.fields);
                     gapTmp = Req( frame, (position.x, position.y - 1), newGap);
                 }
                 else
@@ -199,7 +190,7 @@ namespace TetrisOptimization
             {
                 if (position.y + 1 >= gapTmp.position.y + gapTmp.size.y)
                 {
-                    ConsoleColor?[,] newMatrix = new ConsoleColor?[gapTmp.size.y+1, gapTmp.size.x];
+                    int[,] newMatrix = new int[gapTmp.size.y+1, gapTmp.size.x];
 
                     (int x, int y) newSize = (gapTmp.size.x, gapTmp.size.y + 1);
                     (int x, int y) newPosition = gapTmp.position;
@@ -207,12 +198,12 @@ namespace TetrisOptimization
                     {
                         for (int y = newPosition.y; y < newPosition.y + newSize.y; y++)
                         {
-                            if(baseBoard[y, x]!=null)
-                                newMatrix[ y - newPosition.y, x - newPosition.x] = baseBoard[y, x].Value;
+                            if(baseBoard[y, x]==null)
+                                newMatrix[ y - newPosition.y, x - newPosition.x] = 1;
                         }
                     }
                     nMatrix = newMatrix;
-                    Gap newGap = new Gap(nMatrix, newSize, newPosition);
+                    Gap newGap = new Gap(nMatrix, newSize, newPosition,gapTmp.fields);
                     gapTmp = Req(frame, (position.x, position.y + 1), newGap);
                 }
                 else
@@ -221,6 +212,16 @@ namespace TetrisOptimization
                 }
             }
             return gapTmp;
+        }
+        private static int[,] prepareMatrix((int x, int y) size,(int x,int y) position,List<(int x, int y)> fileds)
+        {
+            int[,] matrix = new int[size.y, size.x];
+            foreach(var p in fileds)
+            {
+                matrix[p.y-position.y,p.x-position.x]= 1;
+            }
+
+            return matrix;
         }
 
     }
