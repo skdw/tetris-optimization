@@ -21,40 +21,27 @@ namespace TetrisOptimization
             set { B[i, j] = value; }
         }
 
-        public void PrintBoard()
-        {
-            for (int i =0; i < B.GetLength(0); ++i)
-            {
-                Console.Write("|");
-                for (int j = 0; j < B.GetLength(1); ++j)
-                {
-                    try
-                    {
-                        if (B[i, j].HasValue)
-                            Console.BackgroundColor = B[i, j].Value;
-                    }
-                    catch (System.IndexOutOfRangeException)
-                    {
-                        Console.BackgroundColor = ConsoleColor.Black;
-                    }
-                    Console.Write("  ");
-                    Console.ResetColor();
-                }
-                Console.Write("|\n");
-            }
-        }
         /// <summary>
-        /// Print the board
+        /// Prints the size of the board
         /// </summary>
-        /// <param name="forceSquare">Force the board to be a square</param>
-        public void Print(bool forceSquare = false)
+        void PrintSize(bool forceSquare, (int, int, int, int) bounds)
         {
-            var bounds = GetBounds(forceSquare);
             var size = GetSize(bounds);
             if(forceSquare)
                 Console.WriteLine($"\nPrinting square of side: {size.h}");
             else
                 Console.WriteLine($"\nPrinting rectangle of size: h={size.h} w={size.w}");
+        }
+
+        /// <summary>
+        /// Print the board
+        /// </summary>
+        /// <param name="cutBounds">Cuts the board's bounds</param>
+        /// <param name="forceSquare">Force the board to be a square</param>
+        public void Print(bool cutBounds = true, bool forceSquare = false)
+        {
+            var bounds = GetBounds(cutBounds, forceSquare);
+            PrintSize(forceSquare, bounds);
 
             for (int i = bounds.minY; i < bounds.maxY; ++i)
             {
@@ -113,8 +100,11 @@ namespace TetrisOptimization
             return -1;
         }
 
-        (int minY, int maxY, int minX, int maxX) GetBounds(bool forceSquare)
+        (int minY, int maxY, int minX, int maxX) GetBounds(bool cutBounds, bool forceSquare)
         {
+            if(cutBounds == false)
+                return (0, B.GetLength(0), 0, B.GetLength(1));
+
             int minY = GetMinYFilled();
             int maxY = GetMaxYFilled();
             int minX = GetMinXFilled();

@@ -31,8 +31,6 @@ namespace TetrisOptimization
         int minSquareSize;
         public int minimalAchivedSize=int.MaxValue;
         Board bestBoard;
-        List<Block> best_permutation;
-        List<(int, int)> bestEvolutionList;
         int maxSquareSize=0;
         Random r = new Random();
         PermutationHeuristic permutation;
