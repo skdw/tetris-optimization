@@ -18,7 +18,7 @@ namespace TetrisOptimization.UnitTests
             board.TryToAdd(1, 0, FiveBlocks.GetBlock(2));
             board.TryToAdd(0, 2, FiveBlocks.GetBlock(4));
             board.TryToAdd(3, 0, FiveBlocks.GetBlock(2));
-            board.PrintBoard();
+            
             CuttingRectangle.baseBoard = board;
             CuttingRectangle.changedBoard = new Board(board);
             List<Gap> gaps =CuttingRectangle.FindingGaps((0, 4, 0, 4));
