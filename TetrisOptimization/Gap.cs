@@ -18,9 +18,8 @@ namespace TetrisOptimization
             fields = gap.fields;
         }
 
-        public Gap(int[,] matrix, (int x, int y) size, (int x, int y) position, List<(int x, int y)> fields)
+        public Gap((int x, int y) size, (int x, int y) position, List<(int x, int y)> fields)
         {
-            this.matrix = matrix.Clone() as int[,];
             this.size = size;
             this.position = position;
             this.fields = fields;
