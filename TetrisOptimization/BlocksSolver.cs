@@ -1,5 +1,6 @@
+using System;
 using System.Collections.Generic;
-using System.Linq;
+using System.Diagnostics;
 
 namespace TetrisOptimization
 {
@@ -14,5 +15,16 @@ namespace TetrisOptimization
             blockSize = _blockSize;
         }
         public abstract Board Solve();
+
+        public Board SolveAndMeasure()
+        {
+            Console.WriteLine("\n");
+            Stopwatch stopwatch = new Stopwatch();
+            stopwatch.Start();
+            var board = Solve();
+            stopwatch.Stop();
+            Console.WriteLine($"Problem solved in {stopwatch.ElapsedMilliseconds} ms");
+            return board;
+        }
     }
 }

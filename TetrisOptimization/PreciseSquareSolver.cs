@@ -25,6 +25,7 @@ namespace TetrisOptimization
 
         public override Board Solve()
         {
+            Console.WriteLine("Solving the precise square problem");
             return InternalSolve(blocks_rot, blockSize);
         }
 
@@ -52,18 +53,18 @@ namespace TetrisOptimization
             for (int a = a_min; a <= a_max; ++a)
             {
                 var board_indexes = Enumerable.Range(0, a * a - 1);
-                var permutations = CommonMethods.GetCombinations(board_indexes, blocks.Count);
+                var combinations = CommonMethods.GetCombinations(board_indexes, blocks.Count);
 
                 // Permutate over board positions
-                foreach (var permutation in permutations)
+                foreach (var combination in combinations)
                 {
                     // Iterate over blocks variations
                     for (int i = 0; i < counts_product; ++i)
                     {
                         var variation = CommonMethods.DecodeVariation(counts, i);
                         var blocks_choose = blocks.Zip(variation, (block, ind) => block[ind]);
-                        var perm_block = permutation.Zip(blocks_choose, Tuple.Create);
-                        var board = TryToCreateBoard(perm_block, a);
+                        var comb_block = combination.Zip(blocks_choose, Tuple.Create);
+                        var board = TryToCreateBoard(comb_block, a);
                         if(board != null)
                             return board;
                     }
@@ -84,7 +85,7 @@ namespace TetrisOptimization
             Board board = new Board(a, a);
             foreach ((int index, Block block) in perm_block)
             {
-                var coords = CommonMethods.DecodeCoords(index, a);
+                var coords = CommonMethods.DecodeCoords(index, a, a);
                 bool failure = board.TryToAdd(coords.Item1, coords.Item2, block);
                 if (failure)
                     return null;

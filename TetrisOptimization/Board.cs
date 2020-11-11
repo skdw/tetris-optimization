@@ -41,9 +41,9 @@ namespace TetrisOptimization
         {
             var size = GetSize(bounds);
             if (forceSquare)
-                Console.WriteLine($"\nPrinting square of side: {size.h}");
+                Console.WriteLine($"Printing square of side: {size.h}");
             else
-                Console.WriteLine($"\nPrinting rectangle of size: h={size.h} w={size.w}");
+                Console.WriteLine($"Printing rectangle of size: h={size.h} w={size.w}");
         }
 
         /// <summary>
