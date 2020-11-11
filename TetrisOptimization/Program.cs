@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 
 namespace TetrisOptimization
@@ -23,8 +23,8 @@ namespace TetrisOptimization
             PreciseSquareSolver preciseSquareSolver = new PreciseSquareSolver(blocks, blockSize);
             preciseSquareSolver.SolveAndMeasure().Print(true, true);
 
-            PreciseSquareSolver squareSolver = new PreciseSquareSolver(blocks, blockSize);
-            squareSolver.Solve().Print(true, true);
+            PreciseRectangleSolver preciseRectangleSolver = new PreciseRectangleSolver(blocks, blockSize);
+            preciseRectangleSolver.SolveAndMeasure().Print(false, false);
         }
     }
 }

@@ -1,0 +1,124 @@
+
+using System.Collections.Generic;
+using System.Linq;
+using System;
+
+namespace TetrisOptimization
+{
+    /// <summary>
+    /// Precise solver for rectangle board
+    /// </summary>
+    public class PreciseRectangleSolver : BlocksSolver
+    {
+        private List<List<Block>> blocks_rot;
+
+        public PreciseRectangleSolver(List<(int, Block)> _blocks, int _blockSize) : base(_blocks, _blockSize)
+        {
+            var block_rotations = CommonMethods.GetRotations(blocks.Select(b => b.Item2).ToList());
+            var zipp = blocks.Zip(block_rotations, (bl1, bl2) => (bl1.Item1, bl2));
+
+            blocks_rot = new List<List<Block>>();
+            foreach(var (count, block) in zipp)
+                for(int i = 0; i < count; ++i)
+                    blocks_rot.Add(block);
+        }
+
+        public override Board Solve()
+        {
+            Console.WriteLine("Solving the precise rectangle problem");
+            return InternalSolve(blocks_rot, blockSize).Item1;
+        }
+
+        /// <summary>
+        /// Solves the task for precise rectangle.
+        /// </summary>
+        /// <param name="blocks"></param>
+        /// <param name="block_size"></param>
+        /// <returns></returns>
+        private (Board, int) InternalSolve(List<List<Block>> blocks, int block_size)
+        {
+            // Count the number of rotations of each block
+            var counts = CommonMethods.CountBlocks(blocks);
+
+            // Number of blocks sequences
+            int counts_product = counts.Aggregate(1, (acc, bl) => acc * bl);
+
+            // Get rectangle size
+            (int a, int b) = GetRectangleSize();
+
+            var board_indexes = Enumerable.Range(0, a * b - 1);
+            var combinations = CommonMethods.GetCombinations(board_indexes, blocks.Count);
+
+            int bestLength = int.MaxValue;
+            Board bestBoard = new Board(a, b);
+
+            // Permutate over board positions
+            foreach (var combination in combinations)
+            {
+                // Iterate over blocks variations
+                for (int i = 0; i < counts_product; ++i)
+                {
+                    var variation = CommonMethods.DecodeVariation(counts, i);
+                    var blocks_choose = blocks.Zip(variation, (block, ind) => block[ind]);
+                    var comb_block = combination.Zip(blocks_choose, Tuple.Create);
+                    (Board board, int cutLength) = CreateCutBoard(comb_block, a, b);
+                    if(cutLength == 0)
+                        return (board, cutLength);
+                    if(cutLength < bestLength)
+                    {
+                        bestBoard = board;
+                        bestLength = cutLength;
+                    }
+                }
+            }
+
+            Console.WriteLine($"{bestLength} blocks yet to place!");
+            return (bestBoard, bestLength);
+        }
+
+        /// <summary>
+        /// Counts the proper rectangle size
+        /// </summary>
+        /// <returns></returns>
+        private (int, int) GetRectangleSize()
+        {
+            int blocks_count = blocks.Sum(b => b.Item1);
+            int area = blocks_count * blockSize;
+            int sqrt = (int)Math.Sqrt(area);
+            for(int i = sqrt; i > 0; --i)
+            {
+                int a = i;
+                int b = area / a;
+                if(a * b == area)
+                    return (a, b);
+            }
+            return (1, area);
+        }
+
+        /// <summary>
+        /// Tries to create rectangle board of size a*b with blocks on specified positions
+        /// </summary>
+        /// <param name="perm_block"></param>
+        /// <param name="a"></param>
+        /// <returns></returns>
+        private (Board, int) CreateCutBoard(IEnumerable<Tuple<int, Block>> perm_block, int a, int b)
+        {
+            Board board = new Board(a, b);
+            List<Tuple<int, Block>> overlappingBlocks = new List<Tuple<int, Block>>(); 
+            foreach (var ind_bl in perm_block)
+            {
+                (int index, Block block) = ind_bl;
+                var coords = CommonMethods.DecodeCoords(index, a, b);
+                bool failure = board.TryToAdd(coords.Item1, coords.Item2, block);
+                if (failure)
+                    overlappingBlocks.Add(ind_bl);
+            }
+
+            int cuts = overlappingBlocks.Count; // count it
+            // solve the cuts
+            // var gaps = GetGaps(board);
+
+            return (board, cuts);
+        }
+    }
+}
