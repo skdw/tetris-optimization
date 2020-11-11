@@ -13,8 +13,8 @@ namespace TetrisOptimization
         public List<List<Block>> permutrationBlock = new List<List<Block>>();
 
         public PermutationHeuristic(int numPermutation, List<(int, Block)> blocks)
-        {            
-            foreach(var t in blocks)
+        {
+            foreach (var t in blocks)
             {
                 this.numBlock += t.Item1;
             }
@@ -24,22 +24,22 @@ namespace TetrisOptimization
             else
                 this.numPermutation = numPermutation;
             this.blocks = blocks;
-            preparePermutation();    
-            
+            preparePermutation();
+
         }
         public void preparePermutation()
         {
-            Random r=new Random();
+            Random r = new Random();
             List<Block> firstList = new List<Block>();
-            foreach(var t in blocks)
+            foreach (var t in blocks)
             {
-                for(int i=0;i<t.Item1;i++)
+                for (int i = 0; i < t.Item1; i++)
                 {
                     firstList.Add(t.Item2);
                 }
             }
             permutrationBlock.Add(firstList);
-            for(int i=0;i<numPermutation-1;i++)
+            for (int i = 0; i < numPermutation - 1; i++)
             {
                 List<Block> nextList = new List<Block>();
                 nextList.AddRange(firstList);

@@ -39,7 +39,7 @@ namespace TetrisOptimization
         }
         public static int MinSqareSize(int num_block, int size)
         {
-            return (int)Math.Ceiling(Math.Sqrt(num_block*size));
+            return (int)Math.Ceiling(Math.Sqrt(num_block * size));
         }
 
         /// <summary>
