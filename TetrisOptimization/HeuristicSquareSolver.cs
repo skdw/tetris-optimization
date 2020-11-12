@@ -37,6 +37,8 @@ namespace TetrisOptimization
         List<TetrisList> EvolutionList = new List<TetrisList>();
         public HeuristicSquareSolver(List<(int, Block)> _blocks, int _blockSize, int numLists, double procentage, int numPermutation) : base(_blocks, _blockSize)
         {
+            cutBounds = true;
+            forceSquare = true;
             this.numLists = numLists;
             this.procentage = procentage;
             this.permutation = new PermutationHeuristic(numPermutation, blocks);

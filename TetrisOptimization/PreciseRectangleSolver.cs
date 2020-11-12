@@ -14,6 +14,8 @@ namespace TetrisOptimization
 
         public PreciseRectangleSolver(List<(int, Block)> _blocks, int _blockSize) : base(_blocks, _blockSize)
         {
+            cutBounds = false;
+            forceSquare = false;
             var block_rotations = CommonMethods.GetRotations(blocks.Select(b => b.Item2).ToList());
             var zipp = blocks.Zip(block_rotations, (bl1, bl2) => (bl1.Item1, bl2));
 

@@ -8,6 +8,8 @@ namespace TetrisOptimization
     {
         protected List<(int, Block)> blocks;
         protected int blockSize;
+        protected bool cutBounds;
+        protected bool forceSquare;
 
         public BlocksSolver(List<(int, Block)> _blocks, int _blockSize)
         {
@@ -25,6 +27,12 @@ namespace TetrisOptimization
             stopwatch.Stop();
             Console.WriteLine($"Problem solved in {stopwatch.ElapsedMilliseconds} ms");
             return board;
+        }
+
+        public void SolveMeasurePrint()
+        {
+            Board board = SolveAndMeasure();
+            board.Print(cutBounds, forceSquare);
         }
     }
 }
