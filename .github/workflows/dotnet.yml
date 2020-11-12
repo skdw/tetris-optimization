@@ -37,6 +37,15 @@ jobs:
       - name: Run an app
         run: dotnet run --project TetrisOptimization
 
-      # Runs a set of commands using the runners shell
-      - name: Run tests
-        run: dotnet test
+      # Runs unit tests
+      - name: Run unit tests
+        run: |
+          dotnet test --no-restore --collect "XPlat Code Coverage" --results-directory ./TestResults
+          cd ./TestResults
+          bash -c 'x=1; for f in ./*/*.xml; do mv "$f" "./coverage${x}.xml"; ((x++)); done'
+      - name: Upload coverage to Codecov
+        uses: codecov/codecov-action@v1
+        with:
+          token: ${{ secrets.CODECOV_TOKEN }}
+          directory: ./TestResults/
+          flags: unittests
