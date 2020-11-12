@@ -10,8 +10,19 @@ namespace TetrisOptimization
     public static class CuttingRectangle
     {
         public static Board baseBoard;
+        /// <summary>
+        /// This is copy of baseBoard for each frame, to fill found gaps
+        /// </summary>
         public static Board changedBoard;
-
+        /// <summary>
+        /// This function check each possible recangle place and chceck cutting length
+        ///
+        /// </summary>
+        /// <param name="board">board with blocks</param>
+        /// <param name="rectangle">size of rectangle</param>
+        /// <param name="x">where are blocks on board in x ax</param>
+        /// <param name="y">where are blocks on board in y ax</param>
+        /// <returns></returns>
         public static int Cutting(Board board, (int x, int y) rectangle, (int x0, int x1) x, (int y0, int y1) y)
         {
             baseBoard = board;
@@ -40,6 +51,11 @@ namespace TetrisOptimization
             //trying to fill gaps maby ++ way
             return 0;
         }
+        /// <summary>
+        /// It finds gaps in frame, which is on loaded baseBoard in class 
+        /// </summary>
+        /// <param name="frame">it is rectangle size frame</param>
+        /// <returns>list of gaps in frame on loaded board</returns>
         public static List<Gap> FindingGaps((int x0, int x1, int y0, int y1) frame)
         {
 
@@ -82,6 +98,13 @@ namespace TetrisOptimization
             }
             return gaps;
         }
+        /// <summary>
+        /// When Finding gaps find empty field on Board this function finds every empty field connected to this field
+        /// </summary>
+        /// <param name="frame">positio of frame on baseBoard</param>
+        /// <param name="position">position of empty field</param>
+        /// <param name="gap">previous gap to increase</param>
+        /// <returns>Whole gap inside the frame</returns>
         private static Gap Req((int x0, int x1, int y0, int y1) frame, (int x, int y) position, Gap gap)
         {
             int color = 12;
