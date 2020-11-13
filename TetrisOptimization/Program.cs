@@ -7,6 +7,20 @@ namespace TetrisOptimization
     {
         static void Main(string[] args)
         {
+            Board board = new Board(6, 5);
+            board.TryToAdd(1, 0, new FiveBlock(2));
+            board.TryToAdd(0, 2, new FiveBlock(4));
+            board.TryToAdd(3, 0, new FiveBlock(2));
+            board.Print(false, false);
+            var ct = CuttingRectangle.Cutting(board, (5, 4), (0, 6), (0, 5));
+            ct.Item2.Print(false, false);
+            Console.WriteLine(ct.Item1);
+
+            List<(int, Block)> blocks = new List<(int, Block)>() { (2, new FiveBlock(1)), (1, new FiveBlock(3)), (1, new FiveBlock(6)) };
+            int blockSize = 5;
+            HeuristicSquare heuristicSquare = new HeuristicSquare(blocks, blockSize, 600, 0.4, 1);
+            //heuristicSquare.Solve().Print(true, true);
+            //Console.WriteLine("Minimal square calculated by heuristic algorithm: " + heuristicSquare.minimalAchivedSize);
             //Board board = new Board(15, 20);
             //board.TryToAdd(0, 0, FiveBlocks.GetRandomBlock());
             //board.TryToAdd(5, 3, FiveBlocks.GetRandomBlock());
@@ -15,11 +29,11 @@ namespace TetrisOptimization
             //board.TryToAdd(5, 13, FiveBlocks.GetRandomBlock());
             //board.TryToAdd(10, 16, FiveBlocks.GetRandomBlock());
             //board.Print();
-            Board board = new Board(6, 5);
-            board.TryToAdd(1, 0, FiveBlocks.GetBlock(2));
-            board.TryToAdd(0, 2, FiveBlocks.GetBlock(4));
-            board.TryToAdd(3, 0, FiveBlocks.GetBlock(2));
-            board.Print();
+            //Board board = new Board(6, 5);
+            //board.TryToAdd(1, 0, FiveBlocks.GetBlock(2));
+            //board.TryToAdd(0, 2, FiveBlocks.GetBlock(4));
+            //board.TryToAdd(3, 0, FiveBlocks.GetBlock(2));
+            //board.Print();
             //CuttingRectangle.Cutting(board, (6, 5), (0, 6), (0, 5));
 
             //List<(int, Block)> blocks = new List<(int, Block)>() { (2, FiveBlocks.GetBlock(1)), (1, FiveBlocks.GetBlock(3)), (1, FiveBlocks.GetBlock(6)) };
@@ -77,31 +91,19 @@ namespace TetrisOptimization
             //board6.TryToAdd(5, 0, cb[1]);
             //board6.PrintBoard();
             //Console.WriteLine(cb.Count);
-            Board board = new Board(6, 5);
-            board.TryToAdd(1, 0, new FiveBlock(2));
-            board.TryToAdd(0, 2, new FiveBlock(4));
-            board.TryToAdd(3, 0, new FiveBlock(2));
-            board.Print(false, false);
-            CuttingRectangle.Cutting(board, (6, 5), (0, 6), (0, 5));
-
-            List<(int, Block)> blocks = new List<(int, Block)>() { (2, new FiveBlock(1)), (1, new FiveBlock(3)), (1, new FiveBlock(6)) };
-            int blockSize = 5;
-            HeuristicSquare heuristicSquare = new HeuristicSquare(blocks, blockSize, 600, 0.4, 1);
-            heuristicSquare.Solve().Print(true, true);
-            Console.WriteLine("Minimal square calculated by heuristic algorithm: " + heuristicSquare.minimalAchivedSize);
 
             //Console.WriteLine(CuttingRectangle.DoesBlockFit(block1, gap1));
-            Console.WriteLine("Length cut test");
-            var board7 = new Board(6, 6);
-            board7.TryToAdd(0, 2, FiveBlocks.GetBlock(6));
-            board7.Print();
-            Console.WriteLine();
-            var gaps = new List<Gap>();
-            var g = new Gap((2, 2), (4, 4),new List<(int, int)> { (4,4),(4,5),(5,4),(5,5)});
-            gaps.Add(g);
-            var lc = CuttingRectangle.LengthCut(board7, (2, 5, 1, 4), (0, 5), (0, 5), gaps);
-            lc.Item2.Print();
-            Console.WriteLine(lc.Item1);
+            //Console.WriteLine("Length cut test");
+            //var board7 = new Board(6, 6);
+            //board7.TryToAdd(3, 0, new FiveBlock(6).Rotate().Rotate().Rotate());
+            //board7.Print(false,false);
+            //Console.WriteLine();
+            //var gaps = new List<Gap>();
+            //var g = new Gap((1, 2), (4, 4),new List<(int, int)> { (4,4),(4,5) });
+            //gaps.Add(g);
+            //var lc = CuttingRectangle.LengthCut(board7, (1, 4, 1, 4), (0, 5), (0, 5), gaps);
+            //lc.Item2.Print(false, false);
+            //Console.WriteLine(lc.Item1);
         }
     }
 }
