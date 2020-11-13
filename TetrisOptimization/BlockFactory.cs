@@ -14,6 +14,10 @@ namespace TetrisOptimization
         {
             switch (blockSize)
             {
+                case 4:
+                    if(index.HasValue)
+                        return new TetrisBlock(index.Value);
+                    return new TetrisBlock();
                 case 5:
                     if (index.HasValue)
                         return new FiveBlock(index.Value);

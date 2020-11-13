@@ -12,6 +12,9 @@ namespace TetrisOptimization.UnitTests
         }
 
         [Test]
+        /// <summary>
+        /// Default call
+        /// </summary>
         public void TestProgramMain0()
         {
             string[] args = { };
@@ -20,6 +23,9 @@ namespace TetrisOptimization.UnitTests
         }
 
         [Test]
+        /// <summary>
+        /// Five blocks - specified
+        /// </summary>
         public void TestProgramMain112()
         {
             string path = "../../../../Data/Example2.txt";
@@ -29,9 +35,24 @@ namespace TetrisOptimization.UnitTests
         }
 
         [Test]
+        /// <summary>
+        /// Five blocks - random
+        /// </summary>
         public void TestProgramMain113()
         {
             string path = "../../../../Data/Example3.txt";
+            string[] args = { path };
+            Program.Main(args);
+            Assert.Pass();
+        }
+
+        [Test]
+        /// <summary>
+        /// Tetris (four) blocks
+        /// </summary>
+        public void TestProgramMain114()
+        {
+            string path = "../../../../Data/Example4.txt";
             string[] args = { path };
             Program.Main(args);
             Assert.Pass();

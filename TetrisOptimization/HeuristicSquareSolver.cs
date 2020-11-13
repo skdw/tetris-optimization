@@ -4,9 +4,6 @@ using System.Drawing;
 using System.Dynamic;
 using System.Runtime.InteropServices;
 using System.Text;
-using TetrisOptimization.Blocks;
-
-
 
 namespace TetrisOptimization
 {

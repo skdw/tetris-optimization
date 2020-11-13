@@ -11,8 +11,6 @@ namespace TetrisOptimization
 
         static int GetRandomBlockId() => random.Next(FiveBlocks.Blocks.Count) + 1;
 
-        public static bool[,] GetRandomBlock() => FiveBlocks.Blocks[GetRandomBlockId()];
-
         /// <summary>
         /// Gets a FiveBlock of given index
         /// </summary>
