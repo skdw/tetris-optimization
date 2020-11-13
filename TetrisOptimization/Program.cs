@@ -85,7 +85,8 @@ namespace TetrisOptimization
             PreciseSquareSolver preciseSquareSolver = new PreciseSquareSolver(blocks, blockSize);
             preciseSquareSolver.SolveMeasurePrint();
 
-            PreciseRectangleSolver preciseRectangleSolver = new PreciseRectangleSolver(blocks, blockSize);
+            List<(int, Block)> blocks2 = new List<(int, Block)>() { (2, new FiveBlock(1)), (1, new FiveBlock(3)) };
+            PreciseRectangleSolver preciseRectangleSolver = new PreciseRectangleSolver(blocks2, blockSize);
             preciseRectangleSolver.SolveMeasurePrint();
         }
 
@@ -100,8 +101,7 @@ namespace TetrisOptimization
                     ParseInput(args[0]);
                     break;
                 default:
-                    Console.WriteLine("Usage: TetrisOptimization [path]");
-                    break;
+                    throw new ArgumentException("Usage: TetrisOptimization [path]");
             }
         }
     }
