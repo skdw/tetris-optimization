@@ -13,13 +13,16 @@ namespace TetrisOptimization.UnitTests
         public void TestRotations()
         {
             var blocks = Enumerable
-                        .Range(0, 10)
-                        .Select(_ => FiveBlocks.GetRandomBlock())
+                        .Range(1, 17)
+                        .Select(i => new FiveBlock(i) as Block)
                         .ToList();
 
             var rotations = CommonMethods.GetRotations(blocks);
-            var rot4 = blocks[0].Rotate().Rotate().Rotate().Rotate();
-            Assert.AreEqual(blocks[0], rot4);
+            foreach((Block block, var rots) in blocks.Zip(rotations))
+            {
+                Block rot3 = block.Rotate().Rotate().Rotate();
+                Assert.AreEqual(rot3, rots[3]);
+            }
         }
 
         [Test]

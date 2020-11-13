@@ -1,16 +1,23 @@
-using System;
-
 namespace TetrisOptimization
 {
+    /// <summary>
+    /// Class handling the block matrix
+    /// </summary>
     public class Block
     {
         public bool[,] matrix { get; }
-        public (int x, int y) size { get; }
+        public (int y, int x) size { get; }
 
         public Block(bool[,] matrix, (int, int) size)
         {
             this.matrix = matrix;
             this.size = size;
+        }
+
+        public Block(bool[,] matrix)
+        {
+            this.matrix = matrix;
+            this.size = (matrix.GetLength(0), matrix.GetLength(1));
         }
 
         /// <summary>
@@ -23,17 +30,16 @@ namespace TetrisOptimization
             for (int i = 0; i < size.y; ++i)
                 for (int j = 0; j < size.x; ++j)
                     rot[j, i] = matrix[size.y - i - 1, j];
-            return new Block(rot, (size.y, size.x));
+            return new Block(rot, (size.x, size.y));
         }
 
-        public ConsoleColor?[,] GetColorMatrix(ConsoleColor color)
+        public int?[,] GetColorMatrix(int colorID)
         {
-            //ConsoleColor?[,] color_block = new ConsoleColor?[size.y, size.x];
-            ConsoleColor?[,] color_block = new ConsoleColor?[matrix.GetLength(0), matrix.GetLength(1)];
-            for (int i = 0; i < matrix.GetLength(0); ++i)
-                for (int j = 0; j < matrix.GetLength(1); ++j)
+            int?[,] color_block = new int?[size.y, size.x];
+            for (int i = 0; i < size.y; ++i)
+                for (int j = 0; j < size.x; ++j)
                     if (matrix[i, j])
-                        color_block[i, j] = color;
+                        color_block[i, j] = colorID;
                     else
                         color_block[i, j] = null;
             return color_block;

@@ -6,28 +6,41 @@ namespace TetrisOptimization
     {
         public Board(int x, int y)
         {
-            B = new ConsoleColor?[y, x];
+            B = new int?[y, x];
         }
         public Board(Board b)
         {
-            this.B=b.B.Clone() as ConsoleColor?[,];
-
+            this.B = b.B.Clone() as int?[,];
         }
 
-        public readonly ConsoleColor?[,] B;
-        public ConsoleColor? this[int i,int j]
+        public readonly int?[,] B;
+        public int? this[int i, int j]
         {
             get { return B[i, j]; }
             set { B[i, j] = value; }
         }
 
+        static int _colorID;
+
+        static int ColorID
+        {
+            get => ++_colorID;
+        }
+
         /// <summary>
-        /// Prints the size of the board
+        /// Get ConsoleColor for printing blocks
+        /// </summary>
+        /// <param name="colorID">integer ID of color</param>
+        /// <returns>console color</returns>
+        static ConsoleColor GetColor(int colorID) => (ConsoleColor)((colorID * 2) % 15 + 1);
+
+        /// <summary>
+        /// Print the size of the board
         /// </summary>
         void PrintSize(bool forceSquare, (int, int, int, int) bounds)
         {
             var size = GetSize(bounds);
-            if(forceSquare)
+            if (forceSquare)
                 Console.WriteLine($"\nPrinting square of side: {size.h}");
             else
                 Console.WriteLine($"\nPrinting rectangle of size: h={size.h} w={size.w}");
@@ -51,7 +64,7 @@ namespace TetrisOptimization
                     try
                     {
                         if (B[i, j].HasValue)
-                            Console.BackgroundColor = B[i,j].Value;
+                            Console.BackgroundColor = GetColor(B[i, j].Value);
                     }
                     catch (System.IndexOutOfRangeException)
                     {
@@ -66,58 +79,58 @@ namespace TetrisOptimization
 
         int GetMinYFilled()
         {
-            for(int i = 0; i < B.GetLength(0); ++i)
-                for(int j = 0; j < B.GetLength(1); ++j)
-                    if(B[i, j].HasValue)
+            for (int i = 0; i < B.GetLength(0); ++i)
+                for (int j = 0; j < B.GetLength(1); ++j)
+                    if (B[i, j].HasValue)
                         return i;
             return -1;
         }
 
         int GetMaxYFilled()
         {
-            for(int i = B.GetLength(0) - 1; i >= 0; --i)
-                for(int j = 0; j < B.GetLength(1); ++j)
-                    if(B[i, j].HasValue)
+            for (int i = B.GetLength(0) - 1; i >= 0; --i)
+                for (int j = 0; j < B.GetLength(1); ++j)
+                    if (B[i, j].HasValue)
                         return i;
             return -1;
         }
 
         int GetMinXFilled()
         {
-            for(int j = 0; j < B.GetLength(1); ++j)
-                for(int i = 0; i < B.GetLength(0); ++i)
-                    if(B[i, j].HasValue)
+            for (int j = 0; j < B.GetLength(1); ++j)
+                for (int i = 0; i < B.GetLength(0); ++i)
+                    if (B[i, j].HasValue)
                         return j;
             return -1;
         }
 
         int GetMaxXFilled()
         {
-            for(int j = B.GetLength(1) - 1; j >= 0; --j)
-                for(int i = 0; i < B.GetLength(0); ++i)
-                    if(B[i, j].HasValue)
+            for (int j = B.GetLength(1) - 1; j >= 0; --j)
+                for (int i = 0; i < B.GetLength(0); ++i)
+                    if (B[i, j].HasValue)
                         return j;
             return -1;
         }
 
         (int minY, int maxY, int minX, int maxX) GetBounds(bool cutBounds, bool forceSquare)
         {
-            if(cutBounds == false)
+            if (cutBounds == false)
                 return (0, B.GetLength(0), 0, B.GetLength(1));
 
             int minY = GetMinYFilled();
             int maxY = GetMaxYFilled();
             int minX = GetMinXFilled();
             int maxX = GetMaxXFilled();
-            if(forceSquare)
+            if (forceSquare)
             {
                 var size = GetSize((minY, maxY, minX, maxX));
-                if(size.w > size.h)
+                if (size.w > size.h)
                 {
                     int diff = size.w - size.h;
                     maxY += diff;
                 }
-                else if(size.h > size.w)
+                else if (size.h > size.w)
                 {
                     int diff = size.h - size.w;
                     maxX += diff;
@@ -137,7 +150,7 @@ namespace TetrisOptimization
         }
 
         /// <summary>
-        /// Tries to add block to the board
+        /// Try to add block to the board
         /// </summary>
         /// <param name="x"></param>
         /// <param name="y"></param>
@@ -145,7 +158,7 @@ namespace TetrisOptimization
         /// <returns>True if an error occurs</returns>
         public bool TryToAdd(int x, int y, Block block)
         {
-            var color_matrix = block.GetColorMatrix(FiveBlocks.GetNextColor());
+            var color_matrix = block.GetColorMatrix(ColorID);
             for (int cy = 0; cy < color_matrix.GetLength(0); ++cy)//y
                 for (int cx = 0; cx < color_matrix.GetLength(1); ++cx)//x
                     if ((y + cy >= B.GetLength(0)) || (x + cx >= B.GetLength(1)))
@@ -160,7 +173,7 @@ namespace TetrisOptimization
                     }
             for (int cy = 0; cy < color_matrix.GetLength(0); ++cy)//y
                 for (int cx = 0; cx < color_matrix.GetLength(1); ++cx)
-                    if(color_matrix[cy,cx].HasValue)
+                    if (color_matrix[cy, cx].HasValue)
                         B[y + cy, x + cx] = color_matrix[cy, cx];
             return true;
         }
