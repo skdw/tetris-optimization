@@ -38,17 +38,18 @@ namespace TetrisOptimization
                 for (int yAx = 0; yAx <= yDif - rectangle.y; yAx++)
                 {
                     var newBoard = new Board(baseBoard);
-                    (int x0, int x1, int y1, int y2) frame = (xAx + x.x0, xAx + rectangle.x, yAx + y.y0, yAx + rectangle.y);
+                    (int x0, int x1, int y1, int y2) frame = (xAx + x.x0, xAx + x.x0 + rectangle.x, yAx + y.y0, yAx + y.y0 + rectangle.y);
                     var achivedCut = CountCuttingLine(newBoard, frame,x,y);
-                    if (achivedCut.Item1 < minimalcutting && achivedCut.Item1 != -1)
+                    //cutBoard.Print(false, false);
+                    if (achivedCut.Item1 < minimalcutting && achivedCut.Item1 > 0)
                     {
                         cutBoard = achivedCut.Item2;
-                        Console.WriteLine("cutBoard assigned here");
+                        //Console.WriteLine("cutBoard assigned here");
                         cutBoard.Print(false, false);
                         minimalcutting = achivedCut.Item1;
                     }
-                    Console.WriteLine("cutBoard shouldn't change");
-                    cutBoard.Print(false, false);
+                    //Console.WriteLine("cutBoard shouldn't change");
+                    //cutBoard.Print(false, false);
                 }
             }
             Console.WriteLine("board");

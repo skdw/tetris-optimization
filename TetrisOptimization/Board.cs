@@ -92,6 +92,7 @@ namespace TetrisOptimization
                 for (int j = 0; j < B.GetLength(1); ++j)
                     if (B[i, j].HasValue)
                         return i;
+                        //return i + 1;
             return -1;
         }
 
@@ -110,6 +111,7 @@ namespace TetrisOptimization
                 for (int i = 0; i < B.GetLength(0); ++i)
                     if (B[i, j].HasValue)
                         return j;
+                        //return j + 1;
             return -1;
         }
 
@@ -175,6 +177,39 @@ namespace TetrisOptimization
                 for (int cx = 0; cx < color_matrix.GetLength(1); ++cx)
                     if (color_matrix[cy, cx].HasValue)
                         B[y + cy, x + cx] = color_matrix[cy, cx];
+            return true;
+        }
+        public bool TryToRemove(int x, int y, Block block)
+        {
+            var color_matrix = block.GetColorMatrix(ColorID);
+            for (int cy = 0; cy < color_matrix.GetLength(0); ++cy)//y
+                for (int cx = 0; cx < color_matrix.GetLength(1); ++cx)//x
+                    if ((y + cy >= B.GetLength(0)) || (x + cx >= B.GetLength(1)))
+                    {
+                        //Console.Error.WriteLine("Out of the board");
+                        return false;
+                    }
+            for (int cy = 0; cy < color_matrix.GetLength(0); ++cy)//y
+                for (int cx = 0; cx < color_matrix.GetLength(1); ++cx)
+                    if (color_matrix[cy, cx].HasValue)
+                        B[y + cy, x + cx] = null;
+            return true;
+        }
+        public bool ScanBoard(int x, int y, Block block)
+        {
+            var color_matrix = block.GetColorMatrix(ColorID);
+            for (int cy = 0; cy < color_matrix.GetLength(0); ++cy)//y
+                for (int cx = 0; cx < color_matrix.GetLength(1); ++cx)//x
+                    if ((y + cy >= B.GetLength(0)) || (x + cx >= B.GetLength(1)))
+                    {
+                        //Console.Error.WriteLine("Out of the board");
+                        return false;
+                    }
+                    else if (B[y + cy, x + cx].HasValue && color_matrix[cy, cx].HasValue)
+                    {
+                        //Console.Error.WriteLine("Trying to override the block");
+                        return false;
+                    }
             return true;
         }
     }
