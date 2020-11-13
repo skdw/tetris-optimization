@@ -125,9 +125,9 @@ namespace TetrisOptimization
             }
             return (minY, maxY, minX, maxX);
         }
-        public (int minY, int maxY, int minX, int maxX) GetBoundsPublic(bool forceSquare)
+        public (int minY, int maxY, int minX, int maxX) GetBoundsPublic(bool cutBounds, bool forceSquare)
         {
-            return this.GetBounds(forceSquare);
+            return this.GetBounds(cutBounds, forceSquare);
         }
         static (int h, int w) GetSize((int minY, int maxY, int minX, int maxX) bounds)
         {

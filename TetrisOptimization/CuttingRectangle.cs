@@ -55,7 +55,7 @@ namespace TetrisOptimization
         /// <returns></returns>
         public static List<Block> GetCutBlock(Board rectangle)
         {
-            var bounds = rectangle.GetBoundsPublic(false);
+            var bounds = rectangle.GetBoundsPublic(true,false);
             //musimy sprawdzic ile kolorow jest w rectangle
             var colors = new Dictionary<ConsoleColor?, bool[,]>();
             for(int x=0;x<rectangle.B.GetLength(0);x++)
@@ -321,7 +321,7 @@ namespace TetrisOptimization
                 {
                     for(int y= gap.position.y; y< gap.position.y+gap.size.y;y++)
                     {
-                        if(!gap.matrix[x- gap.position.x, y- gap.position.y].HasValue)
+                        if(gap.matrix[x- gap.position.x, y- gap.position.y]==1) //gap 1 jak jest dziura, 0 jak jest klocek
                         {
                             if (board.TryToAdd(x, y, unitBlock))
                             {
@@ -353,8 +353,11 @@ namespace TetrisOptimization
             {
                 for(int j=0;j<gap.size.y;j++)
                 {
-                    if ((gap.matrix[i, j].HasValue && rot.matrix[i, j])
-                        || (!gap.matrix[i, j].HasValue) && !rot.matrix[i, j]) return false;
+                    //if ((gap.matrix[i, j].HasValue && rot.matrix[i, j])
+                    //    || (!gap.matrix[i, j].HasValue) && !rot.matrix[i, j]) return false;
+                    if ((gap.matrix[i, j]==0 && rot.matrix[i, j])//gap 0 jest klocek
+                        || (gap.matrix[i, j]==1) && !rot.matrix[i, j]) return false;
+
                 }
             }
             return true;

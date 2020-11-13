@@ -20,7 +20,7 @@ namespace TetrisOptimization
             board.TryToAdd(1, 0, FiveBlocks.GetBlock(2));
             board.TryToAdd(0, 2, FiveBlocks.GetBlock(4));
             board.TryToAdd(3, 0, FiveBlocks.GetBlock(2));
-            board.PrintBoard();
+            board.Print();
             //CuttingRectangle.Cutting(board, (6, 5), (0, 6), (0, 5));
 
             //List<(int, Block)> blocks = new List<(int, Block)>() { (2, FiveBlocks.GetBlock(1)), (1, FiveBlocks.GetBlock(3)), (1, FiveBlocks.GetBlock(6)) };
@@ -83,13 +83,13 @@ namespace TetrisOptimization
             Console.WriteLine("Length cut test");
             var board7 = new Board(6, 6);
             board7.TryToAdd(0, 2, FiveBlocks.GetBlock(6));
-            board7.PrintBoard();
+            board7.Print();
             Console.WriteLine();
             var gaps = new List<Gap>();
-            var g = new Gap(new ConsoleColor?[2, 2] { { null, null }, { null, null } }, (2, 2), (4, 4));
+            var g = new Gap((2, 2), (4, 4),new List<(int, int)> { (4,4),(4,5),(5,4),(5,5)});
             gaps.Add(g);
             var lc = CuttingRectangle.LengthCut(board7, (2, 5, 1, 4), (0, 5), (0, 5), gaps);
-            lc.Item2.PrintBoard();
+            lc.Item2.Print();
             Console.WriteLine(lc.Item1);
         }
     }
