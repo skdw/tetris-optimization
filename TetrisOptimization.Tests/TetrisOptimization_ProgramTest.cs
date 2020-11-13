@@ -59,6 +59,30 @@ namespace TetrisOptimization.UnitTests
         }
 
         [Test]
+        /// <summary>
+        /// Heuristic rectangle - not existing yet
+        /// </summary>
+        public void TestProgramMain115()
+        {
+            string path = "../../../../Data/Example5.txt";
+            string[] args = { path };
+            var ex = Assert.Throws<NotImplementedException>(() => Program.Main(args));
+            Assert.That(ex.Message, Is.EqualTo("Heuristic rectangle solver is not implemented yet"));
+        }
+
+        [Test]
+        /// <summary>
+        /// Unknown solver type
+        /// </summary>
+        public void TestProgramMain116()
+        {
+            string path = "../../../../Data/Example6.txt";
+            string[] args = { path };
+            var ex = Assert.Throws<ArgumentException>(() => Program.Main(args));
+            Assert.That(ex.Message, Is.EqualTo("Unknown solver type"));
+        }
+
+        [Test]
         public void TestProgramMain12()
         {
             string path = "non_existing_path";
