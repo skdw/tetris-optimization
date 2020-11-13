@@ -89,7 +89,7 @@ namespace TetrisOptimization
             preciseRectangleSolver.SolveMeasurePrint();
         }
 
-        static void Main(string[] args)
+        public static void Main(string[] args)
         {
             switch(args.Length)
             {
