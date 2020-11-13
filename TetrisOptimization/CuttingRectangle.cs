@@ -27,21 +27,22 @@ namespace TetrisOptimization
             {
                 for (int yAx = 0; yAx <= yDif - rectangle.y; yAx++)
                 {
+                    var newBoard = new Board(baseBoard);
                     (int x0, int x1, int y1, int y2) frame = (xAx + x.x0, xAx + rectangle.x, yAx + y.y0, yAx + rectangle.y);
-                    var achivedCut = CountCuttingLine(baseBoard, frame,x,y);
-                    if (achivedCut.Item1 < minimalcutting)
+                    var achivedCut = CountCuttingLine(newBoard, frame,x,y);
+                    if (achivedCut.Item1 < minimalcutting && achivedCut.Item1 != -1)
                     {
                         cutBoard = achivedCut.Item2;
-                        Console.WriteLine("cutBoard");
+                        Console.WriteLine("cutBoard assigned here");
                         cutBoard.Print(false, false);
                         minimalcutting = achivedCut.Item1;
                     }
+                    Console.WriteLine("cutBoard shouldn't change");
+                    cutBoard.Print(false, false);
                 }
             }
-            Console.WriteLine("base board");
-            baseBoard.Print(false, false);
-            Console.WriteLine("change board");
-            changedBoard.Print(false, false);
+            Console.WriteLine("board");
+            //board.Print(false, false);
             //cutBoard.Print(false, false);
             return (minimalcutting, cutBoard);
         }

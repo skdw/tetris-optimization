@@ -12,7 +12,7 @@ namespace TetrisOptimization
         {
             this.B = b.B.Clone() as int?[,];
         }
-
+        
         public readonly int?[,] B;
         public int? this[int i, int j]
         {
