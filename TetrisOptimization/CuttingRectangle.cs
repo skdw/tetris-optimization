@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Runtime.ExceptionServices;
 using System.Security.Cryptography.X509Certificates;
@@ -11,11 +12,13 @@ namespace TetrisOptimization
     {
         public static Board baseBoard;
         public static Board changedBoard;
+        public static Board cutBoard;
 
         public static int Cutting(Board board,(int x,int y) rectangle, (int x0, int x1) x, (int y0,int y1) y)
         {
             baseBoard = board;
-            
+            changedBoard = new Board(board);
+            cutBoard = new Board(board);
             int xDif = x.x1 - x.x0;
             int yDif = y.y1 - y.y0;
             int minimalcutting = int.MaxValue;
@@ -26,19 +29,380 @@ namespace TetrisOptimization
                 {
                     changedBoard = new Board(board);
                     (int x0, int x1, int y1, int y2) frame = (xAx + x.x0, xAx + rectangle.x, yAx + y.y0, yAx + rectangle.y);
-                    int achivedCut = CountCuttingLine(frame,x,y);
-                    if (achivedCut < minimalcutting)
-                        minimalcutting = achivedCut;
+                    var achivedCut = CountCuttingLine(board, frame,x,y);
+                    if (achivedCut.Item1 < minimalcutting)
+                    {
+                        cutBoard = achivedCut.Item2;
+                        minimalcutting = achivedCut.Item1;
+                    }
                 }
             }
             return minimalcutting;
         }
-        private static int CountCuttingLine((int x0,int x1,int y0,int y1) frame, (int x0, int x1) x, (int y0, int y1) y)
+        private static (int,Board) CountCuttingLine(Board board,(int x0,int x1,int y0,int y1) frame, (int x0, int x1) x, (int y0, int y1) y)
         {
             List<Gap> gaps = FindingGaps(frame);
+            //dodac klocki ktore sa na zewnatrz ramki
             //int l = LengthCut(board, frame, x, y, gaps);
             //trying to fill gaps maby ++ way
-            return 0;
+            return LengthCut(board, frame, x, y, gaps); ;
+        }
+        //maja
+        /// <summary>
+        /// Funkcja wycina z boarda wszystkie napotkane bloki i zwraca je w liscie
+        /// </summary>
+        /// <param name="rectangle"></param>
+        /// <returns></returns>
+        public static List<Block> GetCutBlock(Board rectangle)
+        {
+            var bounds = rectangle.GetBoundsPublic(false);
+            //musimy sprawdzic ile kolorow jest w rectangle
+            var colors = new Dictionary<ConsoleColor?, bool[,]>();
+            for(int x=0;x<rectangle.B.GetLength(0);x++)
+            {
+                for(int y=0;y<rectangle.B.GetLength(1);y++)
+                {
+                    if(rectangle.B[x,y].HasValue)
+                    {
+                        if(!colors.ContainsKey(rectangle.B[x,y].Value))
+                        {
+                            colors.Add(rectangle.B[x, y].Value, new bool[bounds.maxY - bounds.minY + 1, bounds.maxX - bounds.minX + 1]);
+                        }
+                    }
+                }    
+            }
+            bool[,] mtrx = new bool[bounds.maxY - bounds.minY + 1, bounds.maxX - bounds.minX + 1];
+            for (int i = bounds.minY; i < bounds.maxY + 1; i++)
+            {
+                for (int j = bounds.minX; j < bounds.maxX + 1; j++)
+                {
+                    if (rectangle.B.GetLength(0) > i && rectangle.B.GetLength(1) > j &&
+                        mtrx.GetLength(0) > i - bounds.minY && mtrx.GetLength(1) > j - bounds.minX &&
+                        rectangle.B[i, j].HasValue)
+                        //mtrx[i - bounds.minY, j - bounds.minX] = true;
+                        colors[rectangle.B[i, j].Value][i - bounds.minY, j - bounds.minX] = true;
+                }
+            }
+            var lst = new List<Block>();
+            foreach(var pair in colors)
+            {
+                lst.Add(new Block(pair.Value, (pair.Value.GetLength(0), pair.Value.GetLength(1))));
+            }
+            return lst;
+        }
+        //maja 
+        //funkcja sprawdza prostokat 9x5 dla prawej czesci ramki dookola znalezionego wystajacego kwadracika na ramki o wspol x y
+        public static List<Block> CheckAreaRight(Board board, int x, int y)
+        {
+            int magic5 = 5, magic9 = 9,magic0=0;
+            var rectangle = new Board(magic5, magic9);
+            var color = System.ConsoleColor.Red;
+            rectangle.B[magic9 - magic5, magic0] = color;
+            int startX = x - (magic9 - magic5);
+            int startY = y;
+            for (int i = startX; i < startX + magic9; i++)
+            {
+                for (int j = startY; j < startY + magic5; j++)
+                {
+                    if (board.B.GetLength(0) > i && board.B.GetLength(1) > j && i >= 0 && j >= 0 && board.B[i, j].HasValue)
+                    {
+                        board.B[i, j] = null;
+                        rectangle.B[i - startX, j - startY] = color;
+                    }
+                }
+            }
+            return GetCutBlock(rectangle);
+        }
+        //maja 
+        //funkcja sprawdza prostokat 9x5 dla lewej czesci ramki dookola znalezionego wystajacego kwadracika na ramki o wspol x y
+        public static List<Block> CheckAreaLeft(Board board, int x, int y)
+        {
+            int magic5 = 5, magic9 = 9;
+            var rectangle = new Board(magic5, magic9);
+            var color = System.ConsoleColor.Red;
+            rectangle.B[magic9 - magic5, magic9 - magic5] = color;
+            int startX = x - (magic9 - magic5);
+            int startY = y - (magic9 - magic5);
+            for (int i = startX; i < startX + magic9; i++)
+            {
+                for (int j = startY; j < startY + magic5; j++)
+                {
+                    if (board.B.GetLength(0) > i && i>=0 && j>=0 && board.B.GetLength(1) > j && board.B[i, j].HasValue)
+                    {
+                        board.B[i, j] = null;
+                        rectangle.B[i - startX, j - startY] = color;
+                    }
+                }
+            }
+            return GetCutBlock(rectangle);
+        }
+        //maja
+        //funkcja sprawdza prostokat 9x5 dla dolnej czesci ramki dookola znalezionego wystajacego kwadracika na ramki o wspol x y
+        public static List<Block> CheckAreaDown(Board board, int x, int y)
+        {
+            int magic5 = 5, magic9 = 9,magic0=0;
+            var rectangle = new Board(magic9, magic5);
+            var color = System.ConsoleColor.Red;
+            rectangle.B[magic0, magic9 - magic5] = color;
+            int startX = x ;
+            int startY = y - (magic9 - magic5);
+            for (int i = startX; i < startX + magic5; i++)
+            {
+                for (int j = startY; j < startY + magic9; j++)
+                {
+                    if (board.B.GetLength(0) > i && board.B.GetLength(1) > j && i >= 0 && j >= 0 && board.B[i, j].HasValue)
+                    {
+                        board.B[i, j] = null;
+                        rectangle.B[i - startX, j - startY] = color;
+                    }
+                }
+            }
+            return GetCutBlock(rectangle);
+        }
+        //maja
+        //funkcja sprawdza prostokat 9x5 dla gornej czesci ramki dookola znalezionego wystajacego kwadracika na ramki o wspol x y
+        public static List<Block> CheckAreaUp(Board board, int x, int y)
+        {
+            int magic5 = 5,magic9 = 9;
+            var rectangle = new Board(magic9, magic5);
+            var color = System.ConsoleColor.Red;
+            rectangle.B[magic9 - magic5, magic9 - magic5] = color;
+            int startX = x - (magic9- magic5);
+            int startY = y - (magic9 - magic5);
+            for(int i=startX;i<startX+ magic5; i++)
+            {
+                for(int j=startY;j<startY+ magic9; j++)
+                {
+                    if (board.B.GetLength(0) > i && board.B.GetLength(1) > j && i >= 0 && j >= 0 && board.B[i, j].HasValue)
+                    {
+                        board.B[i, j] = null;
+                        rectangle.B[i - startX, j - startY] = color;
+                    }
+                }
+            }
+            return GetCutBlock(rectangle);
+        }
+        //maja
+        //funkcja rozcina bloki wystajace za ramke, nastepnie, dla tak powstalej listy blokow, 
+        //szuka idealnej gap (ExactFit), a pozostale bloki tnie na pojedyncze kwadraty i wypelnia reszte dziur
+        //dodac szukanie klockow spoza ramki
+        public static (int,Board) LengthCut(Board board, (int x0, int x1, int y0, int y1) frame, (int x0, int x1) x, (int y0, int y1) y, List<Gap> gaps)
+        {
+            int cuts = 0;
+            ConsoleColor? lastColor = ConsoleColor.Red;
+            //czym jest x i y?
+            List<Block> cutOffBlocks = new List<Block>();
+            //przejscie po ramce 
+            for(int i=frame.x0;i<=frame.x1;i++)
+            {
+                //lewa czesc ramki
+                
+                //sprawdzamy czy mamy taki sam kolor nad i pod ramka 
+                if(frame.y0 - 1>=0 && board.B[i, frame.y0].HasValue &&
+                    board.B[i, frame.y0 - 1].HasValue &&
+                    board.B[i,frame.y0].Value == board.B[i, frame.y0-1].Value)
+                {
+                    //zapisac ostatni kolor i sprawdzac
+                    cutOffBlocks.AddRange(CheckAreaLeft(board, i, frame.y0));
+                    cuts++;
+                }
+
+                //prawa czesc ramki
+                //sprawdzamy czy mamy taki sam kolor nad i pod ramka 
+                if (frame.y0 + 1 >= 0 && board.B[i, frame.y0].HasValue &&
+                    board.B[i, frame.y0 + 1].HasValue &&
+                    board.B[i, frame.y0].Value == board.B[i, frame.y0 + 1].Value)
+                {
+                    cutOffBlocks.AddRange(CheckAreaRight(board, i, frame.y0));
+                    cuts++;
+                }
+            }
+            for(int k=frame.y0;k<=frame.y1;k++)
+            {
+                //gorna czesc ramki
+                //sprawdzamy czy mamy taki sam kolor nad i pod ramka 
+                if (frame.x0 - 1 >= 0 && board.B[frame.x0, k].HasValue &&
+                    board.B[frame.x0 - 1, k].HasValue &&
+                    board.B[frame.x0, k].Value == board.B[frame.x0-1,k].Value)
+                {
+                    cutOffBlocks.AddRange(CheckAreaUp(board,frame.x0, k));
+                    cuts++;
+                }
+                //dolna czesc ramki
+                //sprawdzamy czy mamy taki sam kolor nad i pod ramka 
+                if (frame.x0 + 1 >= 0 && board.B[frame.x0, k].HasValue &&
+                    board.B[frame.x0 + 1, k].HasValue &&
+                    board.B[frame.x0, k].Value == board.B[frame.x0 + 1, k].Value)
+                {
+                    cutOffBlocks.AddRange(CheckAreaDown(board, frame.x0, k));
+                    cuts++;
+                }
+            }
+            //usuwanie z poza ramki
+            for(int m=x.x0;m<=x.x1;m+=5)
+            {
+                for(int n=y.y0;n<=y.y1;n+=5)
+                {
+                    if(m<board.B.GetLength(0) && n<board.B.GetLength(1) && board.B[m,n].HasValue)
+                    {
+                        cutOffBlocks.AddRange(CheckAreaRight(board, m, n));
+                    }
+                }
+            }
+
+            //dla listy odcietych blokow, patrzymy czy ktoras dziura pasuje idealnie do bloku
+            var remaining = ExactFit(gaps, cutOffBlocks, board);
+            //dla pozostalych wypelniamy pojedynczymi kwadratami
+            return (UnitCut(remaining, board, cuts),board);
+        }
+        //maja
+        public static int HowManyUnitCuts(Block block)
+        {
+            int cuts = 0;
+            HashSet<int> cutY = new HashSet<int>();
+            HashSet<int> cutX = new HashSet<int>();
+            //pionowe ciecia
+            for (int i = 0; i < block.matrix.GetLength(0); i++)
+            {
+                for (int j = 0; j < block.matrix.GetLength(1)-1; j++)
+                {
+                    if (block.matrix[i, j] && block.matrix[i , j + 1] && !cutY.Contains(j))
+                    {
+                        cutY.Add(j);
+                        cuts++;
+                        //break;
+                    }
+                }
+            }
+            //poziome ciecia
+            for(int y = 0; y < block.matrix.GetLength(1); y++)
+            {
+                for (int x = 0; x < block.matrix.GetLength(0)-1; x++)
+                {
+                    if(block.matrix[x,y] && block.matrix[x + 1, y] && !cutX.Contains(x))
+                    {
+                        cutX.Add(x);
+                        cuts++;
+                        //break;
+                    }
+                }
+            }
+            return cuts;
+        }
+        //maja
+        /// <summary>
+        /// Funkcja tnie pozostale bloki na jednostkowe bloczki i wypelnia po kolei dziury - size blocku na odwrot!
+        /// </summary>
+        /// <param name="remaining"></param>
+        /// <param name="board"></param>
+        /// <param name="cuts"></param>
+        /// <returns></returns>
+        public static int UnitCut((List<Block> blocks, List<Gap> gaps) remaining,Board board, int cuts)
+        {
+            int howManyUnitBlocks = 0;
+            foreach(Block block in remaining.blocks)
+            {
+                //tu size blockow na odwrot
+                for(int i=0; i<block.size.y;i++)
+                {
+                    for(int j=0;j<block.size.x;j++)
+                    {
+                        if (block.matrix[i, j]) howManyUnitBlocks++;
+                    }
+                }
+                cuts += HowManyUnitCuts(block);
+            }
+            var unitMatrix = new bool[1,1];
+            unitMatrix[0, 0] = true;
+            var unitBlock = new Block(unitMatrix, (1, 1));
+            foreach(Gap gap in remaining.gaps)
+            {
+                for(int x=gap.position.x;x<gap.size.x+ gap.position.x; x++)
+                {
+                    for(int y= gap.position.y; y< gap.position.y+gap.size.y;y++)
+                    {
+                        if(!gap.matrix[x- gap.position.x, y- gap.position.y].HasValue)
+                        {
+                            if (board.TryToAdd(x, y, unitBlock))
+                            {
+                                howManyUnitBlocks--;
+                            }
+                            else return -1;
+                        }
+                    }
+                }
+                //jesli skonczyly sie dziury ale cos sie nie dodalo
+                if(gap==remaining.gaps.Last() && howManyUnitBlocks>0)
+                {
+                    return -1;
+                }
+            }
+            return cuts;
+        }
+        //maja
+        /// <summary>
+        /// Sprawdza czy blok idealnie pasuj do dziury - uwaga: size w block jest na odwrot!
+        /// </summary>
+        /// <param name="rot"></param>
+        /// <param name="gap"></param>
+        /// <returns></returns>
+        public static bool DoesBlockFit(Block rot, Gap gap)
+        {
+            if (rot.size.y != gap.size.x || rot.size.x != gap.size.y) return false;
+            for(int i=0;i<gap.size.x;i++)
+            {
+                for(int j=0;j<gap.size.y;j++)
+                {
+                    if ((gap.matrix[i, j].HasValue && rot.matrix[i, j])
+                        || (!gap.matrix[i, j].HasValue) && !rot.matrix[i, j]) return false;
+                }
+            }
+            return true;
+        }
+        //maja
+        public static (List<Block>,List<Gap>) ExactFit(List<Gap> gaps,List<Block> blocks, Board board)
+        {
+            var newBlocks = new List<Block>(blocks);
+            var newGaps = new Dictionary<Gap,int>();
+            foreach(var gap in gaps)
+            {
+                newGaps.Add(gap, 0);
+            }    
+            bool breakFrom = false;
+            //dla kazdego bloku
+            foreach(Block block in blocks)
+            {
+                //dla kazdego obrotu
+                for(int i=0;i<4;i++)
+                {
+                    Block rot = CommonMethods.GetSpecyficRotation(block,i);
+                    foreach(Gap gap in gaps)
+                    {
+                        if(newGaps[gap]==0 && DoesBlockFit(rot, gap))
+                        {
+                            if(board.TryToAdd(gap.position.x, gap.position.y, rot))
+                            {
+                                newBlocks.Remove(block);
+                                newGaps[gap]++;
+                                breakFrom = true;
+                                break;
+                            }
+                            
+                        }
+                    }
+                    if(breakFrom)
+                    {
+                        breakFrom = false;
+                        break;
+                    }
+                }
+            }
+            var gps = new List<Gap>();
+            foreach(var dc in newGaps)
+            {
+                if (dc.Value == 0) gps.Add(dc.Key);
+            }
+            return (newBlocks,gps);
         }
         public static List<Gap> FindingGaps( (int x0, int x1, int y0, int y1) frame)
         {

@@ -125,7 +125,10 @@ namespace TetrisOptimization
             }
             return (minY, maxY, minX, maxX);
         }
-
+        public (int minY, int maxY, int minX, int maxX) GetBoundsPublic(bool forceSquare)
+        {
+            return this.GetBounds(forceSquare);
+        }
         static (int h, int w) GetSize((int minY, int maxY, int minX, int maxX) bounds)
         {
             int h = bounds.maxY - bounds.minY + 1;
@@ -148,18 +151,18 @@ namespace TetrisOptimization
                     if ((y + cy >= B.GetLength(0)) || (x + cx >= B.GetLength(1)))
                     {
                         //Console.Error.WriteLine("Out of the board");
-                        return true;
+                        return false;
                     }
                     else if (B[y + cy, x + cx].HasValue && color_matrix[cy, cx].HasValue)
                     {
                         //Console.Error.WriteLine("Trying to override the block");
-                        return true;
+                        return false;
                     }
             for (int cy = 0; cy < color_matrix.GetLength(0); ++cy)//y
                 for (int cx = 0; cx < color_matrix.GetLength(1); ++cx)
                     if(color_matrix[cy,cx].HasValue)
                         B[y + cy, x + cx] = color_matrix[cy, cx];
-            return false;
+            return true;
         }
     }
 }

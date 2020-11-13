@@ -28,9 +28,10 @@ namespace TetrisOptimization
 
         public ConsoleColor?[,] GetColorMatrix(ConsoleColor color)
         {
-            ConsoleColor?[,] color_block = new ConsoleColor?[size.y, size.x];
-            for (int i = 0; i < size.y; ++i)
-                for (int j = 0; j < size.x; ++j)
+            //ConsoleColor?[,] color_block = new ConsoleColor?[size.y, size.x];
+            ConsoleColor?[,] color_block = new ConsoleColor?[matrix.GetLength(0), matrix.GetLength(1)];
+            for (int i = 0; i < matrix.GetLength(0); ++i)
+                for (int j = 0; j < matrix.GetLength(1); ++j)
                     if (matrix[i, j])
                         color_block[i, j] = color;
                     else
