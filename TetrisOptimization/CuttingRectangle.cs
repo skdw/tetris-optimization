@@ -24,7 +24,7 @@ namespace TetrisOptimization
         /// <param name="x">where are blocks on board in x ax</param>
         /// <param name="y">where are blocks on board in y ax</param>
         /// <returns></returns>
-        public static int Cutting(Board board, (int x, int y) rectangle, (int x0, int x1) x, (int y0, int y1) y)
+        public static (int,Board) Cutting(Board board, (int x, int y) rectangle, (int x0, int x1) x, (int y0, int y1) y)
         {
             baseBoard = new Board(board);
             changedBoard = new Board(board);
