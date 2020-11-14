@@ -101,7 +101,7 @@ namespace TetrisOptimization
                     else
                     {
                         //wyliczamy punkt z ktorego zaczniemy spacer
-                        (int, int) point = CalculateCoordOnCircle(planeX / 2, planeY / 2, GetCircleRadius(planeX / 2, planeY / 2));
+                        (int, int) point = CalculateCoordOnCircle(planeX / 2, planeY / 2, GetCircleRadius(planeX / 2, planeY / 2),planeX,planeY);
                         //spacer po prostej
                         WalkTheLine(point, blck, board, planeX / 2, planeY / 2);
                         //UpdateTempDim(point.Item1, point.Item2, blck.matrix.GetLength(0) + point.Item1, blck.matrix.GetLength(1) + point.Item2);
@@ -110,6 +110,8 @@ namespace TetrisOptimization
                     }
                     //zaktualizuj wymiary figury
                     UpdateCurrentDim();
+                    board.Print(false, false);
+                    //Console.ReadLine();
                 }
                 //cutting
                 var bounds = board.GetBoundsPublic(true, false);
@@ -122,6 +124,7 @@ namespace TetrisOptimization
                     bestCuts = test.Item1;
                     boardFinal = board;
                 }
+                //Console.ReadLine();
             }
             return (bestCuts,boardFinal);
         }
@@ -188,12 +191,18 @@ namespace TetrisOptimization
         //funkcja liczaca promien aktualnego okregu wg aktualnych xmax,xmin,... czy *2 wystarczy?
         public int GetCircleRadius(int centerX,int centerY)
         {
-            return Math.Max(Math.Max(Math.Abs(centerX - currentFigure[0]), Math.Abs(centerX-currentFigure[1])),Math.Max(centerY-currentFigure[2],centerY-currentFigure[3]));
+            return 4*Math.Max(Math.Max(Math.Abs(centerX - currentFigure[0]), Math.Abs(centerX-currentFigure[1])),Math.Max(centerY-currentFigure[2],centerY-currentFigure[3]));
         }
         //funkcja liczaca punkt okregu, na ktorym stawiamy kolejna figure
-        public (int,int) CalculateCoordOnCircle(int centerX,int centerY,int r)
+        public (int,int) CalculateCoordOnCircle(int centerX,int centerY,int r,int boardWidth, int boardHeight)
         {
-            return ((int)(centerX + r*Math.Cos(currentAngle)), (int)(centerY +r*Math.Sin(currentAngle))) ;
+            (int, int) point = ((int)(centerX + r * Math.Cos(currentAngle)), (int)(centerY + r * Math.Sin(currentAngle)));
+            while(point.Item1<0 || point.Item2<0 || point.Item1>boardHeight || point.Item2>boardWidth)
+            {
+                r--;
+                point = ((int)(centerX + r * Math.Cos(currentAngle)), (int)(centerY + r * Math.Sin(currentAngle)));
+            }
+            return point;
         }
 
         //funkcja ktora updatuje wymiary xmin, xmax, ... ostatnio polozonego bloku
@@ -284,8 +293,9 @@ namespace TetrisOptimization
             bool first = true;
             int dist = Distance(start, (centerX, centerY));
             int distPrev = Distance(start, (centerX, centerY));
+            int howFarFromCenter = 3;
             //petla poki mozemy przesunac
-            while (scanned && distPrev>dist)
+            while (scanned && howFarFromCenter>0)
             {
                 //jesli zeskanowalismy ze da sie dodac ale sie nie dodalo to konczymy z bledem
                 if (!board.TryToAdd(start.Item1, start.Item2, block )) return false;
@@ -297,6 +307,7 @@ namespace TetrisOptimization
                 //zwiekszamy iteratory
                 start = IncrementIterators8(start);
                 dist = Distance(start, (centerX, centerY));
+                if (dist > distPrev) howFarFromCenter--;
                 //tu remove 
                 board.TryToRemove(startPrev.Item1, startPrev.Item2, block);
                 //tu skanujemy jedno blizej

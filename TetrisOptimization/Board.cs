@@ -58,6 +58,7 @@ namespace TetrisOptimization
 
             for (int i = bounds.minY; i < bounds.maxY; ++i)
             {
+                Console.Write(i);
                 Console.Write("|");
                 for (int j = bounds.minX; j < bounds.maxX; ++j)
                 {
