@@ -36,7 +36,7 @@ namespace TetrisOptimization
             //board.Print();
             //CuttingRectangle.Cutting(board, (6, 5), (0, 6), (0, 5));
 
-            List<(int, Block)> blocks2 = new List<(int, Block)>() { (2, new FiveBlock(1)), (1, new FiveBlock(3)), (1, new FiveBlock(6)) };
+            List<(int, Block)> blocks2 = new List<(int, Block)>() { (2, new FiveBlock(1)), (2, new FiveBlock(3)), (3, new FiveBlock(6)) };
             
             var hr = new Heuristic_rectangle(blocks2);
             (int bestCuts,Board bestBoard) = hr.Algorithm();

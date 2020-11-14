@@ -159,7 +159,7 @@ namespace TetrisOptimization
         /// <param name="y"></param>
         /// <param name="color_matrix"></param>
         /// <returns>True if an error occurs</returns>
-        public bool TryToAdd(int x, int y, Block block)
+        public bool TryToAdd(int y, int x, Block block)
         {
             var color_matrix = block.GetColorMatrix(ColorID);
             for (int cy = 0; cy < color_matrix.GetLength(0); ++cy)//y
@@ -180,7 +180,7 @@ namespace TetrisOptimization
                         B[y + cy, x + cx] = color_matrix[cy, cx];
             return true;
         }
-        public bool TryToRemove(int x, int y, Block block)
+        public bool TryToRemove(int y, int x, Block block)
         {
             var color_matrix = block.GetColorMatrix(ColorID);
             for (int cy = 0; cy < color_matrix.GetLength(0); ++cy)//y
@@ -196,7 +196,7 @@ namespace TetrisOptimization
                         B[y + cy, x + cx] = null;
             return true;
         }
-        public bool ScanBoard(int x, int y, Block block)
+        public bool ScanBoard(int y, int x, Block block)
         {
             var color_matrix = block.GetColorMatrix(ColorID);
             for (int cy = 0; cy < color_matrix.GetLength(0); ++cy)//y

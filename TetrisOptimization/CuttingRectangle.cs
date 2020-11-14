@@ -356,7 +356,6 @@ namespace TetrisOptimization
                 {
                     for(int y= gap.position.y; y< gap.position.y+ gap.matrix.GetLength(1); y++)
                     {
-                       
                         if(gap.matrix[x- gap.position.x, y- gap.position.y]==1 && unitBlockList.Count>0) //gap 1 jak jest dziura, 0 jak jest klocek
                         {
                             if (board.TryToAdd(x, y, unitBlockList[0]))
@@ -428,7 +427,6 @@ namespace TetrisOptimization
                                 breakFrom = true;
                                 break;
                             }
-                            
                         }
                     }
                     if(breakFrom)

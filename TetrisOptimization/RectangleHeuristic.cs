@@ -24,7 +24,7 @@ namespace TetrisOptimization
         public Heuristic_rectangle(List<(int, Block)> list)
         {
             blocks = list;
-            currentFigure =new int[4];
+            currentFigure = new int[4];
             tempFigure = new int[4];
             rectangleX = 0;
             rectangleY = 0;
@@ -88,7 +88,7 @@ namespace TetrisOptimization
                     var rot = rand.Next() % rots.Count;
                     var blck = CommonMethods.GetSpecyficRotation(blck1, rot);
 
-                    if (first)
+                    if (first) // pierwszy klocek k³adziemy na œrodku g³ównego prostok¹ta
                     {
                         //poloz klocek na srodku
                         var isAdded = board.TryToAdd(planeX / 2 - blck.matrix.GetLength(0) / 2, planeY / 2 - blck.matrix.GetLength(1) / 2 + 1, blck);
@@ -101,9 +101,10 @@ namespace TetrisOptimization
                     else
                     {
                         //wyliczamy punkt z ktorego zaczniemy spacer
-                        (int, int) point = CalculateCoordOnCircle(planeX / 2, planeY / 2, GetCircleRadius(planeX / 2, planeY / 2),planeX,planeY);
+                        (int, int) point = CalculateCoordOnCircle(planeX / 2, planeY / 2, GetCircleRadius(planeX / 2, planeY / 2),planeX,planeY,blck);
                         //spacer po prostej
-                        WalkTheLine(point, blck, board, planeX / 2, planeY / 2);
+                        var walk = WalkTheLine(point, blck, board, planeX / 2, planeY / 2);
+                        if (!walk) board.TryToAdd(point.Item1, point.Item2, blck);
                         //UpdateTempDim(point.Item1, point.Item2, blck.matrix.GetLength(0) + point.Item1, blck.matrix.GetLength(1) + point.Item2);
                         //zwiekszamy kat
                         IncrementAngle();
@@ -191,13 +192,13 @@ namespace TetrisOptimization
         //funkcja liczaca promien aktualnego okregu wg aktualnych xmax,xmin,... czy *2 wystarczy?
         public int GetCircleRadius(int centerX,int centerY)
         {
-            return 4*Math.Max(Math.Max(Math.Abs(centerX - currentFigure[0]), Math.Abs(centerX-currentFigure[1])),Math.Max(centerY-currentFigure[2],centerY-currentFigure[3]));
+            return 10*Math.Max(Math.Max(Math.Abs(centerX - currentFigure[0]), Math.Abs(centerX-currentFigure[1])),Math.Max(Math.Abs(centerY-currentFigure[2]),Math.Abs(centerY-currentFigure[3])));
         }
         //funkcja liczaca punkt okregu, na ktorym stawiamy kolejna figure
-        public (int,int) CalculateCoordOnCircle(int centerX,int centerY,int r,int boardWidth, int boardHeight)
+        public (int,int) CalculateCoordOnCircle(int centerX,int centerY,int r,int boardWidth, int boardHeight,Block block)
         {
             (int, int) point = ((int)(centerX + r * Math.Cos(currentAngle)), (int)(centerY + r * Math.Sin(currentAngle)));
-            while(point.Item1<0 || point.Item2<0 || point.Item1>boardHeight || point.Item2>boardWidth)
+            while(point.Item1<0 || point.Item2<0 || point.Item1 + block.matrix.GetLength(0)>boardHeight || point.Item2 + block.matrix.GetLength(1)>boardWidth)
             {
                 r--;
                 point = ((int)(centerX + r * Math.Cos(currentAngle)), (int)(centerY + r * Math.Sin(currentAngle)));
@@ -314,8 +315,8 @@ namespace TetrisOptimization
                 scanned = board.ScanBoard(start.Item1, start.Item2, block);
 
             }
-            board.TryToAdd(startPrev.Item1, startPrev.Item2, block);
-            return true;
+            //board.TryToAdd(startPrev.Item1, startPrev.Item2, block);
+            return board.TryToAdd(startPrev.Item1, startPrev.Item2, block);
         }
        
         //ta funkcje trzeba poprawic
