@@ -85,7 +85,7 @@ namespace TetrisOptimization
                 int y = 0;
                 do
                 {
-                    flag = board.TryToAdd(x, y, b);
+                    flag = board.TryToAdd(y, x, b);
                     y++;
                 } while (flag);
                 if (x1 > x)

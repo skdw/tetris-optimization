@@ -12,7 +12,7 @@ namespace TetrisOptimization
         public static Board baseBoard;
         public static Board changedBoard;
 
-        public static int Cutting(Board board, (int x, int y) rectangle, (int x0, int x1) x, (int y0, int y1) y)
+        public static int Cutting(Board board, (int y, int x) rectangle, (int y0, int y1) y, (int x0, int x1) x)
         {
             baseBoard = board;
 
@@ -25,22 +25,22 @@ namespace TetrisOptimization
                 for (int yAx = 0; yAx <= yDif - rectangle.y; yAx++)
                 {
                     changedBoard = new Board(board);
-                    (int x0, int x1, int y1, int y2) frame = (xAx + x.x0, xAx + rectangle.x, yAx + y.y0, yAx + rectangle.y);
-                    int achivedCut = CountCuttingLine(frame, x, y);
+                    (int y0, int y1, int x1, int x2) frame = (yAx + y.y0, yAx + rectangle.y, xAx + x.x0, xAx + rectangle.x);
+                    int achivedCut = CountCuttingLine(frame, y, x);
                     if (achivedCut < minimalcutting)
                         minimalcutting = achivedCut;
                 }
             }
             return minimalcutting;
         }
-        private static int CountCuttingLine((int x0, int x1, int y0, int y1) frame, (int x0, int x1) x, (int y0, int y1) y)
+        private static int CountCuttingLine((int y0, int y1, int x0, int x1) frame, (int y0, int y1) y, (int x0, int x1) x)
         {
             List<Gap> gaps = FindingGaps(frame);
             //int l = LengthCut(board, frame, x, y, gaps);
             //trying to fill gaps maby ++ way
             return 0;
         }
-        public static List<Gap> FindingGaps((int x0, int x1, int y0, int y1) frame)
+        public static List<Gap> FindingGaps((int y0, int y1, int x0, int x1) frame)
         {
 
             List<Gap> gaps = new List<Gap>();
@@ -52,9 +52,9 @@ namespace TetrisOptimization
                     {
                         int[,] matrix = new int[1, 1];
                         matrix[0, 0] = 1;
-                        List<(int x, int y)> fieldlist = new List<(int x, int y)>();
-                        Gap gap = new Gap((1, 1), (x, y), fieldlist);
-                        Gap gapTmp = Req(frame, (x, y), gap);
+                        List<(int y, int x)> fieldlist = new List<(int y, int x)>();
+                        Gap gap = new Gap((1, 1), (y, x), fieldlist);
+                        Gap gapTmp = Req(frame, (y, x), gap);
                         gapTmp.matrix = prepareMatrix(gapTmp.size, gapTmp.position, gapTmp.fields);
                         gaps.Add(gapTmp);
 
@@ -82,11 +82,11 @@ namespace TetrisOptimization
             }
             return gaps;
         }
-        private static Gap Req((int x0, int x1, int y0, int y1) frame, (int x, int y) position, Gap gap)
+        private static Gap Req((int y0, int y1, int x0, int x1) frame, (int y, int x) position, Gap gap)
         {
             int color = 12;
             changedBoard[position.y, position.x] = color;
-            gap.fields.Add((position.x, position.y));
+            gap.fields.Add((position.y, position.x));
             if (position.x - 1 < frame.x0 || changedBoard[position.y, position.x - 1].HasValue)
             {
                 if (position.x + 1 >= frame.x1 || changedBoard[position.y, position.x + 1].HasValue)
@@ -105,15 +105,15 @@ namespace TetrisOptimization
             {
                 if (position.x - 1 < gapTmp.position.x)
                 {
-                    (int x, int y) newSize = (gapTmp.size.x + 1, gapTmp.size.y);
-                    (int x, int y) newPosition = (gapTmp.position.x - 1, gapTmp.position.y);
+                    (int y, int x) newSize = (gapTmp.size.y, gapTmp.size.x + 1);
+                    (int y, int x) newPosition = (gapTmp.position.y, gapTmp.position.x - 1);
                     Gap newGap = new Gap(newSize, newPosition, gapTmp.fields);
-                    gapTmp = Req(frame, (position.x - 1, position.y), newGap);
+                    gapTmp = Req(frame, (position.y, position.x - 1), newGap);
                 }
                 else
                 {
 
-                    gapTmp = Req(frame, (position.x - 1, position.y), gapTmp);
+                    gapTmp = Req(frame, (position.y, position.x - 1), gapTmp);
                 }
 
             }
@@ -121,14 +121,14 @@ namespace TetrisOptimization
             {
                 if (position.x + 1 >= gapTmp.position.x + gapTmp.size.x)
                 {
-                    (int x, int y) newSize = (gapTmp.size.x + 1, gapTmp.size.y);
-                    (int x, int y) newPosition = gapTmp.position;
+                    (int y, int x) newSize = (gapTmp.size.y, gapTmp.size.x + 1);
+                    (int y, int x) newPosition = gapTmp.position;
                     Gap newGap = new Gap(newSize, newPosition, gapTmp.fields);
-                    gapTmp = Req(frame, (position.x + 1, position.y), newGap);
+                    gapTmp = Req(frame, (position.y, position.x + 1), newGap);
                 }
                 else
                 {
-                    gapTmp = Req(frame, (position.x + 1, position.y), gapTmp);
+                    gapTmp = Req(frame, (position.y, position.x + 1), gapTmp);
                 }
 
 
@@ -137,14 +137,14 @@ namespace TetrisOptimization
             {
                 if (position.y - 1 < gapTmp.position.y)
                 {
-                    (int x, int y) newSize = (gapTmp.size.x, gapTmp.size.y + 1);
-                    (int x, int y) newPosition = (gapTmp.position.x, gapTmp.position.y - 1);
+                    (int y, int x) newSize = (gapTmp.size.y + 1, gapTmp.size.x);
+                    (int y, int x) newPosition = (gapTmp.position.y - 1, gapTmp.position.x);
                     Gap newGap = new Gap(newSize, newPosition, gapTmp.fields);
-                    gapTmp = Req(frame, (position.x, position.y - 1), newGap);
+                    gapTmp = Req(frame, (position.y - 1, position.x), newGap);
                 }
                 else
                 {
-                    gapTmp = Req(frame, (position.x, position.y - 1), gapTmp);
+                    gapTmp = Req(frame, (position.y - 1, position.x), gapTmp);
                 }
 
             }
@@ -152,19 +152,19 @@ namespace TetrisOptimization
             {
                 if (position.y + 1 >= gapTmp.position.y + gapTmp.size.y)
                 {
-                    (int x, int y) newSize = (gapTmp.size.x, gapTmp.size.y + 1);
-                    (int x, int y) newPosition = gapTmp.position;
+                    (int y, int x) newSize = (gapTmp.size.y + 1, gapTmp.size.x);
+                    (int y, int x) newPosition = gapTmp.position;
                     Gap newGap = new Gap(newSize, newPosition, gapTmp.fields);
-                    gapTmp = Req(frame, (position.x, position.y + 1), newGap);
+                    gapTmp = Req(frame, (position.y + 1, position.x), newGap);
                 }
                 else
                 {
-                    gapTmp = Req(frame, (position.x, position.y + 1), gapTmp);
+                    gapTmp = Req(frame, (position.y + 1, position.x), gapTmp);
                 }
             }
             return gapTmp;
         }
-        public static int[,] prepareMatrix((int x, int y) size, (int x, int y) position, List<(int x, int y)> fileds)
+        public static int[,] prepareMatrix((int y, int x) size, (int y, int x) position, List<(int y, int x)> fileds)
         {
             int[,] matrix = new int[size.y, size.x];
             foreach (var p in fileds)
