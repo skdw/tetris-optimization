@@ -63,13 +63,10 @@ namespace TetrisOptimization
             //zakladamy ze poczatkowo ramka prostokata ktora bedziemy ruszac znajduje sie na srodku planszy
             int multiplier = 10;
             int planeX = tp.Item1 * multiplier, planeY = tp.Item2 * multiplier;
-            var board = new Board(planeX, planeY);
-            var boardFinal = new Board(planeX, planeY);
+            var board = new Board(planeY, planeX);
+            var boardFinal = new Board(planeY, planeX);
             int bestCuts = int.MaxValue;
             
-            //wspolrzedne ramki prostokta
-            rectangleX = planeX / 2 - tp.Item1 / 2;
-            rectangleY = planeY / 2 - tp.Item2 / 2;
 
             //inicjalizujemy xmin i ymin na int.max
             currentFigure[0] = int.MaxValue; currentFigure[2] = int.MaxValue;
@@ -81,7 +78,7 @@ namespace TetrisOptimization
             foreach (List<Block> rots in list)
             {
                 //dla kazdej permutacji nowy board
-                board = new Board(planeX, planeY);
+                board = new Board(planeY, planeX);
                 foreach (Block blck1 in rots)
                 {
                     //losowe wybranie obrotu
@@ -91,7 +88,8 @@ namespace TetrisOptimization
                     if (first) // pierwszy klocek k³adziemy na œrodku g³ównego prostok¹ta
                     {
                         //poloz klocek na srodku
-                        var isAdded = board.TryToAdd(planeX / 2 - blck.matrix.GetLength(0) / 2, planeY / 2 - blck.matrix.GetLength(1) / 2 + 1, blck);
+                       // var isAdded = board.TryToAdd(planeY / 2 - blck.matrix.GetLength(0) / 2 + 1,planeX / 2 - blck.matrix.GetLength(1) / 2, blck);
+                        var isAdded = board.TryToAdd(planeY / 2, planeX / 2, blck);
                         //jak blad dodawania - wychodzimy
                         if (!isAdded) return (-1,boardFinal);
                         //zaktualizuj wymiary figury
@@ -101,29 +99,45 @@ namespace TetrisOptimization
                     else
                     {
                         //wyliczamy punkt z ktorego zaczniemy spacer
-                        (int, int) point = CalculateCoordOnCircle(planeX / 2, planeY / 2, GetCircleRadius(planeX / 2, planeY / 2),planeX,planeY,blck);
+                        (int, int) point = CalculateCoordOnCircle(planeY / 2, planeX / 2, GetCircleRadius(planeX / 2, planeY / 2),planeX,planeY,blck);
                         //spacer po prostej
-                        var walk = WalkTheLine(point, blck, board, planeX / 2, planeY / 2);
-                        if (!walk) board.TryToAdd(point.Item1, point.Item2, blck);
+                        var walk = WalkTheLine(point, blck, board, planeY / 2, planeX / 2);
+                        if (!walk) board.TryToAdd(point.Item2,point.Item1, blck);
                         //UpdateTempDim(point.Item1, point.Item2, blck.matrix.GetLength(0) + point.Item1, blck.matrix.GetLength(1) + point.Item2);
                         //zwiekszamy kat
                         IncrementAngle();
                     }
                     //zaktualizuj wymiary figury
                     UpdateCurrentDim();
-                    board.Print(false, false);
+                    //board.Print(false, false);
                     //Console.ReadLine();
                 }
+                first = true;
+                var boardTempVert = board;
+                var boardTempHoriz = board;
                 //cutting
-                var bounds = board.GetBoundsPublic(true, false);
-                board.Print(false, false);
-                var test = CuttingRectangle.Cutting(board, (rectangleWidth, rectangleHeight), (bounds.minY, bounds.maxY), (bounds.minX, bounds.maxX));
-                test.Item2.Print(false, false);
-                Console.WriteLine(test.Item1);
+                var bounds = boardTempVert.GetBoundsPublic(true, false);
+                //Console.WriteLine("Board initial");
+                //boardTempVert.Print(true, false);
+                //Console.ReadLine();
+                var test = CuttingRectangle.Cutting(boardTempVert, (rectangleWidth, rectangleHeight), (bounds.minY, bounds.maxY), (bounds.minX, bounds.maxX));
+                //Console.WriteLine($"test vertical: {test.Item1}");
+                //test.Item2.Print(true, false);
+                //Console.ReadLine();
+                //Console.WriteLine(test.Item1);
                 if(test.Item1<bestCuts)
                 {
                     bestCuts = test.Item1;
-                    boardFinal = board;
+                    boardFinal = test.Item2;
+                }
+                var test2 = CuttingRectangle.Cutting(boardTempHoriz, (rectangleHeight, rectangleWidth), (bounds.minY, bounds.maxY), (bounds.minX, bounds.maxX));
+                //Console.WriteLine($"test horizontal: {test2.Item1}");
+                //test2.Item2.Print(true, false);
+                //Console.WriteLine(test.Item1);
+                if (test2.Item1 < bestCuts)
+                {
+                    bestCuts = test2.Item1;
+                    boardFinal = test2.Item2;
                 }
                 //Console.ReadLine();
             }
@@ -296,7 +310,7 @@ namespace TetrisOptimization
             int distPrev = Distance(start, (centerX, centerY));
             int howFarFromCenter = 3;
             //petla poki mozemy przesunac
-            while (scanned && howFarFromCenter>0)
+            while (scanned && howFarFromCenter>=0)
             {
                 //jesli zeskanowalismy ze da sie dodac ale sie nie dodalo to konczymy z bledem
                 if (!board.TryToAdd(start.Item1, start.Item2, block )) return false;
@@ -319,15 +333,7 @@ namespace TetrisOptimization
             return board.TryToAdd(startPrev.Item1, startPrev.Item2, block);
         }
        
-        //ta funkcje trzeba poprawic
-        public bool MoveRectangle(int i, int j, int x, int y)
-        {
-            if (x + i > rectangleWidth + rectangleX) rectangleX++;
-            if (x + i < rectangleX) rectangleX--;
-            if (y + j > rectangleHeight + rectangleY) rectangleY++;
-            if (y + j < rectangleY) rectangleY--;
-            return true;
-        }
+        
 	
         
 

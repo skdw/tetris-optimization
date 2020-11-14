@@ -36,12 +36,12 @@ namespace TetrisOptimization
             //board.Print();
             //CuttingRectangle.Cutting(board, (6, 5), (0, 6), (0, 5));
 
-            List<(int, Block)> blocks2 = new List<(int, Block)>() { (2, new FiveBlock(1)), (2, new FiveBlock(3)), (3, new FiveBlock(6)) };
+            List<(int, Block)> blocks2 = new List<(int, Block)>() { (27, new FiveBlock(1)), (20, new FiveBlock(3)), (5, new FiveBlock(6)) , (15, new FiveBlock(7)), (9, new FiveBlock(8)) };
             
             var hr = new Heuristic_rectangle(blocks2);
             (int bestCuts,Board bestBoard) = hr.Algorithm();
             Console.WriteLine($"Best cuts: {bestCuts}");
-            bestBoard.Print(false, false);
+            bestBoard.Print(true, false);
             //HeuristicSquare heuristicSquare = new HeuristicSquare(blocks, blockSize, 600, 0.4, 1);
             //heuristicSquare.Solve().Print(true);
             //Console.WriteLine("Minimal square calculated by heuristic algorithm: " + heuristicSquare.minimalAchivedSize);
