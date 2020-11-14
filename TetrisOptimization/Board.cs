@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace TetrisOptimization
 {
@@ -20,12 +22,7 @@ namespace TetrisOptimization
             set { B[i, j] = value; }
         }
 
-        static int _colorID;
-
-        static int ColorID
-        {
-            get => ++_colorID;
-        }
+        int colorID = 0;
 
         /// <summary>
         /// Get ConsoleColor for printing blocks
@@ -136,7 +133,7 @@ namespace TetrisOptimization
                     maxX += diff;
                 }
             }
-            return (minY, maxY, minX, maxX);
+            return (minY, maxY + 1, minX, maxX + 1);
         }
 
         static (int h, int w) GetSize((int minY, int maxY, int minX, int maxX) bounds)
@@ -151,28 +148,81 @@ namespace TetrisOptimization
         /// </summary>
         /// <param name="y"></param>
         /// <param name="x"></param>
-        /// <param name="color_matrix"></param>
+        /// <param name="force_override_id">Null to prevent overriding. Number of blocks to code the block id.</param>
         /// <returns>True if an error occurs</returns>
-        public bool TryToAdd(int y, int x, Block block)
+        public bool TryToAdd(int y, int x, Block block, int? force_override_id = null)
         {
-            var color_matrix = block.GetColorMatrix(ColorID);
-            for (int cy = 0; cy < color_matrix.GetLength(0); ++cy)//y
-                for (int cx = 0; cx < color_matrix.GetLength(1); ++cx)//x
+            // Check for errors
+            for (int cy = 0; cy < block.size.y; ++cy)
+                for (int cx = 0; cx < block.size.x; ++cx)
                     if ((y + cy >= B.GetLength(0)) || (x + cx >= B.GetLength(1)))
                     {
-                        //Console.Error.WriteLine("Out of the board");
+                        // Out of the board
                         return true;
                     }
-                    else if (B[y + cy, x + cx].HasValue && color_matrix[cy, cx].HasValue)
+                    else if (B[y + cy, x + cx].HasValue && block.matrix[cy, cx])
                     {
-                        //Console.Error.WriteLine("Trying to override the block");
-                        return true;
+                        // Trying to override the block
+                        if(force_override_id is null) // prevent overriding (square)
+                            return true;
                     }
-            for (int cy = 0; cy < color_matrix.GetLength(0); ++cy)//y
-                for (int cx = 0; cx < color_matrix.GetLength(1); ++cx)
-                    if (color_matrix[cy, cx].HasValue)
-                        B[y + cy, x + cx] = color_matrix[cy, cx];
+
+            // Add block to the board
+            int colortmpID = ++colorID;
+            for (int cy = 0; cy < block.size.y; ++cy)
+                for (int cx = 0; cx < block.size.x; ++cx)
+                    if (block.matrix[cy, cx])
+                    {
+                        if(B[y + cy, x + cx].HasValue) // overriding
+                        {
+                            B[y + cy, x + cx] *= force_override_id;
+                            B[y + cy, x + cx] += colortmpID;
+                        }
+                        else // just adding
+                            B[y + cy, x + cx] = colortmpID;
+                    }
             return false;
+        }
+
+        public int SumIDs()
+        {
+            int sum = 0;
+            for(int i = 0; i < B.GetLength(0); ++i)
+                for(int j = 0; j < B.GetLength(1); ++j)
+                    if(B[i, j].HasValue)
+                        sum += B[i, j].Value;
+            return sum;
+        }
+
+        /// <summary>
+        /// Moves overlapped blocks into blank locations
+        /// </summary>
+        /// <param name="force_override_id">override id - base of the numeral system</param>
+        public void MoveOverlapped(int force_override_id)
+        {
+            List<(int, int)> holes = new List<(int, int)>();
+            List<(int, int, int)> overlaps = new List<(int, int, int)>();
+
+            for(int i = 0; i < B.GetLength(0); ++i)
+                for(int j = 0; j < B.GetLength(1); ++j)
+                {
+                    if(B[i, j] == null)
+                    {
+                        holes.Add((i, j));
+                    }
+                    while(B[i, j].HasValue && B[i, j].Value > force_override_id)
+                    {
+                        overlaps.Add((i, j, B[i, j].Value % force_override_id));
+                        B[i, j] /= force_override_id;
+                    }
+                }
+
+            var zzip = overlaps.Zip(holes);
+            // invent a good way to place overlapped blocks (minimize the cuts!)
+            foreach((var overlap, var hole) in zzip)
+            {
+                B[hole.Item1, hole.Item2] = overlap.Item3;
+            }
         }
     }
 }

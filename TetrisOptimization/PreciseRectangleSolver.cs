@@ -74,7 +74,7 @@ namespace TetrisOptimization
                 }
             }
 
-            Console.WriteLine($"{bestLength} blocks yet to place!");
+            Console.WriteLine($"Badness: {bestLength}");
             return (bestBoard, bestLength);
         }
 
@@ -101,25 +101,30 @@ namespace TetrisOptimization
         /// Tries to create rectangle board of size a*b with blocks on specified positions
         /// </summary>
         /// <param name="perm_block"></param>
-        /// <param name="a"></param>
-        /// <returns></returns>
+        /// <param name="a">board rows</param>
+        /// <param name="b">board columns</param>
+        /// <returns>(Board, int) - optimal board, minimal cuts number</returns>
         private (Board, int) CreateCutBoard(IEnumerable<Tuple<int, Block>> perm_block, int a, int b)
         {
+            int force_override_id = perm_block.Count() + 1;
             Board board = new Board(a, b);
-            List<Tuple<int, Block>> overlappingBlocks = new List<Tuple<int, Block>>(); 
+            //List<Tuple<int, Block>> overlappingBlocks = new List<Tuple<int, Block>>(); 
             foreach (var ind_bl in perm_block)
             {
                 (int index, Block block) = ind_bl;
                 var coords = CommonMethods.DecodeCoords(index, a, b);
-                bool failure = board.TryToAdd(coords.Item1, coords.Item2, block);
+                bool failure = board.TryToAdd(coords.Item1, coords.Item2, block, force_override_id);
                 if (failure)
-                    overlappingBlocks.Add(ind_bl);
+                    return (board, Int32.MaxValue);
+                    //overlappingBlocks.Add(ind_bl);
             }
 
-            int cuts = overlappingBlocks.Count; // count it
+            //int cuts = overlappingBlocks.Count; // count it
             // solve the cuts
             // var gaps = GetGaps(board);
-
+            //board.Print();
+            int cuts = board.SumIDs();
+            board.MoveOverlapped(force_override_id);
             return (board, cuts);
         }
     }
