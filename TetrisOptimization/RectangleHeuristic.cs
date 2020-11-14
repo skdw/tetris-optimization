@@ -270,7 +270,11 @@ namespace TetrisOptimization
             //}
             return start;
         }
-
+           
+        public int Distance((int,int) start, (int,int) center)
+        {
+            return (int)(Math.Sqrt(Math.Pow(start.Item1 - center.Item1, 2) + Math.Pow(start.Item2 - center.Item2, 2)));
+        }
         //funkcja przyblizajaca klocek krok po kroku do srodka
         public bool WalkTheLine((int,int) start, Block block, Board board,int centerX, int centerY)
         {
@@ -278,8 +282,10 @@ namespace TetrisOptimization
             (int, int) startPrev = start;
             //(int, int) delta = GetDeltaXY(start, centerX, centerY);
             bool first = true;
+            int dist = Distance(start, (centerX, centerY));
+            int distPrev = Distance(start, (centerX, centerY));
             //petla poki mozemy przesunac
-            while (scanned)
+            while (scanned && distPrev>dist)
             {
                 //jesli zeskanowalismy ze da sie dodac ale sie nie dodalo to konczymy z bledem
                 if (!board.TryToAdd(start.Item1, start.Item2, block )) return false;
@@ -287,8 +293,10 @@ namespace TetrisOptimization
                 UpdateTempDim(start.Item1, start.Item2, start.Item1+block.matrix.GetLength(0), start.Item2+block.matrix.GetLength(1));
                 //
                 startPrev = start;
+                distPrev = dist;
                 //zwiekszamy iteratory
                 start = IncrementIterators8(start);
+                dist = Distance(start, (centerX, centerY));
                 //tu remove 
                 board.TryToRemove(startPrev.Item1, startPrev.Item2, block);
                 //tu skanujemy jedno blizej
