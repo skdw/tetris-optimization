@@ -11,7 +11,8 @@ namespace TetrisOptimization
         /// Call algorithms given lines of input data
         /// </summary>
         /// <param name="lines"></param>
-        static void CallAlgorithms(Queue<string> lines)
+        /// <param name="printBlocks"></param>
+        static void CallAlgorithms(Queue<string> lines, bool printBlocks)
         {
             while(lines.Count > 0)
             {
@@ -44,6 +45,11 @@ namespace TetrisOptimization
                         .ToList();
                 }
                 BlocksSolver solver = BlocksSolverFactory.GetSolver(solverType, blocks, blockSize);
+                if(printBlocks)
+                {
+                    solver.PrintBlocks();
+                    printBlocks = false;
+                }
                 solver.SolveMeasurePrint();
             }
         }
@@ -52,12 +58,13 @@ namespace TetrisOptimization
         /// Parse input file
         /// </summary>
         /// <param name="path">Input file path</param>
-        static void ParseInput(string path)
+        /// <param name="printBlocks"></param>
+        static void ParseInput(string path, bool printBlocks)
         {
             try
             {
                 Queue<string> lines = new Queue<string>(File.ReadAllLines(path));
-                CallAlgorithms(lines);
+                CallAlgorithms(lines, printBlocks);
             }
             catch
             {
@@ -99,7 +106,7 @@ namespace TetrisOptimization
                     ExampleCallback();
                     break;
                 case 1:
-                    ParseInput(args[0]);
+                    ParseInput(args[0], true);
                     break;
                 default:
                     throw new ArgumentException("Usage: TetrisOptimization [path]");

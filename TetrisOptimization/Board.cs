@@ -138,8 +138,8 @@ namespace TetrisOptimization
 
         static (int h, int w) GetSize((int minY, int maxY, int minX, int maxX) bounds)
         {
-            int h = bounds.maxY - bounds.minY + 1;
-            int w = bounds.maxX - bounds.minX + 1;
+            int h = bounds.maxY - bounds.minY;
+            int w = bounds.maxX - bounds.minX;
             return (h, w);
         }
 

@@ -45,6 +45,12 @@ namespace TetrisOptimization
             // Number of blocks sequences
             int counts_product = counts.Aggregate(1, (acc, bl) => acc * bl);
 
+            // Rotate blocks chooses
+            var blocks_chooses = Enumerable
+                .Range(0, counts_product)
+                .Select(i => blocks.Zip(CommonMethods.DecodeVariation(counts, i), (block, ind) => block[ind]))
+                .ToList();
+
             // Get rectangle size
             (int a, int b) = GetRectangleSize();
 
@@ -54,15 +60,13 @@ namespace TetrisOptimization
             int bestLength = int.MaxValue;
             Board bestBoard = new Board(a, b);
 
-            // Permutate over board positions
-            foreach (var combination in combinations)
+            // Iterate over blocks variations
+            foreach (var blocks_choice in blocks_chooses)
             {
-                // Iterate over blocks variations
-                for (int i = 0; i < counts_product; ++i)
+                // Permutate over board positions
+                foreach (var combination in combinations)
                 {
-                    var variation = CommonMethods.DecodeVariation(counts, i);
-                    var blocks_choose = blocks.Zip(variation, (block, ind) => block[ind]);
-                    var comb_block = combination.Zip(blocks_choose, Tuple.Create);
+                    var comb_block = combination.Zip(blocks_choice, Tuple.Create);
                     (Board board, int cutLength) = CreateCutBoard(comb_block, a, b);
                     if(cutLength == 0)
                         return (board, cutLength);
