@@ -1,17 +1,10 @@
-using Microsoft.VisualBasic.CompilerServices;
 using System;
 using System.Collections.Generic;
-using System.Runtime.InteropServices;
-using System.Text;
-using TetrisOptimization.Blocks;
 
 namespace TetrisOptimization
 {
-    
-    public class Heuristic_rectangle
+    public class HeuristicRectangle : BlocksSolver
     {
-        //lista wejsciowa z obrotami
-        List<(int,Block)> blocks;
         //xmin, xmax, ymin, ymax, current - aktualna figura na boardzie, temp - ostatnio kladziony blok
         public int[] currentFigure,tempFigure;
 
@@ -21,9 +14,8 @@ namespace TetrisOptimization
 
         //aktualny kat zegara
         double currentAngle;
-        public Heuristic_rectangle(List<(int, Block)> list)
+        public HeuristicRectangle(List<(int, Block)> list, int blockSize) : base(list, blockSize)
         {
-            blocks = list;
             currentFigure = new int[4];
             tempFigure = new int[4];
             rectangleX = 0;
@@ -32,8 +24,15 @@ namespace TetrisOptimization
             rectangleHeight = 0;
             currentAngle = 0;
         }
-        //algorytm - zwraca true przy powodzeniu, false przy bledzie
-        public (int,Board) Algorithm()
+
+        public override Board Solve()
+        {
+            var res = Algorithm();
+            Console.WriteLine($"Best cuts: {res.Item1}");
+            return res.Item2;
+        }
+
+        private (int, Board) Algorithm()
         {
             //znajdujemy wymiary ramki prostokata
             var tp = GetMainRectangleDim();
@@ -85,7 +84,7 @@ namespace TetrisOptimization
                     var rot = rand.Next() % rots.Count;
                     var blck = CommonMethods.GetSpecyficRotation(blck1, rot);
 
-                    if (first) // pierwszy klocek k³adziemy na œrodku g³ównego prostok¹ta
+                    if (first) // pierwszy klocek kï¿½adziemy na ï¿½rodku gï¿½ï¿½wnego prostokï¿½ta
                     {
                         //poloz klocek na srodku
                        // var isAdded = board.TryToAdd(planeY / 2 - blck.matrix.GetLength(0) / 2 + 1,planeX / 2 - blck.matrix.GetLength(1) / 2, blck);
@@ -171,7 +170,6 @@ namespace TetrisOptimization
             // of the divisors
             var v = new List<int>();
             var v2 = new List<int>();
-            int t = 0;
             for (int i = 1;
                 i <= Math.Sqrt(n); i++) {
                 if (n % i == 0) {
@@ -305,7 +303,6 @@ namespace TetrisOptimization
             var scanned = board.ScanBoard(start.Item1, start.Item2, block);
             (int, int) startPrev = start;
             //(int, int) delta = GetDeltaXY(start, centerX, centerY);
-            bool first = true;
             int dist = Distance(start, (centerX, centerY));
             int distPrev = Distance(start, (centerX, centerY));
             int howFarFromCenter = 3;

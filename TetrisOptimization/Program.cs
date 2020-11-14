@@ -38,9 +38,8 @@ namespace TetrisOptimization
 
             List<(int, Block)> blocks2 = new List<(int, Block)>() { (10, new FiveBlock(1)), (20, new FiveBlock(3)), (15, new FiveBlock(6)) , (15, new FiveBlock(7)), (9, new FiveBlock(8)) };
             
-            var hr = new Heuristic_rectangle(blocks2);
-            (int bestCuts,Board bestBoard) = hr.Algorithm();
-            Console.WriteLine($"Best cuts: {bestCuts}");
+            var hr = new HeuristicRectangle(blocks2, 5);
+            Board bestBoard = hr.Solve();
             bestBoard.Print(true, false);
             //HeuristicSquare heuristicSquare = new HeuristicSquare(blocks, blockSize, 600, 0.4, 1);
             //heuristicSquare.Solve().Print(true);
