@@ -13,20 +13,20 @@ namespace TetrisOptimization.UnitTests
         public void FindingGaps()
         {
             Board board = new Board(6, 5);
-            board.TryToAdd(1, 0, new FiveBlock(2));
-            board.TryToAdd(0, 2, new FiveBlock(4));
-            board.TryToAdd(3, 0, new FiveBlock(2));
+            board.TryToAdd(0, 1, new FiveBlock(2));
+            board.TryToAdd(2, 0, new FiveBlock(4));
+            board.TryToAdd(0, 3, new FiveBlock(2));
 
             CuttingRectangle.baseBoard = board;
             CuttingRectangle.changedBoard = new Board(board);
             List<Gap> gaps = CuttingRectangle.FindingGaps((0, 4, 0, 4));
-            List<(int, int)> filds = new List<(int, int)>() { (0, 0), (0, 1), (1, 1), (1, 2), (0, 2) };
+            List<(int, int)> filds = new List<(int, int)>() { (0, 0), (1, 0), (1, 1), (2, 1), (2, 0) };
             int[,] tmpmatrix = new int[3, 2];
             for (int i = 0; i < 3; i++)
                 for (int j = 0; j < 2; j++)
                     if (i != 0 || j != 1)
                         tmpmatrix[i, j]++;
-            Gap g = new Gap((2, 3), (0, 0), filds);
+            Gap g = new Gap((3, 2), (0, 0), filds);
             g.matrix = tmpmatrix;
 
             Assert.AreEqual(gaps[0].fields, filds);
