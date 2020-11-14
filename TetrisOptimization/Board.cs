@@ -12,7 +12,7 @@ namespace TetrisOptimization
         {
             this.B = b.B.Clone() as int?[,];
         }
-        
+
         public readonly int?[,] B;
         public int? this[int i, int j]
         {
@@ -58,7 +58,7 @@ namespace TetrisOptimization
 
             for (int i = bounds.minY; i < bounds.maxY; ++i)
             {
-                Console.Write(i);
+                Console.Write(String.Format("{0,5}", i));
                 Console.Write("|");
                 for (int j = bounds.minX; j < bounds.maxX; ++j)
                 {
@@ -93,7 +93,6 @@ namespace TetrisOptimization
                 for (int j = 0; j < B.GetLength(1); ++j)
                     if (B[i, j].HasValue)
                         return i;
-                        //return i + 1;
             return -1;
         }
 
@@ -112,7 +111,6 @@ namespace TetrisOptimization
                 for (int i = 0; i < B.GetLength(0); ++i)
                     if (B[i, j].HasValue)
                         return j;
-                        //return j + 1;
             return -1;
         }
 
@@ -141,10 +139,12 @@ namespace TetrisOptimization
             }
             return (minY, maxY, minX, maxX);
         }
+
         public (int minY, int maxY, int minX, int maxX) GetBoundsPublic(bool cutBounds, bool forceSquare)
         {
             return this.GetBounds(cutBounds, forceSquare);
         }
+
         static (int h, int w) GetSize((int minY, int maxY, int minX, int maxX) bounds)
         {
             int h = bounds.maxY - bounds.minY + 1;
@@ -167,19 +167,20 @@ namespace TetrisOptimization
                     if ((y + cy >= B.GetLength(0)) || (x + cx >= B.GetLength(1)))
                     {
                         //Console.Error.WriteLine("Out of the board");
-                        return false;
+                        return true;
                     }
                     else if (B[y + cy, x + cx].HasValue && color_matrix[cy, cx].HasValue)
                     {
                         //Console.Error.WriteLine("Trying to override the block");
-                        return false;
+                        return true;
                     }
             for (int cy = 0; cy < color_matrix.GetLength(0); ++cy)//y
                 for (int cx = 0; cx < color_matrix.GetLength(1); ++cx)
                     if (color_matrix[cy, cx].HasValue)
                         B[y + cy, x + cx] = color_matrix[cy, cx];
-            return true;
+            return false;
         }
+
         public bool TryToRemove(int y, int x, Block block)
         {
             var color_matrix = block.GetColorMatrix(ColorID);
@@ -196,6 +197,7 @@ namespace TetrisOptimization
                         B[y + cy, x + cx] = null;
             return true;
         }
+
         public bool ScanBoard(int y, int x, Block block)
         {
             var color_matrix = block.GetColorMatrix(ColorID);

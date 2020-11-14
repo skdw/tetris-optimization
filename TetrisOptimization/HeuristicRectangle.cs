@@ -84,13 +84,13 @@ namespace TetrisOptimization
                     var rot = rand.Next() % rots.Count;
                     var blck = CommonMethods.GetSpecyficRotation(blck1, rot);
 
-                    if (first) // pierwszy klocek k�adziemy na �rodku g��wnego prostok�ta
+                    if (first) // pierwszy klocek kladziemy na srodku glownego prostokata
                     {
                         //poloz klocek na srodku
                        // var isAdded = board.TryToAdd(planeY / 2 - blck.matrix.GetLength(0) / 2 + 1,planeX / 2 - blck.matrix.GetLength(1) / 2, blck);
-                        var isAdded = board.TryToAdd(planeY / 2, planeX / 2, blck);
+                        bool err = board.TryToAdd(planeY / 2, planeX / 2, blck);
                         //jak blad dodawania - wychodzimy
-                        if (!isAdded) return (-1,boardFinal);
+                        if (err) return (-1,boardFinal);
                         //zaktualizuj wymiary figury
                         UpdateTempDim(planeX / 2 - blck.matrix.GetLength(0) / 2, planeY / 2 - blck.matrix.GetLength(1) / 2, blck.matrix.GetLength(0) + planeX / 2 - blck.matrix.GetLength(0) / 2, blck.matrix.GetLength(1) + planeY / 2 - blck.matrix.GetLength(1) / 2 + 1);
                         first = !first;
@@ -310,7 +310,8 @@ namespace TetrisOptimization
             while (scanned && howFarFromCenter>=0)
             {
                 //jesli zeskanowalismy ze da sie dodac ale sie nie dodalo to konczymy z bledem
-                if (!board.TryToAdd(start.Item1, start.Item2, block )) return false;
+                bool err1 = board.TryToAdd(start.Item1, start.Item2, block);
+                if (err1) return false;
                 //updateujemy 
                 UpdateTempDim(start.Item1, start.Item2, start.Item1+block.matrix.GetLength(0), start.Item2+block.matrix.GetLength(1));
                 //
@@ -327,7 +328,8 @@ namespace TetrisOptimization
 
             }
             //board.TryToAdd(startPrev.Item1, startPrev.Item2, block);
-            return board.TryToAdd(startPrev.Item1, startPrev.Item2, block);
+            bool err = board.TryToAdd(startPrev.Item1, startPrev.Item2, block);
+            return !err;
         }
        
         

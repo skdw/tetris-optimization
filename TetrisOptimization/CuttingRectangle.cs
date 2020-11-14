@@ -446,7 +446,7 @@ namespace TetrisOptimization
                     {
                         if(gap.matrix[y- gap.position.y, x- gap.position.x]==1 && unitBlockList.Count>0) //gap 1 jak jest dziura, 0 jak jest klocek
                         {
-                            if (board.TryToAdd(y,x, unitBlockList[0]))
+                            if (board.TryToAdd(y,x, unitBlockList[0]) == false)
                             {
                                 unitBlockList.RemoveAt(0);
                                 howManyUnitBlocks--;
@@ -508,7 +508,7 @@ namespace TetrisOptimization
                     {
                         if(newGaps[gap]==0 && DoesBlockFit(rot, gap))
                         {
-                            if(board.TryToAdd(gap.position.y, gap.position.x, rot))
+                            if(board.TryToAdd(gap.position.y, gap.position.x, rot) == false)
                             {
                                 newBlocks.Remove(block);
                                 newGaps[gap]++;
