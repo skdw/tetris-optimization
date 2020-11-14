@@ -4,7 +4,7 @@ namespace TetrisOptimization
 {
     public class Board
     {
-        public Board(int x, int y)
+        public Board(int y, int x)
         {
             B = new int?[y, x];
         }
@@ -155,8 +155,8 @@ namespace TetrisOptimization
         /// <summary>
         /// Try to add block to the board
         /// </summary>
-        /// <param name="x"></param>
         /// <param name="y"></param>
+        /// <param name="x"></param>
         /// <param name="color_matrix"></param>
         /// <returns>True if an error occurs</returns>
         public bool TryToAdd(int y, int x, Block block)
