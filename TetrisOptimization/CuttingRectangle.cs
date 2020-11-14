@@ -208,7 +208,7 @@ namespace TetrisOptimization
         //funkcja rozcina bloki wystajace za ramke, nastepnie, dla tak powstalej listy blokow, 
         //szuka idealnej gap (ExactFit), a pozostale bloki tnie na pojedyncze kwadraty i wypelnia reszte dziur
         //dodac szukanie klockow spoza ramki
-        public static (int,Board) LengthCut(Board board, (int y0, int y1, int x0, int x1) frame, (int y0, int y1) y,(int x0,int x1) x List<Gap> gaps)
+        public static (int, Board) LengthCut(Board board, (int y0, int y1, int x0, int x1) frame, (int y0, int y1) y, (int x0, int x1) x, List<Gap> gaps)
         {
             int cuts = 0;
             ConsoleColor? lastColor = ConsoleColor.Red;
