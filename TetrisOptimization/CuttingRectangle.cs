@@ -556,25 +556,25 @@ namespace TetrisOptimization
                     }
                 }
             }
-            foreach (var g in gaps)
-            {
+            //foreach (var g in gaps)
+            //{
 
-                for (int i = 0; i < g.matrix.GetLength(0); ++i)
-                {
-                    Console.Write("|");
-                    for (int j = 0; j < g.matrix.GetLength(1); ++j)
-                    {
-                        if (g.matrix[i, j] == 0)
-                            Console.BackgroundColor = ConsoleColor.Red;
-                        else
-                            Console.BackgroundColor = ConsoleColor.Black;
-                        Console.Write("  ");
-                        Console.ResetColor();
-                    }
-                    Console.Write("|\n");
-                }
-                Console.Write("\n");
-            }
+            //    for (int i = 0; i < g.matrix.GetLength(0); ++i)
+            //    {
+            //        Console.Write("|");
+            //        for (int j = 0; j < g.matrix.GetLength(1); ++j)
+            //        {
+            //            if (g.matrix[i, j] == 0)
+            //                Console.BackgroundColor = ConsoleColor.Red;
+            //            else
+            //                Console.BackgroundColor = ConsoleColor.Black;
+            //            Console.Write("  ");
+            //            Console.ResetColor();
+            //        }
+            //        Console.Write("|\n");
+            //    }
+            //    Console.Write("\n");
+            //}
             return gaps;
         }
         /// <summary>
