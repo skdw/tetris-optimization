@@ -144,7 +144,7 @@ namespace TetrisOptimization
             { true, true, true }
         };
 
-        public static Dictionary<int, bool[,]> Blocks = new Dictionary<int, bool[,]>()
+        public static readonly Dictionary<int, bool[,]> Blocks = new Dictionary<int, bool[,]>()
         {
             {1, I_m},
             {2, R1_m},
