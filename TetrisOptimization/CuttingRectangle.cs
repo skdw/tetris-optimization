@@ -45,26 +45,13 @@ namespace TetrisOptimization
                     var newBoard = new Board(baseBoard);
                     (int y1, int y2,int x0, int x1) frame = (yAx + y.y0, yAx + y.y0 + rectangle.y-1,xAx + x.x0, xAx + x.x0 + rectangle.x-1);
                     var achivedCut = CountCuttingLine(newBoard, frame,y,x);
-                    //Console.WriteLine($"Board po zakonczeniu ciec i achieveCut={achivedCut}");
-                    //check newBoard if its filled
-                    //int error = ErrorCheck(board)
-                    //Console.WriteLine($"achieved cut: {achivedCut.Item1}");
-                    //newBoard.Print(true, false);
-                    //Console.ReadLine();
                     if (achivedCut.Item1 < minimalcutting && achivedCut.Item1 > 0 /*&& error!=-1*/)
                     {
                         cutBoard = achivedCut.Item2;
-                        //Console.WriteLine("cutBoard assigned here");
-                        //cutBoard.Print(false, false);
                         minimalcutting = achivedCut.Item1;
                     }
-                    //Console.WriteLine("cutBoard shouldn't change");
-                    //cutBoard.Print(false, false);
                 }
             }
-            //Console.WriteLine("board");
-            //board.Print(false, false);
-            //cutBoard.Print(false, false);
             return (minimalcutting, cutBoard);
         }
         public static int ErrorCheck(Board board)
@@ -82,9 +69,6 @@ namespace TetrisOptimization
         private static (int,Board) CountCuttingLine(Board board,(int y0,int y1, int x0, int x1) frame, (int y0, int y1) y,(int x0, int x1) x)
         {
             List<Gap> gaps = FindingGaps(frame);
-            //Console.WriteLine($"gaps: {gaps.Count}");
-            //changedBoard.Print();
-            //Console.ReadLine();
             foreach (var gap in gaps)
             {
                 gap.matrix = prepareMatrix(gap.size, gap.position, gap.fields);
@@ -126,7 +110,6 @@ namespace TetrisOptimization
                     if (rectangle.B.GetLength(0) > i && rectangle.B.GetLength(1) > j &&
                         mtrx.GetLength(0) > i - bounds.minY && mtrx.GetLength(1) > j - bounds.minX &&
                         rectangle.B[i, j].HasValue)
-                        //mtrx[i - bounds.minY, j - bounds.minX] = true;
                         colors[rectangle.B[i, j].Value][i - bounds.minY, j - bounds.minX] = true;
                 }
             }
@@ -143,7 +126,7 @@ namespace TetrisOptimization
         {
             int magic5 = 5, magic9 = 9,magic0=0;
             var rectangle = new Board(magic9, magic5);
-            var color = /*System.ConsoleColor.Red*/12;
+            var color =12;
             rectangle.B[magic9 - magic5, magic0] = color; //kolor czerwony
             int startX = x;
             int startY = y-(magic9-magic5);
@@ -305,43 +288,6 @@ namespace TetrisOptimization
                     }
                 }
             }
-            //for(int m=y.y0;m<=y.y1;m+=5)
-            //{
-            //    for(int n=x.x0;n<=x.x1;n+=5)
-            //    {
-            //        if(m<board.B.GetLength(0) && n<board.B.GetLength(1) && board.B[m,n].HasValue)
-            //        {
-            //            cutOffBlocks.AddRange(CheckAreaRight(board, m, n));
-            //        }
-            //    }
-            //}
-
-            ////usuwanie poza ramka
-            //int magic5 = 5;
-            ////cesc lewa
-            //for(int a=0;a<board.B.GetLength(0) - magic5;a++)
-            //{
-            //    for(int b=0;b<frame.y0;b++)
-            //    {
-            //        if(board.B[a,b].HasValue)
-            //        {
-            //            cutOffBlocks.AddRange(CheckAreaDown(board, a, b,magic5,frame.y0-b));
-            //        }
-            //    }
-            //}
-            ////czesc prawa
-            //for (int a = 0; a < board.B.GetLength(0) - magic5; a++)
-            //{
-            //    for (int b = frame.y1+1; b < board.B.GetLength(1); b++)
-            //    {
-            //        if (board.B[a, b].HasValue)
-            //        {
-            //            cutOffBlocks.AddRange(CheckAreaDown(board, a, b,magic5, board.B.GetLength(1)-b));
-            //        }
-            //    }
-            //}
-
-
 
             //dla listy odcietych blokow, patrzymy czy ktoras dziura pasuje idealnie do bloku
             var remaining = ExactFit(gaps, cutOffBlocks, board);
@@ -480,8 +426,6 @@ namespace TetrisOptimization
             {
                 for(int j=0;j<gap.matrix.GetLength(1);j++)
                 {
-                    //if ((gap.matrix[i, j].HasValue && rot.matrix[i, j])
-                    //    || (!gap.matrix[i, j].HasValue) && !rot.matrix[i, j]) return false;
                     if ((gap.matrix[i, j]==0 && rot.matrix[i, j])//gap 0 jest klocek
                         || (gap.matrix[i, j]==1) && !rot.matrix[i, j]) return false;
 
@@ -559,25 +503,6 @@ namespace TetrisOptimization
                     }
                 }
             }
-            //foreach (var g in gaps)
-            //{
-
-            //    for (int i = 0; i < g.matrix.GetLength(0); ++i)
-            //    {
-            //        Console.Write("|");
-            //        for (int j = 0; j < g.matrix.GetLength(1); ++j)
-            //        {
-            //            if (g.matrix[i, j] == 0)
-            //                Console.BackgroundColor = ConsoleColor.Red;
-            //            else
-            //                Console.BackgroundColor = ConsoleColor.Black;
-            //            Console.Write("  ");
-            //            Console.ResetColor();
-            //        }
-            //        Console.Write("|\n");
-            //    }
-            //    Console.Write("\n");
-            //}
             return gaps;
         }
 

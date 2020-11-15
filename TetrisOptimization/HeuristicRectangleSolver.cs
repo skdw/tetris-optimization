@@ -20,8 +20,6 @@ namespace TetrisOptimization
             forceSquare = false;
             currentFigure = new int[4];
             tempFigure = new int[4];
-            //rectangleX = 0;
-            //rectangleY = 0;
             rectangleWidth = 0;
             rectangleHeight = 0;
             currentAngle = 0;
@@ -42,24 +40,10 @@ namespace TetrisOptimization
             rectangleWidth = tp.Item1;
 
             //bierzemy liste permutacji klockow
-            //var list = GetPermutatedList();
             //narazie jedna permutacja wejsciowa, bo nie wiem o co chodzi w permutationHeuristic
             var ph = new PermutationHeuristic(5, blocks);
 
             List<List<Block>> list = ph.permutrationBlock;
-            //List<List<Block>> list = new List<List<Block>>();
-            ////list.Add(blocks);
-            //var temp = new List<Block>();
-            //foreach (var it in blocks)
-            //{
-            //    //var temp = new List<Block>();
-            //    for(int i=0;i<it.Item1;i++)
-            //    {
-            //        temp.Add(new Block(it.Item2.matrix));
-            //    }
-            //    //list.Add(temp);
-            //}
-            //list.Add(temp);
             //tworzymy plaszczyzne planszy - np. 10 * wieksze wymiary niz prostokat, takie ze nie wyjdziemy za nie
             //zakladamy ze poczatkowo ramka prostokata ktora bedziemy ruszac znajduje sie na srodku planszy
             int multiplier = 10;
@@ -89,7 +73,6 @@ namespace TetrisOptimization
                     if (first) // pierwszy klocek kladziemy na srodku glownego prostokata
                     {
                         //poloz klocek na srodku
-                       // var isAdded = board.TryToAdd(planeY / 2 - blck.matrix.GetLength(0) / 2 + 1,planeX / 2 - blck.matrix.GetLength(1) / 2, blck);
                         bool err = board.TryToAdd(planeY / 2, planeX / 2, blck);
                         //jak blad dodawania - wychodzimy
                         if (err) return (-1,boardFinal);
@@ -110,37 +93,24 @@ namespace TetrisOptimization
                     }
                     //zaktualizuj wymiary figury
                     UpdateCurrentDim();
-                    //board.Print(false, false);
-                    //Console.ReadLine();
                 }
                 first = true;
                 var boardTempVert = board;
                 var boardTempHoriz = board;
                 //cutting
                 var bounds = boardTempVert.GetBoundsPublic(true, false);
-                //Console.WriteLine("Board initial");
-                //boardTempVert.Print(true, false);
-                //Console.ReadLine();
                 var test = CuttingRectangle.Cutting(boardTempVert, (rectangleWidth, rectangleHeight), (bounds.minY, bounds.maxY), (bounds.minX, bounds.maxX));
-                //Console.WriteLine($"test vertical: {test.Item1}");
-                //test.Item2.Print(true, false);
-                //Console.ReadLine();
-                //Console.WriteLine(test.Item1);
                 if(test.Item1<bestCuts)
                 {
                     bestCuts = test.Item1;
                     boardFinal = test.Item2;
                 }
                 var test2 = CuttingRectangle.Cutting(boardTempHoriz, (rectangleHeight, rectangleWidth), (bounds.minY, bounds.maxY), (bounds.minX, bounds.maxX));
-                //Console.WriteLine($"test horizontal: {test2.Item1}");
-                //test2.Item2.Print(true, false);
-                //Console.WriteLine(test.Item1);
                 if (test2.Item1 < bestCuts)
                 {
                     bestCuts = test2.Item1;
                     boardFinal = test2.Item2;
                 }
-                //Console.ReadLine();
             }
             return (bestCuts,boardFinal);
         }
@@ -202,8 +172,6 @@ namespace TetrisOptimization
             return new List<List<ConsoleColor?[,]>>();
         }
 
-        // p r o s z e  z w e r y f i k u j c i e   t o 
-        //funkcja liczaca promien aktualnego okregu wg aktualnych xmax,xmin,... czy *2 wystarczy?
         public int GetCircleRadius(int centerX,int centerY)
         {
             return 10*Math.Max(Math.Max(Math.Abs(centerX - currentFigure[0]), Math.Abs(centerX-currentFigure[1])),Math.Max(Math.Abs(centerY-currentFigure[2]),Math.Abs(centerY-currentFigure[3])));
@@ -223,10 +191,6 @@ namespace TetrisOptimization
         //funkcja ktora updatuje wymiary xmin, xmax, ... ostatnio polozonego bloku
         public void UpdateTempDim(int x, int y, int xmax, int ymax)
         {
-            //if (x < tempFigure[0]) tempFigure[0] = x;
-            //if (xmax > tempFigure[1]) tempFigure[1] = xmax;
-            //if (y < tempFigure[2]) tempFigure[2] = y;
-            //if (ymax > tempFigure[3]) tempFigure[3] = ymax;
             tempFigure[0] = x;
             tempFigure[1] = xmax;
             tempFigure[2] = y;
@@ -240,9 +204,6 @@ namespace TetrisOptimization
             currentFigure[2] = tempFigure[2] < currentFigure[2] ? tempFigure[2] : currentFigure[2];
             currentFigure[3] = tempFigure[3] > currentFigure[3] ? tempFigure[3] : currentFigure[3];
         }
-        
-        
-        
         
         
         //narazie ustawione na dodawanie co 45* 
@@ -273,25 +234,6 @@ namespace TetrisOptimization
                 case -7 * Math.PI / 4:
                     return (start.Item1-1, start.Item2-1);
             }
-            //switch (currentAngle)
-            //{
-            //    case 0:
-            //        return (start.Item1, start.Item2-1);
-            //    case Math.PI:
-            //        return (start.Item1, start.Item2+1);
-            //    case Math.PI / 2:
-            //        return (start.Item1+1, start.Item2);
-            //    case 3 * Math.PI / 2:
-            //        return (start.Item1-1, start.Item2);
-            //    case Math.PI / 4:
-            //        return (start.Item1+1, start.Item2-1);
-            //    case 3 * Math.PI / 4:
-            //        return (start.Item1+1, start.Item2+1);
-            //    case 5 * Math.PI / 4:
-            //        return (start.Item1-1, start.Item2+1);
-            //    case 7 * Math.PI / 4:
-            //        return (start.Item1-1, start.Item2-1);
-            //}
             return start;
         }
            
@@ -304,7 +246,6 @@ namespace TetrisOptimization
         {
             var scanned = board.ScanBoard(start.Item1, start.Item2, block);
             (int, int) startPrev = start;
-            //(int, int) delta = GetDeltaXY(start, centerX, centerY);
             int dist = Distance(start, (centerX, centerY));
             int distPrev = Distance(start, (centerX, centerY));
             int howFarFromCenter = 3;
@@ -329,7 +270,6 @@ namespace TetrisOptimization
                 scanned = board.ScanBoard(start.Item1, start.Item2, block);
 
             }
-            //board.TryToAdd(startPrev.Item1, startPrev.Item2, block);
             bool err = board.TryToAdd(startPrev.Item1, startPrev.Item2, block);
             return !err;
         }
