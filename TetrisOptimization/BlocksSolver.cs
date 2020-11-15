@@ -37,7 +37,7 @@ namespace TetrisOptimization
 
         public void PrintBlocks()
         {
-            Console.WriteLine("Printing processed blocks");
+            Console.WriteLine("Processed blocks");
             foreach((int no, Block block) in blocks)
             {
                 Console.WriteLine($"{no} times:");

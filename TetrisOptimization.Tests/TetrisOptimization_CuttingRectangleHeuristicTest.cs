@@ -5,7 +5,7 @@ using NUnit.Framework;
 
 namespace TetrisOptimization.Tests
 {
-    public class TestOptimization_CuttingRectangleHeuristicTest
+    public class TetrisOptimization_CuttingRectangleHeuristicTest
     {
         [SetUp]
         public void Setup() { }

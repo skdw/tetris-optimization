@@ -3,23 +3,25 @@ using System.Collections.Generic;
 
 namespace TetrisOptimization
 {
-    public class HeuristicRectangle : BlocksSolver
+    public class HeuristicRectangleSolver : BlocksSolver
     {
         //xmin, xmax, ymin, ymax, current - aktualna figura na boardzie, temp - ostatnio kladziony blok
         public int[] currentFigure,tempFigure;
 
         //wymiary, polozenie ramki
-        int rectangleX, rectangleY;
+        //int rectangleX, rectangleY;
         int rectangleWidth,rectangleHeight;
 
         //aktualny kat zegara
         double currentAngle;
-        public HeuristicRectangle(List<(int, Block)> list, int blockSize) : base(list, blockSize)
+        public HeuristicRectangleSolver(List<(int, Block)> list, int blockSize) : base(list, blockSize)
         {
+            cutBounds = true;
+            forceSquare = false;
             currentFigure = new int[4];
             tempFigure = new int[4];
-            rectangleX = 0;
-            rectangleY = 0;
+            //rectangleX = 0;
+            //rectangleY = 0;
             rectangleWidth = 0;
             rectangleHeight = 0;
             currentAngle = 0;
