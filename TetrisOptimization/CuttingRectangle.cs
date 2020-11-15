@@ -11,20 +11,22 @@ namespace TetrisOptimization
     public static class CuttingRectangle
     {
         public static Board baseBoard;
+        
         /// <summary>
-        /// This is copy of baseBoard for each frame, to fill found gaps
+        /// Copy of baseBoard for each frame used to fill the found gaps
         /// </summary>
         public static Board changedBoard;
+
         /// <summary>
-        /// This function check each possible recangle place and chceck cutting length
+        /// This function checks each possible recangle place and the cutting length
         ///
         /// </summary>
         /// <param name="board">board with blocks</param>
         /// <param name="rectangle">size of rectangle</param>
-        /// <param name="x">where are blocks on board in x ax</param>
         /// <param name="y">where are blocks on board in y ax</param>
+        /// <param name="x">where are blocks on board in x ax</param>
         /// <returns></returns>
-        public static (int,Board) Cutting(Board board, (int y, int x) rectangle,  (int y0, int y1) y, (int x0, int x1) x)
+        public static (int, Board) Cutting(Board board, (int y, int x) rectangle, (int y0, int y1) y, (int x0, int x1) x)
         {
             baseBoard = new Board(board);
             changedBoard = new Board(board);
@@ -234,7 +236,7 @@ namespace TetrisOptimization
         public static (int,Board) LengthCut(Board board, (int y0, int y1, int x0, int x1) frame, (int y0, int y1) y,(int x0,int x1) x, List<Gap> gaps)
         {
             int cuts = 0;
-            ConsoleColor? lastColor = ConsoleColor.Red;
+            //ConsoleColor? lastColor = ConsoleColor.Red;
             //czym jest x i y?
             List<Block> cutOffBlocks = new List<Block>();
             //przejscie po ramce 
@@ -531,6 +533,7 @@ namespace TetrisOptimization
             }
             return (newBlocks,gps);
         }
+
         /// <summary>
         /// It finds gaps in frame, which is on loaded baseBoard in class 
         /// </summary>
@@ -577,6 +580,7 @@ namespace TetrisOptimization
             //}
             return gaps;
         }
+
         /// <summary>
         /// When Finding gaps find empty field on Board this function finds every empty field connected to this field
         /// </summary>
@@ -584,7 +588,7 @@ namespace TetrisOptimization
         /// <param name="position">position of empty field</param>
         /// <param name="gap">previous gap to increase</param>
         /// <returns>Whole gap inside the frame</returns>
-        private static Gap Req((int y0, int y1,int x0, int x1) frame, (int y, int x) position, Gap gap)
+        private static Gap Req((int y0, int y1, int x0, int x1) frame, (int y, int x) position, Gap gap)
         {
             int color = 12;
             changedBoard[position.y, position.x] = color;
