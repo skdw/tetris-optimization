@@ -1,4 +1,6 @@
-# tetris-optimization [![codecov](https://codecov.io/gh/skdw/tetris-optimization/branch/main/graph/badge.svg?token=5VAJVKNU49)](https://codecov.io/gh/skdw/tetris-optimization)
+# tetris-optimization 
+![.NET Core](https://github.com/skdw/tetris-optimization/workflows/.NET%20Core/badge.svg)
+[![codecov](https://codecov.io/gh/skdw/tetris-optimization/branch/main/graph/badge.svg?token=5VAJVKNU49)](https://codecov.io/gh/skdw/tetris-optimization)
 
 The algorithm arranges tetris puzzles to minimize their area. Overlapping is not permitted. 
 
