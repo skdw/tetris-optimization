@@ -60,14 +60,14 @@ namespace TetrisOptimization.UnitTests
 
         [Test]
         /// <summary>
-        /// Heuristic rectangle - not existing yet
+        /// Heuristic rectangle solver
         /// </summary>
         public void TestProgramMain115()
         {
             string path = "../../../../Data/Example5.txt";
             string[] args = { path };
-            var ex = Assert.Throws<NotImplementedException>(() => Program.Main(args));
-            Assert.That(ex.Message, Is.EqualTo("Heuristic rectangle solver is not implemented yet"));
+            Program.Main(args);
+            Assert.Pass();
         }
 
         [Test]

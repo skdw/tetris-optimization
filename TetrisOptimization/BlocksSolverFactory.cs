@@ -22,7 +22,7 @@ namespace TetrisOptimization
                 case "op":
                     return new PreciseRectangleSolver(blocks, blockSize);
                 case "hp":
-                    throw new NotImplementedException("Heuristic rectangle solver is not implemented yet");
+                    return new HeuristicRectangleSolver(blocks, blockSize);
                 default:
                     throw new ArgumentException("Unknown solver type");
             }

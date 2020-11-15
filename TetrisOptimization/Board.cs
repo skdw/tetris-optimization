@@ -38,9 +38,9 @@ namespace TetrisOptimization
         {
             var size = GetSize(bounds);
             if (forceSquare)
-                Console.WriteLine($"Printing square of side: {size.h}");
+                Console.WriteLine($"Square of side: {size.h}");
             else
-                Console.WriteLine($"Printing rectangle of size: h={size.h} w={size.w}");
+                Console.WriteLine($"Rectangle of size: h={size.h} w={size.w}");
         }
 
         /// <summary>
@@ -55,6 +55,7 @@ namespace TetrisOptimization
 
             for (int i = bounds.minY; i < bounds.maxY; ++i)
             {
+                Console.Write(String.Format("{0,5}", i));
                 Console.Write("|");
                 for (int j = bounds.minX; j < bounds.maxX; ++j)
                 {
@@ -136,6 +137,11 @@ namespace TetrisOptimization
             return (minY, maxY + 1, minX, maxX + 1);
         }
 
+        public (int minY, int maxY, int minX, int maxX) GetBoundsPublic(bool cutBounds, bool forceSquare)
+        {
+            return this.GetBounds(cutBounds, forceSquare);
+        }
+
         static (int h, int w) GetSize((int minY, int maxY, int minX, int maxX) bounds)
         {
             int h = bounds.maxY - bounds.minY;
@@ -182,6 +188,39 @@ namespace TetrisOptimization
                             B[y + cy, x + cx] = colortmpID;
                     }
             return false;
+        }
+
+        public bool TryToRemove(int y, int x, Block block)
+        {
+            for (int cy = 0; cy < block.size.y; ++cy)//y
+                for (int cx = 0; cx < block.size.x; ++cx)//x
+                    if ((y + cy >= B.GetLength(0)) || (x + cx >= B.GetLength(1)))
+                    {
+                        //Console.Error.WriteLine("Out of the board");
+                        return false;
+                    }
+            for (int cy = 0; cy < block.size.y; ++cy)//y
+                for (int cx = 0; cx < block.size.x; ++cx)
+                    if (block.matrix[cy, cx])
+                        B[y + cy, x + cx] = null;
+            return true;
+        }
+
+        public bool ScanBoard(int y, int x, Block block)
+        {
+            for (int cy = 0; cy < block.size.y; ++cy)//y
+                for (int cx = 0; cx < block.size.x; ++cx)//x
+                    if ((y + cy >= B.GetLength(0)) || (x + cx >= B.GetLength(1)))
+                    {
+                        //Console.Error.WriteLine("Out of the board");
+                        return false;
+                    }
+                    else if (B[y + cy, x + cx].HasValue && block.matrix[cy, cx])
+                    {
+                        //Console.Error.WriteLine("Trying to override the block");
+                        return false;
+                    }
+            return true;
         }
 
         public int SumIDs()
