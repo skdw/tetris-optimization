@@ -52,8 +52,6 @@ namespace TetrisOptimization
                 }
             }
             Console.WriteLine("board");
-            //board.Print(false, false);
-            //cutBoard.Print(false, false);
             return (minimalcutting, cutBoard);
         }
         private static (int,Board) CountCuttingLine(Board board,(int x0,int x1,int y0,int y1) frame, (int x0, int x1) x, (int y0, int y1) y)
@@ -64,7 +62,6 @@ namespace TetrisOptimization
                 gap.matrix = prepareMatrix(gap.size, gap.position, gap.fields);
             }
             //dodac klocki ktore sa na zewnatrz ramki
-            //int l = LengthCut(board, frame, x, y, gaps);
             //trying to fill gaps maby ++ way
             return LengthCut(board, frame, x, y, gaps); ;
         }
@@ -117,7 +114,7 @@ namespace TetrisOptimization
         {
             int magic5 = 5, magic9 = 9,magic0=0;
             var rectangle = new Board(magic5, magic9);
-            var color = /*System.ConsoleColor.Red*/12;
+            var color = 12;
             rectangle.B[magic9 - magic5, magic0] = color; //kolor czerwony
             int startX = x - (magic9 - magic5);
             int startY = y;
@@ -211,13 +208,11 @@ namespace TetrisOptimization
         {
             int cuts = 0;
             ConsoleColor? lastColor = ConsoleColor.Red;
-            //czym jest x i y?
             List<Block> cutOffBlocks = new List<Block>();
             //przejscie po ramce 
             for(int i=frame.x0;i<=frame.x1;i++)
             {
-                //lewa czesc ramki
-                
+                //lewa czesc ramki                
                 //sprawdzamy czy mamy taki sam kolor nad i pod ramka 
                 if(frame.y0 - 1>=0 &&
                     board.B.GetLength(0)>i && board.B.GetLength(1)>frame.y0 &&
@@ -390,8 +385,6 @@ namespace TetrisOptimization
             {
                 for(int j=0;j<gap.matrix.GetLength(1);j++)
                 {
-                    //if ((gap.matrix[i, j].HasValue && rot.matrix[i, j])
-                    //    || (!gap.matrix[i, j].HasValue) && !rot.matrix[i, j]) return false;
                     if ((gap.matrix[i, j]==0 && rot.matrix[i, j])//gap 0 jest klocek
                         || (gap.matrix[i, j]==1) && !rot.matrix[i, j]) return false;
 
