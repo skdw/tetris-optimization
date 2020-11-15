@@ -16,6 +16,12 @@ namespace TetrisOptimization
             fields = gap.fields;
         }
 
+        /// <summary>
+        /// Create a new gap
+        /// </summary>
+        /// <param name="size">size of matrix</param>
+        /// <param name="position">position on board</param>
+        /// <param name="fields">empty fields on board contained by the gap</param>
         public Gap((int y, int x) size, (int y, int x) position, List<(int y, int x)> fields)
         {
             this.size = size;
