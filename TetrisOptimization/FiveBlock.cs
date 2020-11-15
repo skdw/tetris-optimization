@@ -9,9 +9,7 @@ namespace TetrisOptimization
     {
         static readonly Random random = new Random();
 
-        static int GetRandomBlockId() => random.Next(FiveBlocks.Blocks.Count);
-
-        public static bool[,] GetRandomBlock() => FiveBlocks.Blocks[GetRandomBlockId() + 1];
+        static int GetRandomBlockId() => random.Next(FiveBlocks.Blocks.Count) + 1;
 
         /// <summary>
         /// Gets a FiveBlock of given index

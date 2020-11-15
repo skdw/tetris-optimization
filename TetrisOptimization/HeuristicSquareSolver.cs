@@ -4,9 +4,6 @@ using System.Drawing;
 using System.Dynamic;
 using System.Runtime.InteropServices;
 using System.Text;
-using TetrisOptimization.Blocks;
-
-
 
 namespace TetrisOptimization
 {
@@ -22,7 +19,7 @@ namespace TetrisOptimization
         public int achviedSize { get; set; }
 
     }
-    class HeuristicSquare : BlocksSolver
+    class HeuristicSquareSolver : BlocksSolver
     {
         int numBlocks;
         int numLists;
@@ -35,8 +32,10 @@ namespace TetrisOptimization
         Random r = new Random();
         PermutationHeuristic permutation;
         List<TetrisList> EvolutionList = new List<TetrisList>();
-        public HeuristicSquare(List<(int, Block)> _blocks, int _blockSize, int numLists, double procentage, int numPermutation) : base(_blocks, _blockSize)
+        public HeuristicSquareSolver(List<(int, Block)> _blocks, int _blockSize, int numLists, double procentage, int numPermutation) : base(_blocks, _blockSize)
         {
+            cutBounds = true;
+            forceSquare = true;
             this.numLists = numLists;
             this.procentage = procentage;
             this.permutation = new PermutationHeuristic(numPermutation, blocks);
@@ -108,6 +107,7 @@ namespace TetrisOptimization
         }
         public override Board Solve()
         {
+            Console.WriteLine("Solving the heuristic square problem");
             while (EvolutionList.Count > 1)
             {
                 foreach (var perm in permutation.permutrationBlock)

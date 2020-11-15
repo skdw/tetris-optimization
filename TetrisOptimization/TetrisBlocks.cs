@@ -1,9 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Numerics;
 
-namespace TetrisOptimization.Blocks
+namespace TetrisOptimization
 {
     public static class TetrisBlocks
     {
@@ -57,26 +55,15 @@ namespace TetrisOptimization.Blocks
             { true, true, true }
         };
 
-        static readonly List<bool[,]> blocks = new List<bool[,]> { I, J, Z, T, S, O, L };
-
-        static readonly Random random = new Random();
-
-        static int GetBlockId() => random.Next(blocks.Count);
-
-        public static bool[,] GetBlock() => blocks[GetBlockId()];
-
-        public static ConsoleColor?[,] GetColorBlock()
-        {
-            ConsoleColor color = (ConsoleColor)(random.Next(14) + 1);
-            bool[,] block = GetBlock();
-            ConsoleColor?[,] color_block = new ConsoleColor?[block.GetLength(0), block.GetLength(1)];
-            for (int i = 0; i < block.GetLength(0); ++i)
-                for (int j = 0; j < block.GetLength(1); ++j)
-                    if (block[i, j])
-                        color_block[i, j] = color;
-                    else
-                        color_block[i, j] = null;
-            return color_block;
-        }
+        public static readonly Dictionary<int, bool[,]> Blocks = new Dictionary<int, bool[,]> 
+        { 
+            {1, I},
+            {2, J},
+            {3, Z},
+            {4, T},
+            {5, S},
+            {6, O},
+            {7, L} 
+        };
     }
 }

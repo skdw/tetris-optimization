@@ -33,18 +33,6 @@ namespace TetrisOptimization
             return new Block(rot, (size.x, size.y));
         }
 
-        public int?[,] GetColorMatrix(int colorID)
-        {
-            int?[,] color_block = new int?[size.y, size.x];
-            for (int i = 0; i < size.y; ++i)
-                for (int j = 0; j < size.x; ++j)
-                    if (matrix[i, j])
-                        color_block[i, j] = colorID;
-                    else
-                        color_block[i, j] = null;
-            return color_block;
-        }
-
         public override bool Equals(object obj)
         {
             Block block = (Block)obj;

@@ -72,7 +72,14 @@ namespace TetrisOptimization
             return result;
         }
 
-        public static (int, int) DecodeCoords(int code, int a) =>
-            (code / a, code % a);
+        /// <summary>
+        /// Decodes coordinates from int to (i, j) indices of a*b board
+        /// </summary>
+        /// <param name="code"></param>
+        /// <param name="a"></param>
+        /// <param name="b"></param>
+        /// <returns></returns>
+        public static (int, int) DecodeCoords(int code, int a, int b) =>
+            (code / a, code % b);
     }
 }
