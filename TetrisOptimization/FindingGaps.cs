@@ -4,20 +4,26 @@ using System.Text;
 
 namespace TetrisOptimization
 {
-    static class FindingGaps
+    class FindingGaps
     {
         /// <summary>
         /// Copy of baseBoard for each frame used to fill the found gaps
         /// </summary>
-        public static Board changedBoard;
+        public Board changedBoard;
+        public Board board;
+        public FindingGaps(Board board)
+        {
+            this.board = board;
+            this.changedBoard = new Board(board);
+        }
+        
         /// <summary>
         /// It finds gaps in frame, which is on loaded baseBoard in class 
         /// </summary>
         /// <param name="frame">it is rectangle size frame</param>
         /// <returns>list of gaps in frame on loaded board</returns>
-        public static List<Gap> FindGaps(Board board, (int y0, int y1, int x0, int x1) frame)
+        public List<Gap> FindGaps((int y0, int y1, int x0, int x1) frame)
         {
-            changedBoard = new Board(board);
             List<Gap> gaps = new List<Gap>();
             for (int x = frame.x0; x <= frame.x1; x++)
             {
@@ -45,7 +51,7 @@ namespace TetrisOptimization
         /// <param name="position">position of empty field</param>
         /// <param name="gap">previous gap to increase</param>
         /// <returns>Whole gap inside the frame</returns>
-        private static Gap Req((int y0, int y1, int x0, int x1) frame, (int y, int x) position, Gap gap)
+        private  Gap Req((int y0, int y1, int x0, int x1) frame, (int y, int x) position, Gap gap)
         {
             int color = 12;
             changedBoard[position.y, position.x] = color;

@@ -63,7 +63,8 @@ namespace TetrisOptimization
         }
         private static (int,Board) CountCuttingLine(Board board,(int y0,int y1, int x0, int x1) frame, (int y0, int y1) y,(int x0, int x1) x)
         {
-            List<Gap> gaps = FindingGaps.FindGaps(board,frame);
+            FindingGaps findingGaps = new FindingGaps(board);
+            List<Gap> gaps = findingGaps.FindGaps(frame);
             foreach (var gap in gaps)
             {
                 gap.matrix = FindingGaps.prepareMatrix(gap.size, gap.position, gap.fields);
