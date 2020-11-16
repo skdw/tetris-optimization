@@ -85,7 +85,7 @@ namespace TetrisOptimization
 
             List<(int, Block)> blocks = new List<(int, Block)>() { (2, new FiveBlock(1)), (1, new FiveBlock(3)), (1, new FiveBlock(6)) };
             int blockSize = 5;
-            HeuristicSquareSolver heuristicSquareSolver = new HeuristicSquareSolver(blocks, blockSize, 600, 0.4, 1);
+            HeuristicSquareSolver heuristicSquareSolver = new HeuristicSquareSolver(blocks, blockSize, 600, 0.4, 1, 0.6);
             heuristicSquareSolver.PrintBlocks();
             heuristicSquareSolver.SolveMeasurePrint();
             Console.WriteLine("Minimal square calculated by heuristic algorithm: " + heuristicSquareSolver.minimalAchivedSize);

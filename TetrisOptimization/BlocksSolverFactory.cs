@@ -11,6 +11,8 @@ namespace TetrisOptimization
 
         private static int HKnumPermutation = 1;
 
+        private static double HPercentageBoardSize = 0.6;
+
         public static BlocksSolver GetSolver(string solverType, List<(int, Block)> blocks, int blockSize)
         {
             switch (solverType)
@@ -18,7 +20,7 @@ namespace TetrisOptimization
                 case "ok":
                     return new PreciseSquareSolver(blocks, blockSize);
                 case "hk":
-                    return new HeuristicSquareSolver(blocks, blockSize, HKnumLists, HKpercentage, HKnumPermutation);
+                    return new HeuristicSquareSolver(blocks, blockSize, HKnumLists, HKpercentage, HKnumPermutation, HPercentageBoardSize);
                 case "op":
                     return new PreciseRectangleSolver(blocks, blockSize);
                 case "hp":
