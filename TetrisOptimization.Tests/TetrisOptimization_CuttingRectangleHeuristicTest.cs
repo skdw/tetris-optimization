@@ -65,10 +65,10 @@ namespace TetrisOptimization.Tests
             board6.TryToAdd(0, 0, cb[0]);
             board6.TryToAdd(0, 4, cb[1]);
             //board6.Print();
-            Assert.AreEqual(cb[0].matrix.GetLength(0), 6);
-            Assert.AreEqual(cb[0].matrix.GetLength(1), 4);
-            Assert.AreEqual(cb[1].matrix.GetLength(0), 6);
-            Assert.AreEqual(cb[1].matrix.GetLength(1), 4);
+            Assert.AreEqual(cb[0].matrix.GetLength(0), 5);
+            Assert.AreEqual(cb[0].matrix.GetLength(1), 3);
+            Assert.AreEqual(cb[1].matrix.GetLength(0), 5);
+            Assert.AreEqual(cb[1].matrix.GetLength(1), 3);
         }
         [Test]
         public void LengthCutTest()
