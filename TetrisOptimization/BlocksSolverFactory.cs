@@ -1,18 +1,23 @@
 using System;
 using System.Collections.Generic;
+using Microsoft.Extensions.Configuration;
+using System.Globalization;
 
 namespace TetrisOptimization
 {
     public static class BlocksSolverFactory
     {
-        private static int HKnumLists = 600;
+        public static IConfiguration Configuration { private get; set; }
 
-        private static double HKpercentage = 0.4;
+        private static int HKnumLists => int.Parse(Configuration["HeuristicSquare:NumLists"]);
 
-        private static int HKnumPermutation = 1;
+        private static double HKpercentage => double.Parse(Configuration["HeuristicSquare:Percentage"], CultureInfo.InvariantCulture);
 
-        private static int HPnumPermutation = 5;
-        private static int HPmultiplier = 10;
+        private static int HKnumPermutation => int.Parse(Configuration["HeuristicSquare:NumPermutation"]);
+
+        private static int HPnumPermutation => int.Parse(Configuration["HeuristicRectangle:NumPermutation"]);
+
+        private static int HPmultiplier => int.Parse(Configuration["HeuristicRectangle:Multiplier"]);
 
         public static BlocksSolver GetSolver(string solverType, List<(int, Block)> blocks, int blockSize)
         {
