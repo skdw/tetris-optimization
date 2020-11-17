@@ -138,8 +138,11 @@ namespace TetrisOptimization
             }
 
             //int cuts = overlappingBlocks.Count; // count it
-            // solve the cuts
-            // var gaps = GetGaps(board);
+
+            // solve the cuts - uncomment after merging the refactoring branch
+            // var finding = new FindingGaps(board);
+            // var gaps = finding.FindGaps((0, board.Size.Y, 0, Size.X));
+
             //board.Print();
             int cuts = board.SumIDs();
             board.MoveOverlapped(force_override_id);
