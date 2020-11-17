@@ -40,6 +40,8 @@ namespace TetrisOptimization
                     var newBoard = new Board(baseBoard);
                     (int y1, int y2,int x0, int x1) frame = (yAx + y.y0, yAx + y.y0 + rectangle.y-1,xAx + x.x0, xAx + x.x0 + rectangle.x-1);
                     var achivedCut = CountCuttingLine(newBoard, frame,y,x);
+                    //baseBoard.Print();
+                    //newBoard.Print();
                     if (achivedCut.Item1 < minimalcutting && achivedCut.Item1 > 0 /*&& error!=-1*/)
                     {
                         cutBoard = achivedCut.Item2;
@@ -93,12 +95,12 @@ namespace TetrisOptimization
                     {
                         if(!colors.ContainsKey(rectangle.B[y,x].Value))
                         {
-                            colors.Add(rectangle.B[y,x].Value, new bool[bounds.maxY - bounds.minY + 1, bounds.maxX - bounds.minX + 1]);
+                            colors.Add(rectangle.B[y,x].Value, new bool[bounds.maxY - bounds.minY, bounds.maxX - bounds.minX]);
                         }
                     }
                 }    
             }
-            bool[,] mtrx = new bool[bounds.maxY - bounds.minY + 1, bounds.maxX - bounds.minX + 1];
+            bool[,] mtrx = new bool[bounds.maxY - bounds.minY, bounds.maxX - bounds.minX];
             for (int i = bounds.minY; i < bounds.maxY + 1; i++)
             {
                 for (int j = bounds.minX; j < bounds.maxX + 1; j++)

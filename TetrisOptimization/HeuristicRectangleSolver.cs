@@ -14,7 +14,10 @@ namespace TetrisOptimization
 
         //aktualny kat zegara
         double currentAngle;
-        public HeuristicRectangleSolver(List<(int, Block)> list, int blockSize) : base(list, blockSize)
+
+        //liczba permutacji i mnoznik wymiarow planszy
+        int numPermutation,multiplier;
+        public HeuristicRectangleSolver(List<(int, Block)> list, int blockSize, int _numPermutation, int hmultiplier) : base(list, blockSize)
         {
             cutBounds = true;
             forceSquare = false;
@@ -23,6 +26,8 @@ namespace TetrisOptimization
             rectangleWidth = 0;
             rectangleHeight = 0;
             currentAngle = 0;
+            numPermutation = _numPermutation;
+            multiplier = hmultiplier;
         }
 
         public override Board Solve()
@@ -41,12 +46,11 @@ namespace TetrisOptimization
 
             //bierzemy liste permutacji klockow
             //narazie jedna permutacja wejsciowa, bo nie wiem o co chodzi w permutationHeuristic
-            var ph = new PermutationHeuristic(5, blocks);
+            var ph = new PermutationHeuristic(numPermutation, blocks);
 
             List<List<Block>> list = ph.permutrationBlock;
             //tworzymy plaszczyzne planszy - np. 10 * wieksze wymiary niz prostokat, takie ze nie wyjdziemy za nie
             //zakladamy ze poczatkowo ramka prostokata ktora bedziemy ruszac znajduje sie na srodku planszy
-            int multiplier = 10;
             int planeX = tp.Item1 * multiplier, planeY = tp.Item2 * multiplier;
             var board = new Board(planeY, planeX);
             var boardFinal = new Board(planeY, planeX);
@@ -132,7 +136,7 @@ namespace TetrisOptimization
                             howManyOnes++;
             var divs = GetDivisors(howManyOnes);
             if(divs.Count%2==1)
-                return (divs[(int)Math.Round((double)divs.Count/2)-1],divs[(int)Math.Round((double)divs.Count/2)-1]);
+                return (divs[(int)Math.Round((double)divs.Count/2)],divs[(int)Math.Round((double)divs.Count/2)]);
             else
                  return (divs[divs.Count/2 - 1],divs[divs.Count/2]);
         }
