@@ -52,7 +52,7 @@ namespace TetrisOptimization
             for (long i = 0; i < combinationsNum; ++i)
             {
                 if (i % 1e3 == 0)
-                Console.WriteLine($"Analyzing combination #{i}...");
+                    Console.WriteLine($"Analyzing combination #{i}...");
 
                 // get the combination
                 var chosen_comb = Comb(combs, combsCounts, i);
@@ -70,7 +70,6 @@ namespace TetrisOptimization
                     foreach (var blockID in combBlockType) // for each block
                         choose[k++] = blank_ids[blockID];
 
-
                     // No nulls are left here
                     int[] combination = Array.ConvertAll(choose, value => value ?? default(int));
 
@@ -82,9 +81,9 @@ namespace TetrisOptimization
                     {
                         var comb_block = combination.Zip(blocks_choice, Tuple.Create);
                         (Board board, int cutLength) = CreateCutBoard(comb_block, a, b);
-                        if(cutLength == 0)
+                        if (cutLength == 0)
                             return (board, cutLength);
-                        if(cutLength < bestLength)
+                        if (cutLength < bestLength)
                         {
                             bestBoard = board;
                             bestLength = cutLength;
@@ -106,11 +105,11 @@ namespace TetrisOptimization
             int blocks_count = blocks.Sum(b => b.Item1);
             int area = blocks_count * blockSize;
             int sqrt = (int)Math.Sqrt(area);
-            for(int i = sqrt; i > 0; --i)
+            for (int i = sqrt; i > 0; --i)
             {
                 int a = i;
                 int b = area / a;
-                if(a * b == area)
+                if (a * b == area)
                     return (a, b);
             }
             return (1, area);
@@ -135,7 +134,7 @@ namespace TetrisOptimization
                 bool failure = board.TryToAdd(coords.Item1, coords.Item2, block, force_override_id);
                 if (failure)
                     return (board, Int32.MaxValue);
-                    //overlappingBlocks.Add(ind_bl);
+                //overlappingBlocks.Add(ind_bl);
             }
 
             //int cuts = overlappingBlocks.Count; // count it

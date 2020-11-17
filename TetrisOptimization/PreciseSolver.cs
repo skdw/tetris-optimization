@@ -18,7 +18,6 @@ namespace TetrisOptimization
             var zipp = blocks.Zip(block_rotations, (bl1, bl2) => (bl1.Item1, bl2));
         }
 
-
         protected IEnumerable<IEnumerable<Block>> BlocksChooses(IEnumerable<List<Block>> blocks_rot)
         {
             // Count the number of rotations of each block
