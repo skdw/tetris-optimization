@@ -113,7 +113,7 @@ namespace TetrisOptimization.Tests
         public void CheckAreaRightTest()
         {
             var boardTest4 = new Board(10, 10);
-            boardTest4.TryToAdd(7, 5, new Block(new bool[2, 3] { { true, true, true }, { true, true, false } }, ( 2,3)));
+            boardTest4.TryToAdd(7, 5, new Block(new bool[2, 3] { { true, true, true }, { true, true, false } }));
             //boardTest4.PrintBoard();
             var test4 = CuttingRectangle.CheckAreaRight(boardTest4, 8, 5);
             Assert.AreEqual(test4[0].matrix.GetLength(0), 2);
@@ -123,7 +123,7 @@ namespace TetrisOptimization.Tests
         public void CheckAreaLeftTest()
         {
             var boardTest4 = new Board(10, 10);
-            boardTest4.TryToAdd(7, 5, new Block(new bool[2, 3] { { true, true, true }, { true, true, false } }, ( 2,3)));
+            boardTest4.TryToAdd(7, 5, new Block(new bool[2, 3] { { true, true, true }, { true, true, false } }));
             //boardTest4.PrintBoard();
             var test4 = CuttingRectangle.CheckAreaLeft(boardTest4, 8, 5);
             Assert.AreEqual(test4[0].matrix.GetLength(0), 2);
@@ -133,7 +133,7 @@ namespace TetrisOptimization.Tests
         public void CheckAreaDownTest()
         {
             var boardTest4 = new Board(10, 10);
-            boardTest4.TryToAdd(7, 5, new Block(new bool[2, 3] { { true, true, true }, { true, true, false } }, (2, 3)));
+            boardTest4.TryToAdd(7, 5, new Block(new bool[2, 3] { { true, true, true }, { true, true, false } }));
             //boardTest4.PrintBoard();
             var test4 = CuttingRectangle.CheckAreaDown(boardTest4, 7, 6);
             Assert.AreEqual(test4[0].matrix.GetLength(0), 2);
@@ -143,7 +143,7 @@ namespace TetrisOptimization.Tests
         public void CheckAreaUpTest()
         {
             var boardTest4 = new Board(10, 10);
-            boardTest4.TryToAdd(7, 5, new Block(new bool[2, 3] { { true, true, true }, { true, true, false } }, (2, 3)));
+            boardTest4.TryToAdd(7, 5, new Block(new bool[2, 3] { { true, true, true }, { true, true, false } }));
             //boardTest4.PrintBoard();
             var test4 = CuttingRectangle.CheckAreaUp(boardTest4, 7, 5);
             Assert.AreEqual(test4[0].matrix.GetLength(0), 1);
