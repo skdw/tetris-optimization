@@ -2,8 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System;
-using System.Threading;
-using System.Threading.Tasks;
+using System.Numerics;
 
 namespace TetrisOptimization
 {
@@ -12,25 +11,18 @@ namespace TetrisOptimization
     /// </summary>
     public class PreciseSquareSolver : BlocksSolver
     {
-        private List<List<Block>> blocks_rot;
-
         public PreciseSquareSolver(List<(int, Block)> _blocks, int _blockSize) : base(_blocks, _blockSize)
         {
             cutBounds = true;
             forceSquare = true;
             var block_rotations = CommonMethods.GetRotations(blocks.Select(b => b.Item2).ToList());
             var zipp = blocks.Zip(block_rotations, (bl1, bl2) => (bl1.Item1, bl2));
-
-            blocks_rot = new List<List<Block>>();
-            foreach(var (count, block) in zipp)
-                for(int i = 0; i < count; ++i)
-                    blocks_rot.Add(block);
         }
 
         public override Board Solve()
         {
             Console.WriteLine("Solving the precise square problem");
-            return InternalSolve(blocks_rot, blockSize);
+            return InternalSolve();
         }
 
 #nullable enable
@@ -47,27 +39,38 @@ namespace TetrisOptimization
             return null;
         }
 
-        private Board InternalSolve(List<List<Block>> blocks, int block_size)
+        public IEnumerable<IEnumerable<Block>> BlocksChooses(IEnumerable<List<Block>> blocks_rot)
         {
             // Count the number of rotations of each block
-            var counts = CommonMethods.CountBlocks(blocks);
+            var counts = CommonMethods.CountBlocks(blocks_rot);
 
             // Number of blocks sequences
-            int counts_product = counts.Aggregate(1, (acc, bl) => acc * bl);
+            long counts_product = counts.Aggregate((long)1, (acc, bl) => acc * bl);
 
-            // Rotate blocks chooses
-            var blocks_chooses = Enumerable
-                .Range(0, counts_product)
-                .Select(i => blocks.Zip(CommonMethods.DecodeVariation(counts, i), (block, ind) => block[ind]))
-                .ToList();
+            for (long i = 0; i < counts_product; i++)
+            {
+                // Rotate blocks chooses
+                yield return blocks_rot.Zip(CommonMethods.Decode(counts, i), (block, ind) => block[ind]);
+            }
+        }
+
+        private Board InternalSolve()
+        {
+            int blocks_no = blocks.Sum(b => b.Item1);
+            var block_rotations = CommonMethods.GetRotations(blocks.Select(b => b.Item2).ToList());
+            var zipp = blocks.Zip(block_rotations, (bl1, bl2) => (bl1.Item1, bl2));
+            var blocks_rot = new List<List<Block>>();
+            foreach(var (count, block) in zipp)
+                for(int i = 0; i < count; ++i)
+                    blocks_rot.Add(block);
 
             // Square root of the sum of blocks areas
-            int a_min = (int)Math.Ceiling(Math.Sqrt(blocks.Count * block_size));
+            int a_min = (int)Math.Ceiling(Math.Sqrt(blocks_rot.Count * blockSize));
 
             // Sum of the long boxes edges
-            int a_max = Enumerable.Sum(blocks.Select(bls =>
+            int a_max = Enumerable.Sum(blocks_rot.Select(bls =>
             {
-                var b0s = bls[0].size;
+                var b0s = bls[0].Size;
                 if (b0s.Item1 > b0s.Item2)
                     return b0s.Item1;
                 return b0s.Item2;
@@ -76,23 +79,66 @@ namespace TetrisOptimization
             // Iterate over square sizes
             for (int a = a_min; a <= a_max; ++a)
             {
-                var board_indexes = Enumerable.Range(0, a * a - 1);
-                var combinations = CommonMethods.GetCombinations(board_indexes, blocks.Count);
+                Console.WriteLine($"Trying to fill blocks into the square of side {a}");
+                int leftToFill = a * a;
 
-                // Board? res = blocks_chooses
-                //     .AsParallel()
-                //     .Select(blocks_choice => ProcessBlocksChoice(combinations, blocks_choice, a))
-                //     .Where(b => b != null)
-                //     .FirstOrDefault();
-
-                // if(res != null)
-                //     return res;
-
-                // Iterate over blocks variations
-                foreach(var blocks_choice in blocks_chooses)
+                // list of lists of combinations for each blocks_count for each id on board
+                var combs = new List<List<IEnumerable<int>>>();
+                List<long> combs_counts = new List<long>();
+                foreach((int num, Block b) in blocks)
                 {
-                    // Permutate over board positions
-                    foreach (var combination in combinations)
+                    Console.WriteLine($"{leftToFill} choose {num}...");
+                    var board_indexes = Enumerable.Range(0, leftToFill);
+                    var combs1 = CommonMethods.GetKCombs(board_indexes, num).ToList();
+                    combs.Add(combs1);
+                    int cnt = combs1.Count;
+                    combs_counts.Add(cnt);
+                    Console.WriteLine($"{leftToFill} choose {num} = {cnt} combinations without repetitions");
+                    leftToFill -= num;
+                }
+
+                BigInteger combinations_big_num = combs_counts.Aggregate(BigInteger.One, (acc, bl) => acc * bl );
+                Console.WriteLine($"Together: {combinations_big_num} combinations without repetitions");
+
+                long combinations_num = long.MaxValue;
+                if(combinations_big_num > long.MaxValue)
+                    Console.WriteLine($"Processing only the first {long.MaxValue} combinations...");
+                else
+                    combinations_num = (long)combinations_big_num;
+
+                // Iterate over board positions' combinations
+                for(long i = 0; i < combinations_num; ++i)
+                {
+                    if(i % 1e3 == 0)
+                        Console.WriteLine($"Analyzing combination #{i}...");
+
+                    List<int> variation = CommonMethods.Decode(combs_counts, i);
+                    IEnumerable<int>[] chosen_comb = new IEnumerable<int>[combs_counts.Count];
+                    for(int j = 0; j < combs_counts.Count; ++j)
+                        chosen_comb[j] = combs[j][variation[j]];
+
+                    int?[] choose = new int?[blocks_no];
+                    int k = 0;
+                    foreach(var combBlockType in chosen_comb) // for each block type
+                    {
+                        var blank_ids = Enumerable
+                            .Range(0, a * a)
+                            .Where(i => !choose.Contains(i))
+                            .ToList();
+
+                        // at which blank id do we place the block?
+                        foreach(var blockID in combBlockType) // for each block
+                            choose[k++] = blank_ids[blockID];
+                    }
+
+                    // No nulls are left here
+                    int[] combination = Array.ConvertAll(choose, value => value ?? default(int));
+
+                    // Get an iterator
+                    var blocks_chooses = BlocksChooses(blocks_rot);
+
+                    // Iterate over blocks variations
+                    foreach(var blocks_choice in blocks_chooses)
                     {
                         var comb_block = combination.Zip(blocks_choice, Tuple.Create);
                         var board = TryToCreateBoard(comb_block, a);
