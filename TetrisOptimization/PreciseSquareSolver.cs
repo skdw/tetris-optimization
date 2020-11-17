@@ -30,7 +30,7 @@ namespace TetrisOptimization
             // Sum of the long boxes edges
             int a_max = Enumerable.Sum(blocks_rot.Select(bls =>
             {
-                var b0s = bls[0].size;
+                var b0s = bls[0].Size;
                 if (b0s.Item1 > b0s.Item2)
                     return b0s.Item1;
                 return b0s.Item2;

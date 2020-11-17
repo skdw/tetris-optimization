@@ -11,6 +11,9 @@ namespace TetrisOptimization
 
         private static int HKnumPermutation = 1;
 
+        private static int HPnumPermutation = 5;
+        private static int HPmultiplier = 10;
+
         public static BlocksSolver GetSolver(string solverType, List<(int, Block)> blocks, int blockSize)
         {
             switch (solverType)
@@ -22,7 +25,7 @@ namespace TetrisOptimization
                 case "op":
                     return new PreciseRectangleSolver(blocks, blockSize);
                 case "hp":
-                    return new HeuristicRectangleSolver(blocks, blockSize);
+                    return new HeuristicRectangleSolver(blocks, blockSize, HPnumPermutation, HPmultiplier);
                 default:
                     throw new ArgumentException("Unknown solver type");
             }
