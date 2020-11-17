@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using Microsoft.Extensions.Configuration;
 
 namespace TetrisOptimization
 {
@@ -101,6 +102,10 @@ namespace TetrisOptimization
 
         public static void Main(string[] args)
         {
+            var dname = Path.GetDirectoryName(System.Reflection.Assembly.GetEntryAssembly().Location);
+            var config_path = Path.GetFullPath(Path.Combine(dname, @"../../../solverconfig.json"));
+            SetConfiguration(config_path);
+
             switch(args.Length)
             {
                 case 0:
@@ -113,5 +118,12 @@ namespace TetrisOptimization
                     throw new ArgumentException("Usage: TetrisOptimization [path]");
             }
         }
+
+        public static void SetConfiguration(string config_path) =>
+            BlocksSolverFactory.Configuration = new ConfigurationBuilder()
+                .AddJsonFile(config_path, 
+                        optional: false,
+                        reloadOnChange: true)
+                .Build();
     }
 }
