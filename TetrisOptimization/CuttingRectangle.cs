@@ -112,7 +112,7 @@ namespace TetrisOptimization
             var lst = new List<Block>();
             foreach(var pair in colors)
             {
-                lst.Add(new Block(pair.Value, (pair.Value.GetLength(0), pair.Value.GetLength(1))));
+                lst.Add(new Block(pair.Value));
             }
             return lst;
         }
@@ -372,11 +372,11 @@ namespace TetrisOptimization
 
             var unitMatrix = new bool[1,1];
             unitMatrix[0, 0] = true;
-            var unitBlock = new Block(unitMatrix, (1, 1));
+            var unitBlock = new Block(unitMatrix);
             var unitBlockList = new List<Block>();
             for(int i=0;i<howManyUnitBlocks;i++)
             {
-                unitBlockList.Add(new Block(unitMatrix, (1, 1)));
+                unitBlockList.Add(new Block(unitMatrix));
             }
             foreach(Gap gap in remaining.gaps)
             {

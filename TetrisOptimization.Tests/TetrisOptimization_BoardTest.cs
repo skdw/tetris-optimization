@@ -18,7 +18,7 @@ namespace TetrisOptimization.UnitTests
             board.TryToAdd(8, 7, new FiveBlock(3));
             board.TryToAdd(5, 13, new FiveBlock(4));
             board.TryToAdd(10, 16, new FiveBlock(5));
-            board.TryToAdd(0, 0, new Block(new bool[,] {{true, false}, {false, true}}, (2, 2)));
+            board.TryToAdd(0, 0, new Block(new bool[,] {{true, false}, {false, true}}));
             Assert.Pass();
         }
     }
