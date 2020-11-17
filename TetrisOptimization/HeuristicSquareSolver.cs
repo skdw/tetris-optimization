@@ -19,7 +19,7 @@ namespace TetrisOptimization
         public int achviedSize { get; set; }
 
     }
-    class HeuristicSquareSolver : BlocksSolver
+    public class HeuristicSquareSolver : BlocksSolver
     {
         int numBlocks;
         int numLists;
@@ -75,7 +75,7 @@ namespace TetrisOptimization
         }
         public int tetris(List<(int, int)> arrange, List<Block> blocks)
         {
-            Board board = new Board(maxSquareSize, maxSquareSize);
+            Board board = new Board(maxSquareSize, (int)(maxSquareSize*procentageBoardSize));
             int y2 = 0;
             int x1 = arrange[0].Item1;
             int x2 = x1;
@@ -96,7 +96,6 @@ namespace TetrisOptimization
                     x2 = b.size.x + x;
                 if (y + b.size.y > y2)
                     y2 = y + b.size.y;
-
             }
             int size = Math.Max(x2 - x1, y2 - 1);
 
