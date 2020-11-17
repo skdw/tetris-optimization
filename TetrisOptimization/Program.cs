@@ -83,6 +83,7 @@ namespace TetrisOptimization
             board.Print(false, false);
             CuttingRectangle.Cutting(board, (6, 5), (0, 6), (0, 5));
 
+
             List<(int, Block)> blocks = new List<(int, Block)>() { (2, new FiveBlock(1)), (1, new FiveBlock(3)), (1, new FiveBlock(6)) };
             int blockSize = 5;
             HeuristicSquareSolver heuristicSquareSolver = new HeuristicSquareSolver(blocks, blockSize, 600, 0.4, 1);
