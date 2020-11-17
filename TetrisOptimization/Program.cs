@@ -103,7 +103,7 @@ namespace TetrisOptimization
         public static void Main(string[] args)
         {
             var dname = Path.GetDirectoryName(System.Reflection.Assembly.GetEntryAssembly().Location);
-            var config_path = Path.GetFullPath(Path.Combine(dname, @"../../../solverconfig.json"));
+            var config_path = Path.GetFullPath(Path.Combine(dname, @"../../../../solverconfig.json"));
             SetConfiguration(config_path);
 
             switch(args.Length)
