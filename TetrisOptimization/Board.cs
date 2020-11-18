@@ -326,22 +326,37 @@ namespace TetrisOptimization
                 }
             ).ToList();
 
-            // sort the gaps descending by the number of fields
-            gaps.Sort((Gap x, Gap y) => y.fields.Count.CompareTo(x.fields.Count));
+            List<Block> overlapsBlocks = overlapsMatrices.Select(m => new Block(m)).ToList();
 
-            foreach (Gap gap in gaps)
-            {
-                // pair the gaps with overlapsMatrices !!!
-            }
+            (var ovBlocks, var ovGaps) = CuttingRectangle.ExactFit(gaps, overlapsBlocks, this);
 
-            var zzip = overlaps.Zip(holes);
-            // invent a good way to place overlapped blocks (minimize the cuts!)
-            foreach ((var overlap, var hole) in zzip)
-            {
-                B[hole.Item1, hole.Item2] = overlap.Item3;
-            }
+            int result = CuttingRectangle.UnitCut((ovBlocks, ovGaps), this, 0);
+
+            // // sort the gaps descending by the number of fields
+            // gaps.Sort((Gap x, Gap y) => y.fields.Count.CompareTo(x.fields.Count));
+
+            // foreach (Gap gap in gaps)
+            // {
+            //     // pair the gaps with overlapsMatrices !!!
+
+            //     // czy któryś klocek pasuje idealnie? - ExactFit
+            //     // zapisujemy listę klocków, które zostały
+
+            //     // 1) idziemy i wciskamy mniejsze klocki w większe dziury
+            //     // 2) wciskamy inne mniejsze w większe - na początek pojedyncze
+            //     // te klocki, które się nie zmieszczą, trzeba ciachnąć na wszystkie możliwe sposoby
+
+            // }
+
+            // var zzip = overlaps.Zip(holes);
+            // // invent a good way to place overlapped blocks (minimize the cuts!)
+            // foreach ((var overlap, var hole) in zzip)
+            // {
+            //     B[hole.Item1, hole.Item2] = overlap.Item3;
+            // }
 
             return SumIDs(); // replace with the number of cuts
+            //return result;
         }
 
         /// <summary>

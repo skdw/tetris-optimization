@@ -11,7 +11,10 @@ namespace TetrisOptimization
     /// </summary>
     public class PreciseSquareSolver : PreciseSolver
     {
-        public PreciseSquareSolver(List<(int, Block)> _blocks, int _blockSize) : base(_blocks, _blockSize) { }
+        public PreciseSquareSolver(List<(int, Block)> _blocks, int _blockSize) : base(_blocks, _blockSize)
+        {
+            forceSquare = true;
+        }
 
         public override Board Solve()
         {
