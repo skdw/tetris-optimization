@@ -22,6 +22,11 @@ namespace TetrisOptimization
             set { B[i, j] = value; }
         }
 
+        public (int Y, int X) Size
+        {
+            get => (B.GetLength(0), B.GetLength(1));
+        }
+
         int colorID = 0;
 
         /// <summary>
@@ -77,8 +82,8 @@ namespace TetrisOptimization
 
         int GetMinYFilled()
         {
-            for (int i = 0; i < B.GetLength(0); ++i)
-                for (int j = 0; j < B.GetLength(1); ++j)
+            for (int i = 0; i < Size.Y; ++i)
+                for (int j = 0; j < Size.X; ++j)
                     if (B[i, j].HasValue)
                         return i;
             return -1;
@@ -86,8 +91,8 @@ namespace TetrisOptimization
 
         int GetMaxYFilled()
         {
-            for (int i = B.GetLength(0) - 1; i >= 0; --i)
-                for (int j = 0; j < B.GetLength(1); ++j)
+            for (int i = Size.Y - 1; i >= 0; --i)
+                for (int j = 0; j < Size.X; ++j)
                     if (B[i, j].HasValue)
                         return i;
             return -1;
@@ -95,8 +100,8 @@ namespace TetrisOptimization
 
         int GetMinXFilled()
         {
-            for (int j = 0; j < B.GetLength(1); ++j)
-                for (int i = 0; i < B.GetLength(0); ++i)
+            for (int j = 0; j < Size.X; ++j)
+                for (int i = 0; i < Size.Y; ++i)
                     if (B[i, j].HasValue)
                         return j;
             return -1;
@@ -104,8 +109,8 @@ namespace TetrisOptimization
 
         int GetMaxXFilled()
         {
-            for (int j = B.GetLength(1) - 1; j >= 0; --j)
-                for (int i = 0; i < B.GetLength(0); ++i)
+            for (int j = Size.X - 1; j >= 0; --j)
+                for (int i = 0; i < Size.Y; ++i)
                     if (B[i, j].HasValue)
                         return j;
             return -1;
@@ -114,7 +119,7 @@ namespace TetrisOptimization
         (int minY, int maxY, int minX, int maxX) GetBounds(bool cutBounds, bool forceSquare)
         {
             if (cutBounds == false)
-                return (0, B.GetLength(0), 0, B.GetLength(1));
+                return (0, Size.Y, 0, Size.X);
 
             int minY = GetMinYFilled();
             int maxY = GetMaxYFilled();
@@ -159,9 +164,9 @@ namespace TetrisOptimization
         public bool TryToAdd(int y, int x, Block block, int? force_override_id = null)
         {
             // Check for errors
-            for (int cy = 0; cy < block.size.y; ++cy)
-                for (int cx = 0; cx < block.size.x; ++cx)
-                    if ((y + cy >= B.GetLength(0)) || (x + cx >= B.GetLength(1)))
+            for (int cy = 0; cy < block.Size.Y; ++cy)
+                for (int cx = 0; cx < block.Size.X; ++cx)
+                    if ((y + cy >= Size.Y) || (x + cx >= Size.X))
                     {
                         // Out of the board
                         return true;
@@ -175,8 +180,8 @@ namespace TetrisOptimization
 
             // Add block to the board
             int colortmpID = ++colorID;
-            for (int cy = 0; cy < block.size.y; ++cy)
-                for (int cx = 0; cx < block.size.x; ++cx)
+            for (int cy = 0; cy < block.Size.Y; ++cy)
+                for (int cx = 0; cx < block.Size.X; ++cx)
                     if (block.matrix[cy, cx])
                     {
                         if(B[y + cy, x + cx].HasValue) // overriding
@@ -192,15 +197,15 @@ namespace TetrisOptimization
 
         public bool TryToRemove(int y, int x, Block block)
         {
-            for (int cy = 0; cy < block.size.y; ++cy)//y
-                for (int cx = 0; cx < block.size.x; ++cx)//x
-                    if ((y + cy >= B.GetLength(0)) || (x + cx >= B.GetLength(1)))
+            for (int cy = 0; cy < block.Size.Y; ++cy)//y
+                for (int cx = 0; cx < block.Size.X; ++cx)//x
+                    if ((y + cy >= Size.Y) || (x + cx >= Size.X))
                     {
                         //Console.Error.WriteLine("Out of the board");
                         return false;
                     }
-            for (int cy = 0; cy < block.size.y; ++cy)//y
-                for (int cx = 0; cx < block.size.x; ++cx)
+            for (int cy = 0; cy < block.Size.Y; ++cy)//y
+                for (int cx = 0; cx < block.Size.X; ++cx)
                     if (block.matrix[cy, cx])
                         B[y + cy, x + cx] = null;
             return true;
@@ -208,9 +213,9 @@ namespace TetrisOptimization
 
         public bool ScanBoard(int y, int x, Block block)
         {
-            for (int cy = 0; cy < block.size.y; ++cy)//y
-                for (int cx = 0; cx < block.size.x; ++cx)//x
-                    if ((y + cy >= B.GetLength(0)) || (x + cx >= B.GetLength(1)))
+            for (int cy = 0; cy < block.Size.Y; ++cy)//y
+                for (int cx = 0; cx < block.Size.X; ++cx)//x
+                    if ((y + cy >= Size.Y) || (x + cx >= Size.X))
                     {
                         //Console.Error.WriteLine("Out of the board");
                         return false;
@@ -226,11 +231,17 @@ namespace TetrisOptimization
         public int SumIDs()
         {
             int sum = 0;
-            for(int i = 0; i < B.GetLength(0); ++i)
-                for(int j = 0; j < B.GetLength(1); ++j)
+            for(int i = 0; i < Size.Y; ++i)
+                for(int j = 0; j < Size.X; ++j)
                     if(B[i, j].HasValue)
                         sum += B[i, j].Value;
             return sum;
+        }
+
+        public int SumCuts()
+        {
+            int cuts = 0;
+            return cuts;
         }
 
         /// <summary>
@@ -242,8 +253,8 @@ namespace TetrisOptimization
             List<(int, int)> holes = new List<(int, int)>();
             List<(int, int, int)> overlaps = new List<(int, int, int)>();
 
-            for(int i = 0; i < B.GetLength(0); ++i)
-                for(int j = 0; j < B.GetLength(1); ++j)
+            for(int i = 0; i < Size.Y; ++i)
+                for(int j = 0; j < Size.X; ++j)
                 {
                     if(B[i, j] == null)
                     {

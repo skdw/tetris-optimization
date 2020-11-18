@@ -1,0 +1,18 @@
+{
+    "HeuristicSquare": {
+        "NumLists": 600,
+        "Percentage": 0.4,
+        "NumPermutation": 1
+    },
+    "HeuristicRectangle": {
+        "NumPermutation": 1,
+        "Multiplier": 10
+    },
+    "Logging": {
+        "LogLevel": {
+            "Default": "Information",
+            "Microsoft": "Warning",
+            "Microsoft.Hosting.Lifetime": "Information"
+        }
+    }
+}

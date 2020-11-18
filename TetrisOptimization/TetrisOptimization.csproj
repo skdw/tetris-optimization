@@ -8,6 +8,8 @@
 
   <ItemGroup>
     <PackageReference Include="MedallionRandom" Version="1.1.0" />
+    <PackageReference Include="Microsoft.Extensions.Configuration" Version="5.0.0" />
+    <PackageReference Include="Microsoft.Extensions.Hosting" Version="5.0.0" />
   </ItemGroup>
 
 </Project>

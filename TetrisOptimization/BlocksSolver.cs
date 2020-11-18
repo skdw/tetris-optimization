@@ -41,7 +41,7 @@ namespace TetrisOptimization
             foreach((int no, Block block) in blocks)
             {
                 Console.WriteLine($"{no} times:");
-                Board blBoard = new Board(block.size.y, block.size.x);
+                Board blBoard = new Board(block.Size.Y, block.Size.X);
                 blBoard.TryToAdd(0, 0, block);
                 blBoard.Print();
             }

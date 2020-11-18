@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using Microsoft.Extensions.Configuration;
 
 namespace TetrisOptimization
 {
@@ -83,6 +84,7 @@ namespace TetrisOptimization
             board.Print(false, false);
             CuttingRectangle.Cutting(board, (6, 5), (0, 6), (0, 5));
 
+
             List<(int, Block)> blocks = new List<(int, Block)>() { (2, new FiveBlock(1)), (1, new FiveBlock(3)), (1, new FiveBlock(6)) };
             int blockSize = 5;
             HeuristicSquareSolver heuristicSquareSolver = new HeuristicSquareSolver(blocks, blockSize, 600, 0.4, 1, 0.6);
@@ -100,6 +102,10 @@ namespace TetrisOptimization
 
         public static void Main(string[] args)
         {
+            var dname = Path.GetDirectoryName(System.Reflection.Assembly.GetEntryAssembly().Location);
+            var config_path = Path.GetFullPath(Path.Combine(dname, @"../../../../solverconfig.json"));
+            SetConfiguration(config_path);
+
             switch(args.Length)
             {
                 case 0:
@@ -112,5 +118,12 @@ namespace TetrisOptimization
                     throw new ArgumentException("Usage: TetrisOptimization [path]");
             }
         }
+
+        public static void SetConfiguration(string config_path) =>
+            BlocksSolverFactory.Configuration = new ConfigurationBuilder()
+                .AddJsonFile(config_path, 
+                        optional: false,
+                        reloadOnChange: true)
+                .Build();
     }
 }

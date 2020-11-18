@@ -50,7 +50,7 @@ namespace TetrisOptimization
         {
             foreach (var t in blocks)
             {
-                int m = Math.Max(t.Item2.size.y, t.Item2.size.x);
+                int m = Math.Max(t.Item2.Size.Y, t.Item2.Size.X);
                 if (m > maxBlockSize)
                     maxBlockSize = m;
                 maxSquareSize += m * t.Item1;
@@ -92,10 +92,11 @@ namespace TetrisOptimization
                 } while (flag);
                 if (x1 > x)
                     x1 = x;
-                if (x2 < b.size.x + x)
-                    x2 = b.size.x + x;
-                if (y + b.size.y > y2)
-                    y2 = y + b.size.y;
+                if (x2 < b.Size.X + x)
+                    x2 = b.Size.X + x;
+                if (y + b.Size.Y > y2)
+                    y2 = y + b.Size.Y;
+
             }
             int size = Math.Max(x2 - x1, y2 - 1);
 
