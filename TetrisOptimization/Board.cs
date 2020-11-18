@@ -174,7 +174,7 @@ namespace TetrisOptimization
                     else if (B[y + cy, x + cx].HasValue && block.matrix[cy, cx])
                     {
                         // Trying to override the block
-                        if(force_override_id is null) // prevent overriding (square)
+                        if (force_override_id is null) // prevent overriding (square)
                             return true;
                     }
 
@@ -184,7 +184,7 @@ namespace TetrisOptimization
                 for (int cx = 0; cx < block.Size.X; ++cx)
                     if (block.matrix[cy, cx])
                     {
-                        if(B[y + cy, x + cx].HasValue) // overriding
+                        if (B[y + cy, x + cx].HasValue) // overriding
                         {
                             B[y + cy, x + cx] *= force_override_id;
                             B[y + cy, x + cx] += colortmpID;
@@ -231,9 +231,9 @@ namespace TetrisOptimization
         public int SumIDs()
         {
             int sum = 0;
-            for(int i = 0; i < Size.Y; ++i)
-                for(int j = 0; j < Size.X; ++j)
-                    if(B[i, j].HasValue)
+            for (int i = 0; i < Size.Y; ++i)
+                for (int j = 0; j < Size.X; ++j)
+                    if (B[i, j].HasValue)
                         sum += B[i, j].Value;
             return sum;
         }
@@ -248,31 +248,114 @@ namespace TetrisOptimization
         /// Moves overlapped blocks into blank locations
         /// </summary>
         /// <param name="force_override_id">override id - base of the numeral system</param>
-        public void MoveOverlapped(int force_override_id)
+        public int MoveOverlapped(int force_override_id)
         {
+            var finding = new FindingGaps(this);
+            List<Gap> gaps = finding.FindGaps((0, Size.Y - 1, 0, Size.X - 1));
+
             List<(int, int)> holes = new List<(int, int)>();
             List<(int, int, int)> overlaps = new List<(int, int, int)>();
 
-            for(int i = 0; i < Size.Y; ++i)
-                for(int j = 0; j < Size.X; ++j)
+            for (int i = 0; i < Size.Y; ++i)
+                for (int j = 0; j < Size.X; ++j)
                 {
-                    if(B[i, j] == null)
+                    if (B[i, j] == null)
                     {
                         holes.Add((i, j));
                     }
-                    while(B[i, j].HasValue && B[i, j].Value > force_override_id)
+                    while (B[i, j].HasValue && B[i, j].Value > force_override_id)
                     {
                         overlaps.Add((i, j, B[i, j].Value % force_override_id));
                         B[i, j] /= force_override_id;
                     }
                 }
 
+            // to podejście jest złe - jeden klocek może być rozcięty innym
+            // wtedy mamy dwa oddzielne obszary do poukładania
+            // int max_id = overlaps.Max(x => x.Item3);
+            // List<(int, int)>[] overlapBlocks = new List<(int, int)>[max_id + 1];
+            // for(int i = 0; i < max_id + 1; ++i)
+            //     overlapBlocks[i] = new List<(int, int)>();
+            // overlaps.ForEach(x => {
+            //     overlapBlocks[x.Item3].Add((x.Item1, x.Item2));
+            // });
+
+
+            List<List<int>> adjacentOverlapsIDs = new List<List<int>>();
+
+            int?[,] overlapsDistances = new int?[overlaps.Count, overlaps.Count];
+            for (int i = 0; i < overlaps.Count; ++i)
+                for (int j = 0; j <= i; ++j)
+                {
+                    overlapsDistances[i, j] = GetDistance(overlaps[i], overlaps[j]);
+
+                    // dist = 1 -> many cells of the same blocks are overlapping
+                    if (overlapsDistances[i, j] <= 1)
+                        adjacentOverlapsIDs.Add(new List<int>() { i, j });
+                }
+
+            for (int i = 1; i < adjacentOverlapsIDs.Count; ++i)
+                for (int j = 0; j < i; ++j)
+                    if (adjacentOverlapsIDs[j].Intersect(adjacentOverlapsIDs[i]).Any())
+                    {
+                        adjacentOverlapsIDs[j].AddRange(adjacentOverlapsIDs[i]);
+                        adjacentOverlapsIDs[i].Clear();
+                    }
+
+            List<List<int>> unionOverlaps = adjacentOverlapsIDs
+                .Where(x => x.Any())
+                .Select(x => x.Distinct())
+                .Select(x => x.ToList())
+                .ToList();
+
+            unionOverlaps.ForEach(x => x.Sort());
+            // min X, Y coords of overlapping cells
+            var minmaxYX = unionOverlaps.Select(ids =>
+                (ids.Min(x => overlaps[x].Item1), (ids.Min(x => overlaps[x].Item2)), ids.Max(x => overlaps[x].Item1), (ids.Max(x => overlaps[x].Item2)))
+                ).ToList();
+
+            List<bool[,]> overlapsMatrices = unionOverlaps
+                .Zip(minmaxYX)
+                .Select(x =>
+                {
+                    var union = x.First;
+                    var minmax = x.Second;
+                    var matrix = new bool[minmax.Item3 - minmax.Item1 + 1, minmax.Item4 - minmax.Item2 + 1];
+                    union.ForEach(p => matrix[overlaps[p].Item1 - minmax.Item1, overlaps[p].Item2 - minmax.Item2] = true);
+                    return matrix;
+                }
+            ).ToList();
+
+            // sort the gaps descending by the number of fields
+            gaps.Sort((Gap x, Gap y) => y.fields.Count.CompareTo(x.fields.Count));
+
+            foreach (Gap gap in gaps)
+            {
+                // pair the gaps with overlapsMatrices !!!
+            }
+
             var zzip = overlaps.Zip(holes);
             // invent a good way to place overlapped blocks (minimize the cuts!)
-            foreach((var overlap, var hole) in zzip)
+            foreach ((var overlap, var hole) in zzip)
             {
                 B[hole.Item1, hole.Item2] = overlap.Item3;
             }
+
+            return SumIDs(); // replace with the number of cuts
+        }
+
+        /// <summary>
+        /// Gets the distance between two blocks on the board
+        /// </summary>
+        /// <param name="y"></param>
+        /// <param name="b1"></param>
+        /// <param name="y"></param>
+        /// <param name="b2"></param>
+        /// <returns></returns>
+        private static int GetDistance((int y, int x, int id) b1, (int y, int x, int id) b2)
+        {
+            int differentBlocks = b1.id == b2.id ? 0 : 2;
+            return Math.Abs(b1.y - b2.y) + Math.Abs(b1.x - b2.x) + differentBlocks;
         }
     }
 }

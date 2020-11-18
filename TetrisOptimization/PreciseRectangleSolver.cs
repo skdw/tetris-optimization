@@ -126,26 +126,30 @@ namespace TetrisOptimization
         {
             int force_override_id = perm_block.Count() + 1;
             Board board = new Board(a, b);
-            //List<Tuple<int, Block>> overlappingBlocks = new List<Tuple<int, Block>>(); 
+
+            // At first, place the blocks which do not conflict each other
+            List<Tuple<int, Block>> overlappingBlocks = new List<Tuple<int, Block>>(); 
             foreach (var ind_bl in perm_block)
+            {
+                (int index, Block block) = ind_bl;
+                var coords = CommonMethods.DecodeCoords(index, a, b);
+                bool failure = board.TryToAdd(coords.Item1, coords.Item2, block);
+                if (failure)
+                    overlappingBlocks.Add(ind_bl);
+            }
+
+            // Then force to place the blocks which did not fit earlier
+            // (place them on top of previous blocks)
+            foreach (var ind_bl in overlappingBlocks)
             {
                 (int index, Block block) = ind_bl;
                 var coords = CommonMethods.DecodeCoords(index, a, b);
                 bool failure = board.TryToAdd(coords.Item1, coords.Item2, block, force_override_id);
                 if (failure)
                     return (board, Int32.MaxValue);
-                //overlappingBlocks.Add(ind_bl);
             }
 
-            //int cuts = overlappingBlocks.Count; // count it
-
-            // solve the cuts - uncomment after merging the refactoring branch
-            // var finding = new FindingGaps(board);
-            // var gaps = finding.FindGaps((0, board.Size.Y, 0, Size.X));
-
-            //board.Print();
-            int cuts = board.SumIDs();
-            board.MoveOverlapped(force_override_id);
+            int cuts = board.MoveOverlapped(force_override_id);
             return (board, cuts);
         }
     }
