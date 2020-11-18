@@ -4,7 +4,7 @@ using System.Text;
 
 namespace TetrisOptimization
 {
-    class FindingGaps
+    public class FindingGaps
     {
         /// <summary>
         /// Copy of baseBoard for each frame used to fill the found gaps
