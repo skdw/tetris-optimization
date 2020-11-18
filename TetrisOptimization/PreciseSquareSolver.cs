@@ -2,70 +2,36 @@
 using System.Collections.Generic;
 using System.Linq;
 using System;
-using System.Threading;
-using System.Threading.Tasks;
+using System.Numerics;
 
 namespace TetrisOptimization
 {
     /// <summary>
     /// Precise solver for square board
     /// </summary>
-    public class PreciseSquareSolver : BlocksSolver
+    public class PreciseSquareSolver : PreciseSolver
     {
-        private List<List<Block>> blocks_rot;
-
         public PreciseSquareSolver(List<(int, Block)> _blocks, int _blockSize) : base(_blocks, _blockSize)
         {
-            cutBounds = true;
             forceSquare = true;
-            var block_rotations = CommonMethods.GetRotations(blocks.Select(b => b.Item2).ToList());
-            var zipp = blocks.Zip(block_rotations, (bl1, bl2) => (bl1.Item1, bl2));
-
-            blocks_rot = new List<List<Block>>();
-            foreach(var (count, block) in zipp)
-                for(int i = 0; i < count; ++i)
-                    blocks_rot.Add(block);
         }
 
         public override Board Solve()
         {
             Console.WriteLine("Solving the precise square problem");
-            return InternalSolve(blocks_rot, blockSize);
+            return InternalSolve();
         }
 
-#nullable enable
-        private Board? ProcessBlocksChoice(IEnumerable<IEnumerable<int>> combinations, IEnumerable<Block> blocks_choice, int a)
+        private Board InternalSolve()
         {
-            // Permutate over board positions
-            foreach (var combination in combinations)
-            {
-                var comb_block = combination.Zip(blocks_choice, Tuple.Create);
-                var board = TryToCreateBoard(comb_block, a);
-                if(board != null)
-                    return board;
-            }
-            return null;
-        }
-
-        private Board InternalSolve(List<List<Block>> blocks, int block_size)
-        {
-            // Count the number of rotations of each block
-            var counts = CommonMethods.CountBlocks(blocks);
-
-            // Number of blocks sequences
-            int counts_product = counts.Aggregate(1, (acc, bl) => acc * bl);
-
-            // Rotate blocks chooses
-            var blocks_chooses = Enumerable
-                .Range(0, counts_product)
-                .Select(i => blocks.Zip(CommonMethods.DecodeVariation(counts, i), (block, ind) => block[ind]))
-                .ToList();
+            // Get blocks rotations
+            var blocks_rot = BlocksRot();
 
             // Square root of the sum of blocks areas
-            int a_min = (int)Math.Ceiling(Math.Sqrt(blocks.Count * block_size));
+            int a_min = (int)Math.Ceiling(Math.Sqrt(blocks_rot.Count * blockSize));
 
             // Sum of the long boxes edges
-            int a_max = Enumerable.Sum(blocks.Select(bls =>
+            int a_max = Enumerable.Sum(blocks_rot.Select(bls =>
             {
                 var b0s = bls[0].Size;
                 if (b0s.Item1 > b0s.Item2)
@@ -76,34 +42,57 @@ namespace TetrisOptimization
             // Iterate over square sizes
             for (int a = a_min; a <= a_max; ++a)
             {
-                var board_indexes = Enumerable.Range(0, a * a - 1);
-                var combinations = CommonMethods.GetCombinations(board_indexes, blocks.Count);
+                Console.WriteLine($"Trying to fill blocks into the square of side {a}");
+                int leftToFill = a * a;
 
-                // Board? res = blocks_chooses
-                //     .AsParallel()
-                //     .Select(blocks_choice => ProcessBlocksChoice(combinations, blocks_choice, a))
-                //     .Where(b => b != null)
-                //     .FirstOrDefault();
+                // Get the combinations
+                (var combs, var combsCounts) = Combs(leftToFill);
 
-                // if(res != null)
-                //     return res;
+                // Total number of combinations
+                long combinationsNum = CombsNum(combsCounts);
 
-                // Iterate over blocks variations
-                foreach(var blocks_choice in blocks_chooses)
+                // Iterate over board positions' combinations
+                for (long i = 0; i < combinationsNum; ++i)
                 {
-                    // Permutate over board positions
-                    foreach (var combination in combinations)
+                    if (i % 1e3 == 0)
+                        Console.WriteLine($"Analyzing combination #{i}...");
+
+                    // get the combination
+                    var chosen_comb = Comb(combs, combsCounts, i);
+
+                    int?[] choose = new int?[blocks.Sum(b => b.Item1)];
+                    int k = 0;
+                    foreach (var combBlockType in chosen_comb) // for each block type
+                    {
+                        List<int> blank_ids = Enumerable
+                            .Range(0, a * a)
+                            .Where(i => !choose.Contains(i))
+                            .ToList();
+
+                        // at which blank id do we place the block?
+                        foreach (var blockID in combBlockType) // for each block
+                            choose[k++] = blank_ids[blockID];
+                    }
+
+                    // No nulls are left here
+                    int[] combination = Array.ConvertAll(choose, value => value ?? default(int));
+
+                    // Get an iterator
+                    var blocks_chooses = BlocksChooses(blocks_rot);
+
+                    // Iterate over blocks variations
+                    foreach (var blocks_choice in blocks_chooses)
                     {
                         var comb_block = combination.Zip(blocks_choice, Tuple.Create);
                         var board = TryToCreateBoard(comb_block, a);
-                        if(board != null)
+                        if (board != null)
                             return board;
                     }
                 }
             }
             throw new System.OperationCanceledException("A board should be returned before");
         }
-
+#nullable enable
         /// <summary>
         /// Tries to create square board of size a*a with blocks on specified positions
         /// </summary>
@@ -122,6 +111,6 @@ namespace TetrisOptimization
             }
             return board;
         }
-        #nullable disable
+#nullable disable
     }
 }

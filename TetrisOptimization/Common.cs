@@ -58,15 +58,25 @@ namespace TetrisOptimization
                     (t1, t2) => t1.Concat(new T[] { t2 }));
         }
 
-        public static List<int> CountBlocks(List<List<Block>> blocks) =>
-            blocks.Select(bl => bl.Count).ToList();
+        public static IEnumerable<IEnumerable<T>> GetKCombs<T>(IEnumerable<T> list, int length) where T : IComparable
+        {
+            if (length == 1)
+                return list.Select(t => new T[] { t });
+            return GetKCombs(list, length - 1)
+                .SelectMany(t => list.Where(o => o.CompareTo(t.Last()) > 0), 
+                    (t1, t2) => t1.Concat(new T[] { t2 }));
+        }
 
-        public static List<int> DecodeVariation(List<int> counts, int code)
+
+        public static List<long> CountBlocks(IEnumerable<List<Block>> blocks) =>
+            blocks.Select(bl => (long)bl.Count).ToList();
+
+        public static List<int> Decode(List<long> counts, long code)
         {
             List<int> result = new List<int>();
             for (int i = 0; i < counts.Count; ++i)
             {
-                result.Add(code % counts[i]);
+                result.Add((int)(code % counts[i]));
                 code /= counts[i];
             }
             return result;
