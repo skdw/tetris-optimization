@@ -19,12 +19,13 @@ namespace TetrisOptimization
         public int achviedSize { get; set; }
 
     }
-    class HeuristicSquareSolver : BlocksSolver
+    public class HeuristicSquareSolver : BlocksSolver
     {
         int numBlocks;
         int numLists;
         int maxBlockSize = 0;
         double procentage;
+        double procentageBoardSize;
         int minSquareSize;
         public int minimalAchivedSize = int.MaxValue;
         Board bestBoard;
@@ -32,12 +33,13 @@ namespace TetrisOptimization
         Random r = new Random();
         PermutationHeuristic permutation;
         List<TetrisList> EvolutionList = new List<TetrisList>();
-        public HeuristicSquareSolver(List<(int, Block)> _blocks, int _blockSize, int numLists, double procentage, int numPermutation) : base(_blocks, _blockSize)
+        public HeuristicSquareSolver(List<(int, Block)> _blocks, int _blockSize, int numLists, double procentage, int numPermutation, double procentageBoardSize) : base(_blocks, _blockSize)
         {
             cutBounds = true;
             forceSquare = true;
             this.numLists = numLists;
             this.procentage = procentage;
+            this.procentageBoardSize = procentageBoardSize;
             this.permutation = new PermutationHeuristic(numPermutation, blocks);
             this.numBlocks = this.permutation.numBlock;
             Sizes();
@@ -64,7 +66,7 @@ namespace TetrisOptimization
                 List<(int x, int rot)> tmp_list = new List<(int, int)>();
                 for (int j = 0; j < numBlocks; j++)
                 {
-                    tmp_list.Add((r.Next(0, maxSquareSize - maxBlockSize), r.Next(0, 3)));
+                    tmp_list.Add((r.Next(0, (int)Math.Ceiling(maxSquareSize * procentageBoardSize) - maxBlockSize), r.Next(0, 3)));
                 }
 
                 EvolutionList.Add(new TetrisList(tmp_list));
@@ -73,7 +75,7 @@ namespace TetrisOptimization
         }
         public int tetris(List<(int, int)> arrange, List<Block> blocks)
         {
-            Board board = new Board(maxSquareSize, maxSquareSize);
+            Board board = new Board(maxSquareSize, (int)(maxSquareSize*procentageBoardSize));
             int y2 = 0;
             int x1 = arrange[0].Item1;
             int x2 = x1;
