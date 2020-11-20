@@ -170,12 +170,6 @@ namespace TetrisOptimization
             return v;
         }
 
-        //funckja liczaca permutacje klockow listy 
-        public List<List<ConsoleColor?[,]>> GetPermutatedList()
-        {
-            return new List<List<ConsoleColor?[,]>>();
-        }
-
         public int GetCircleRadius(int centerX,int centerY)
         {
             return 10*Math.Max(Math.Max(Math.Abs(centerX - currentFigure[0]), Math.Abs(centerX-currentFigure[1])),Math.Max(Math.Abs(centerY-currentFigure[2]),Math.Abs(centerY-currentFigure[3])));
