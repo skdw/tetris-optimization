@@ -11,9 +11,18 @@ namespace TetrisOptimization.UnitTests
         }
 
         [Test]
-        public void TestSixBlock()
+        public void TestSixBlock1()
         {
             string path = "../../../../Data/Example10.txt";
+            string[] args = { path };
+            Program.Main(args);
+            Assert.Pass();
+        }
+
+        [Test]
+        public void TestSixBlock2()
+        {
+            string path = "../../../../Data/Example11.txt";
             string[] args = { path };
             Program.Main(args);
             Assert.Pass();

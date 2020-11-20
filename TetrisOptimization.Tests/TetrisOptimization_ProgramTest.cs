@@ -95,11 +95,19 @@ namespace TetrisOptimization.UnitTests
         }
 
         [Test]
+        public void TestProgramMain1112()
+        {
+            string path = "../../../../Data/Example12.txt";
+            string[] args = { path };
+            Assert.Throws<NotImplementedException>(() => Program.Main(args));
+        }
+
+        [Test]
         public void TestProgramMain12()
         {
             string path = "non_existing_path";
             string[] args = { path };
-            var ex = Assert.Throws<FileNotFoundException>(() => Program.Main(args));
+            Assert.Throws<FileNotFoundException>(() => Program.Main(args));
         }
 
         [Test]
