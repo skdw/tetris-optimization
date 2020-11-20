@@ -9,10 +9,12 @@ namespace TetrisOptimization
         public Board(int y, int x)
         {
             B = new int?[y, x];
+            Size = (y, x);
         }
         public Board(Board b)
         {
-            this.B = b.B.Clone() as int?[,];
+            B = b.B.Clone() as int?[,];
+            Size = (B.GetLength(0), B.GetLength(1));
         }
 
         public readonly int?[,] B;
@@ -22,10 +24,7 @@ namespace TetrisOptimization
             set { B[i, j] = value; }
         }
 
-        public (int Y, int X) Size
-        {
-            get => (B.GetLength(0), B.GetLength(1));
-        }
+        public (int Y, int X) Size { get; }
 
         int colorID = 0;
 

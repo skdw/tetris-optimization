@@ -1,4 +1,7 @@
 {
+    "Precise": {
+        "ParallelStep": 1000
+    },
     "HeuristicSquare": {
         "NumLists": 600,
         "Percentage": 0.5,

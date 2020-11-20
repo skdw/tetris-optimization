@@ -2,7 +2,9 @@
 using System.Collections.Generic;
 using System.Linq;
 using System;
+using System.Collections.Concurrent;
 using System.Numerics;
+using System.Threading.Tasks;
 
 namespace TetrisOptimization
 {
@@ -11,7 +13,7 @@ namespace TetrisOptimization
     /// </summary>
     public class PreciseRectangleSolver : PreciseSolver
     {
-        public PreciseRectangleSolver(List<(int, Block)> _blocks, int _blockSize) : base(_blocks, _blockSize)
+        public PreciseRectangleSolver(List<(int, Block)> _blocks, int _blockSize, int _parallelStep) : base(_blocks, _blockSize, _parallelStep)
         {
             forceSquare = false;
         }
@@ -52,7 +54,8 @@ namespace TetrisOptimization
             long combinationsNum = CombsNum(combsCounts);
 
             // Iterate over board positions' combinations
-            for (long i = 0; i < combinationsNum; ++i)
+            //for (long i = 0; i < combinationsNum; ++i)
+            (Board, int)? CheckCombination(long i)
             {
                 if (i % 1e3 == 0)
                     Console.WriteLine($"Analyzing combination #{i}...");
@@ -64,10 +67,10 @@ namespace TetrisOptimization
                 int k = 0;
                 foreach (var combBlockType in chosen_comb) // for each block type
                 {
-                    List<int> blank_ids = Enumerable
+                    var blank_ids = Enumerable
                         .Range(0, a * b)
                         .Where(i => !choose.Contains(i))
-                        .ToList();
+                        .ToArray();
 
                     // at which blank id do we place the block?
                     foreach (var blockID in combBlockType) // for each block
@@ -93,8 +96,20 @@ namespace TetrisOptimization
                         }
                     }
                 }
+                return null;
             }
-
+            
+            var resultCollection = new ConcurrentBag<(Board, int)?>();
+            for (int k = 0; k < combinationsNum; k += parallelStep)
+            {
+                Parallel.For(k, k + parallelStep, i => 
+                    resultCollection.Add(CheckCombination(i)));
+                foreach (var board in resultCollection)
+                    if (board != null)
+                        return board.Value;
+                resultCollection.Clear();
+            }
+            
             Console.WriteLine($"Badness: {bestLength}");
             return (bestBoard, bestLength);
         }

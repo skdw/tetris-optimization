@@ -71,12 +71,12 @@ namespace TetrisOptimization
         public static List<long> CountBlocks(IEnumerable<List<Block>> blocks) =>
             blocks.Select(bl => (long)bl.Count).ToList();
 
-        public static List<int> Decode(List<long> counts, long code)
+        public static int[] Decode(List<long> counts, long code)
         {
-            List<int> result = new List<int>();
+            var result = new int[counts.Count];
             for (int i = 0; i < counts.Count; ++i)
             {
-                result.Add((int)(code % counts[i]));
+                result[i] = (int)(code % counts[i]);
                 code /= counts[i];
             }
             return result;
