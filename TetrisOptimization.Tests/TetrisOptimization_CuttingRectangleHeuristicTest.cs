@@ -12,9 +12,8 @@ namespace TetrisOptimization.Tests
         [Test]
         public void CuttingTest()
         {
-            List<(int, Block)> blocks2 = new List<(int, Block)>() { (10, new FiveBlock(1)), (20, new FiveBlock(3)), (15, new FiveBlock(6)), (15, new FiveBlock(7)), (9, new FiveBlock(8)) };
-
-            var hr = new HeuristicRectangleSolver(blocks2,5,5,10);
+            List<(int, Block)> blocks2 = new List<(int, Block)>() { (10, new FiveBlock(1)), (10, new FiveBlock(3)), (5, new FiveBlock(6)), (15, new FiveBlock(7)) };
+            var hr = new HeuristicRectangleSolver(blocks2,5,1,10);
             Board bestBoard = hr.Solve();
             bestBoard.Print(true, false);
             

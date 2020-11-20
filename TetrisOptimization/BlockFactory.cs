@@ -22,6 +22,10 @@ namespace TetrisOptimization
                     if (index.HasValue)
                         return new FiveBlock(index.Value);
                     return new FiveBlock();
+                case 6:
+                    if (index.HasValue)
+                        return new SixBlock(index.Value);
+                    return new SixBlock();
                 default:
                     throw new NotImplementedException();
             }

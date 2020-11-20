@@ -238,12 +238,6 @@ namespace TetrisOptimization
             return sum;
         }
 
-        public int SumCuts()
-        {
-            int cuts = 0;
-            return cuts;
-        }
-
         /// <summary>
         /// Moves overlapped blocks into blank locations
         /// </summary>

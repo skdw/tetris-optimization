@@ -1,5 +1,6 @@
 using System;
 using System.IO;
+using System.Threading.Tasks;
 using NUnit.Framework;
 
 namespace TetrisOptimization.UnitTests
@@ -83,11 +84,52 @@ namespace TetrisOptimization.UnitTests
         }
 
         [Test]
+        /// <summary>
+        /// Precise rectangle solver
+        /// </summary>
+        public void TestProgramMain119()
+        {
+            string path = "../../../../Data/Example9.txt";
+            string[] args = { path };
+            Program.Main(args);
+            Assert.Pass();
+        }
+
+        [Test]
+        public void TestProgramMain1112()
+        {
+            string path = "../../../../Data/Example12.txt";
+            string[] args = { path };
+            Assert.Throws<NotImplementedException>(() => Program.Main(args));
+        }
+
+        [Test]
+        public void TestProgramMain1113()
+        {
+            string path = "../../../../Data/Example13.txt";
+            string[] args = { path };
+            var task = Task.Run(() => Program.Main(args));
+            var completedInTime = task.Wait(2000);
+            Assert.False(completedInTime);
+        }
+
+        [Test]
+        /// <summary>
+        /// 2x2 blocks
+        /// </summary>
+        public void TestProgramMain1114()
+        {
+            string path = "../../../../Data/Example14.txt";
+            string[] args = { path };
+            Program.Main(args);
+            Assert.Pass();
+        }
+        [Test]
         public void TestProgramMain12()
         {
             string path = "non_existing_path";
             string[] args = { path };
-            var ex = Assert.Throws<FileNotFoundException>(() => Program.Main(args));
+            Assert.Throws<FileNotFoundException>(() => Program.Main(args));
         }
 
         [Test]
