@@ -27,5 +27,13 @@ namespace TetrisOptimization.UnitTests
             Program.Main(args);
             Assert.Pass();
         }
+
+        [Test]
+        public void TestSixEquality()
+        {
+            var b1 = new SixBlock(5);
+            var b2 = new SixBlock(10);
+            Assert.AreNotEqual(b1, b2);
+        }
     }
 }
