@@ -83,6 +83,18 @@ namespace TetrisOptimization.UnitTests
         }
 
         [Test]
+        /// <summary>
+        /// Precise rectangle solver
+        /// </summary>
+        public void TestProgramMain119()
+        {
+            string path = "../../../../Data/Example9.txt";
+            string[] args = { path };
+            Program.Main(args);
+            Assert.Pass();
+        }
+
+        [Test]
         public void TestProgramMain12()
         {
             string path = "non_existing_path";

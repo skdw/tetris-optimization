@@ -1,6 +1,6 @@
 {
     "HeuristicSquare": {
-        "NumLists": 60000,
+        "NumLists": 600,
         "Percentage": 0.5,
         "NumPermutation": 2
     },
