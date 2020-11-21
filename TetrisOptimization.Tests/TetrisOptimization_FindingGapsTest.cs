@@ -3,7 +3,7 @@ using System.Collections.Generic;
 
 namespace TetrisOptimization.UnitTests
 {
-    public class FingingGapsTest
+    public class FindingGapsTest
     {
         Board board;
         [SetUp]
