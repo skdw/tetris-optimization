@@ -122,7 +122,9 @@ namespace TetrisOptimization
         private static string GetConfigPath(string inputPath)
         {
             const string pattern = @"TetrisOptimization(?:\.Tests)?\/bin\/(Debug|Release)\/.+$";
-            var curDir = Regex.Replace(Directory.GetCurrentDirectory(), pattern, string.Empty);
+            const string patternWindows = @"TetrisOptimization(?:\.Tests)?\\bin\\(Debug|Release)\\.+$";
+            var curDir1 = Regex.Replace(Directory.GetCurrentDirectory(), pattern, string.Empty);
+            var curDir =  Regex.Replace(curDir1, patternWindows, string.Empty);
             var firstChar = inputPath.Substring(0, 1);
             var basePath = firstChar == "/" ? "" : curDir;
             var configPath = Path.GetFullPath(Path.Combine(basePath, inputPath));

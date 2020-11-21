@@ -21,7 +21,7 @@ namespace TetrisOptimization
 
         private static int HPmultiplier => int.Parse(Configuration["HeuristicRectangle:Multiplier"]);
 
-        private static double HPercentageBoardSize = 0.6;
+        private static double HPercentageBoardSize => 0.6;
 
         public static BlocksSolver GetSolver(string solverType, List<(int, Block)> blocks, int blockSize)
         {
