@@ -7,16 +7,16 @@ namespace TetrisOptimization
     /// </summary>
     public class FiveBlock : Block
     {
-        static readonly Random random = new Random();
+        private static readonly Random Random = new Random();
 
-        static int GetRandomBlockId() => random.Next(FiveBlocks.Blocks.Count) + 1;
+        static int GetRandomBlockId() => Random.Next(FiveBlocks.Blocks.Count) + 1;
 
         /// <summary>
         /// Gets a FiveBlock of given index
         /// </summary>
         /// <param name="i"></param>
         /// <returns></returns>
-        public FiveBlock(int i): base(FiveBlocks.Blocks[i + 1]) { }
+        public FiveBlock(int i): base(FiveBlocks.Blocks[i]) { }
 
         /// <summary>
         /// Gets a random FiveBlock

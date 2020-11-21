@@ -11,17 +11,17 @@ namespace TetrisOptimization
         protected bool cutBounds;
         protected bool forceSquare;
 
-        public BlocksSolver(List<(int, Block)> _blocks, int _blockSize)
+        protected BlocksSolver(List<(int, Block)> _blocks, int _blockSize)
         {
             blocks = _blocks;
             blockSize = _blockSize;
         }
         public abstract Board Solve();
 
-        public Board SolveAndMeasure()
+        private Board SolveAndMeasure()
         {
             Console.WriteLine("\n");
-            Stopwatch stopwatch = new Stopwatch();
+            var stopwatch = new Stopwatch();
             stopwatch.Start();
             var board = Solve();
             stopwatch.Stop();
@@ -41,7 +41,7 @@ namespace TetrisOptimization
             foreach((int no, Block block) in blocks)
             {
                 Console.WriteLine($"{no} times:");
-                Board blBoard = new Board(block.Size.Y, block.Size.X);
+                var blBoard = new Board(block.Size.Y, block.Size.X);
                 blBoard.TryToAdd(0, 0, block);
                 blBoard.Print();
             }

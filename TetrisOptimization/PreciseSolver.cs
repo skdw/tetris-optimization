@@ -10,10 +10,13 @@ namespace TetrisOptimization
     /// </summary>
     public abstract class PreciseSolver : BlocksSolver
     {
-        protected PreciseSolver(List<(int, Block)> _blocks, int _blockSize) : base(_blocks, _blockSize)
+        protected PreciseSolver(List<(int, Block)> _blocks, int _blockSize, int _parallelStep) : base(_blocks, _blockSize)
         {
             cutBounds = true;
+            parallelStep = _parallelStep;
         }
+
+        protected int parallelStep;
 
         protected IEnumerable<IEnumerable<Block>> BlocksChooses(IEnumerable<List<Block>> blocks_rot)
         {
@@ -75,7 +78,7 @@ namespace TetrisOptimization
 
         protected IEnumerable<int>[] Comb(List<List<IEnumerable<int>>> combs, List<long> combsCounts, long i)
         {
-            List<int> variation = CommonMethods.Decode(combsCounts, i);
+            var variation = CommonMethods.Decode(combsCounts, i);
             IEnumerable<int>[] chosen_comb = new IEnumerable<int>[combsCounts.Count];
             for (int j = 0; j < combsCounts.Count; ++j)
                 chosen_comb[j] = combs[j][variation[j]];

@@ -36,7 +36,7 @@ namespace TetrisOptimization
                         List<(int y, int x)> fieldlist = new List<(int y, int x)>();
                         Gap gap = new Gap((1, 1), (y, x), fieldlist);
                         Gap gapTmp = Req(frame, (y, x), gap);
-                        gapTmp.matrix = prepareMatrix(gapTmp.size, gapTmp.position, gapTmp.fields);
+                        gapTmp.matrix = PrepareMatrix(gapTmp.size, gapTmp.position, gapTmp.fields);
                         gaps.Add(gapTmp);
                     }
                 }
@@ -138,12 +138,12 @@ namespace TetrisOptimization
         /// </summary>
         /// <param name="size">gap size</param>
         /// <param name="position">gap position on Board</param>
-        /// <param name="fileds">fields from which gap consists</param>
+        /// <param name="fields">fields from which gap consists</param>
         /// <returns>gap matrix</returns>
-        public static int[,] prepareMatrix((int y, int x) size, (int y, int x) position, List<(int y, int x)> fileds)
+        public static int[,] PrepareMatrix((int y, int x) size, (int y, int x) position, List<(int y, int x)> fields)
         {
             int[,] matrix = new int[size.y, size.x];
-            foreach (var p in fileds)
+            foreach (var p in fields)
             {
                 matrix[p.y - position.y, p.x - position.x] = 1;
             }

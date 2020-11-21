@@ -10,12 +10,10 @@ namespace TetrisOptimization
         public Block(bool[,] matrix)
         {
             this.matrix = matrix;
+            Size = (matrix.GetLength(0), matrix.GetLength(1));
         }
 
-        public (int Y, int X) Size
-        {
-            get => (matrix.GetLength(0), matrix.GetLength(1));
-        }
+        public (int Y, int X) Size { get; }
 
         /// <summary>
         /// Rotates block by 90 degrees

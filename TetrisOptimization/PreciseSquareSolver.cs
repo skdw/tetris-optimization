@@ -1,8 +1,11 @@
 
+#nullable enable
 using System.Collections.Generic;
 using System.Linq;
 using System;
+using System.Collections.Concurrent;
 using System.Numerics;
+using System.Threading.Tasks;
 
 namespace TetrisOptimization
 {
@@ -11,7 +14,7 @@ namespace TetrisOptimization
     /// </summary>
     public class PreciseSquareSolver : PreciseSolver
     {
-        public PreciseSquareSolver(List<(int, Block)> _blocks, int _blockSize) : base(_blocks, _blockSize)
+        public PreciseSquareSolver(List<(int, Block)> _blocks, int _blockSize, int _parallelStep) : base(_blocks, _blockSize, _parallelStep)
         {
             forceSquare = true;
         }
@@ -52,7 +55,7 @@ namespace TetrisOptimization
                 long combinationsNum = CombsNum(combsCounts);
 
                 // Iterate over board positions' combinations
-                for (long i = 0; i < combinationsNum; ++i)
+                Board? CheckCombination(long i)
                 {
                     if (i % 1e3 == 0)
                         Console.WriteLine($"Analyzing combination #{i}...");
@@ -64,10 +67,10 @@ namespace TetrisOptimization
                     int k = 0;
                     foreach (var combBlockType in chosen_comb) // for each block type
                     {
-                        List<int> blank_ids = Enumerable
+                        var blank_ids = Enumerable
                             .Range(0, a * a)
                             .Where(i => !choose.Contains(i))
-                            .ToList();
+                            .ToArray();
 
                         // at which blank id do we place the block?
                         foreach (var blockID in combBlockType) // for each block
@@ -88,11 +91,22 @@ namespace TetrisOptimization
                         if (board != null)
                             return board;
                     }
+                    return null;
+                }
+                
+                var resultCollection = new ConcurrentBag<Board?>();
+                for (int k = 0; k < combinationsNum; k += parallelStep)
+                {
+                    Parallel.For(k, k + parallelStep, i => 
+                        resultCollection.Add(CheckCombination(i)));
+                    foreach (var board in resultCollection)
+                        if (board != null)
+                            return board;
+                    resultCollection.Clear();
                 }
             }
-            throw new System.OperationCanceledException("A board should be returned before");
+            throw new OperationCanceledException("A board should be returned before");
         }
-#nullable enable
         /// <summary>
         /// Tries to create square board of size a*a with blocks on specified positions
         /// </summary>

@@ -135,9 +135,9 @@ namespace TetrisOptimization.UnitTests
         [Test]
         public void TestProgramMain2()
         {
-            string[] args = { "", "" };
+            string[] args = { "", "", "" };
             var ex = Assert.Throws<ArgumentException>(() => Program.Main(args));
-            Assert.That(ex.Message, Is.EqualTo("Usage: TetrisOptimization [path]"));
+            Assert.That(ex.Message, Is.EqualTo("Usage: TetrisOptimization [data_path] [config_path]"));
         }
     }
 }

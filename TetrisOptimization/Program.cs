@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Text.RegularExpressions;
 using Microsoft.Extensions.Configuration;
 
 namespace TetrisOptimization
@@ -88,7 +89,7 @@ namespace TetrisOptimization
             var preciseRectangleSolver = BlocksSolverFactory.GetSolver("op", blocks2, blockSize);
             preciseRectangleSolver.SolveMeasurePrint();
 
-            var heuristicSquareSolver = BlocksSolverFactory.GetSolver("hk", blocks, blockSize) as HeuristicSquareSolver;
+            var heuristicSquareSolver = (HeuristicSquareSolver)BlocksSolverFactory.GetSolver("hk", blocks, blockSize);
             heuristicSquareSolver.PrintBlocks();
             heuristicSquareSolver.SolveMeasurePrint();
             Console.WriteLine("Minimal square calculated by heuristic algorithm: " + heuristicSquareSolver.minimalAchivedSize);
@@ -99,28 +100,48 @@ namespace TetrisOptimization
 
         public static void Main(string[] args)
         {
-            var dname = Path.GetDirectoryName(System.Reflection.Assembly.GetEntryAssembly().Location);
-            var config_path = Path.GetFullPath(Path.Combine(dname, @"../../../../solverconfig.json"));
-            SetConfiguration(config_path);
-
             switch(args.Length)
             {
                 case 0:
+                    SetConfiguration();
                     ExampleCallback();
                     break;
                 case 1:
+                    SetConfiguration();
+                    ParseInput(args[0], true);
+                    break;
+                case 2:
+                    SetConfiguration(args[1]);
                     ParseInput(args[0], true);
                     break;
                 default:
-                    throw new ArgumentException("Usage: TetrisOptimization [path]");
+                    throw new ArgumentException("Usage: TetrisOptimization [data_path] [config_path]");
             }
         }
 
-        public static void SetConfiguration(string config_path) =>
+        private static string GetConfigPath(string inputPath)
+        {
+            const string pattern = @"TetrisOptimization(?:\.Tests)?\/bin\/(Debug|Release)\/.+$";
+            const string patternWindows = @"TetrisOptimization(?:\.Tests)?\\bin\\(Debug|Release)\\.+$";
+            var curDir1 = Regex.Replace(Directory.GetCurrentDirectory(), pattern, string.Empty);
+            var curDir =  Regex.Replace(curDir1, patternWindows, string.Empty);
+            var firstChar = inputPath.Substring(0, 1);
+            var basePath = firstChar == "/" ? "" : curDir;
+            var configPath = Path.GetFullPath(Path.Combine(basePath, inputPath));
+            if (!File.Exists(configPath))
+                throw new FileNotFoundException($"Cannot load the solver configuration {configPath}", configPath);
+            Console.WriteLine($"Config path: {configPath}");
+            return configPath;
+        }
+
+        private static void SetConfiguration(string inputPath = "solverconfig.json")
+        {
             BlocksSolverFactory.Configuration = new ConfigurationBuilder()
-                .AddJsonFile(config_path, 
-                        optional: false,
-                        reloadOnChange: true)
+                .SetBasePath(Directory.GetCurrentDirectory())
+                .AddJsonFile(GetConfigPath(inputPath),
+                    optional: false,
+                    reloadOnChange: true)
                 .Build();
+        }
     }
 }
