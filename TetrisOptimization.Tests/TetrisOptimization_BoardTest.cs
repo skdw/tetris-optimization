@@ -74,7 +74,7 @@ namespace TetrisOptimization.UnitTests
         public void TestBoardErrorCheck2()
         {
             Board board = new Board(2, 2);
-            board.TryToAdd(0, 0, new TetrisBlock(5));
+            board.TryToAdd(0, 0, new TetrisBlock(6));
             int check = CuttingRectangle.ErrorCheck(board);
             Assert.AreEqual(check, 0);
         }

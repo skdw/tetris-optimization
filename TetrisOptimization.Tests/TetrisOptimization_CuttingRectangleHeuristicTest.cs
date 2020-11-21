@@ -3,9 +3,9 @@ using System.Collections.Generic;
 using System.Text;
 using NUnit.Framework;
 
-namespace TetrisOptimization.Tests
+namespace TetrisOptimization.UnitTests
 {
-    public class TetrisOptimization_CuttingRectangleHeuristicTest
+    public class CuttingRectangleHeuristicTest
     {
         [SetUp]
         public void Setup() { }
@@ -22,22 +22,22 @@ namespace TetrisOptimization.Tests
         [Test]
         public void HowManyUnitCutsTest()
         {
-            var test1 = new FiveBlock(1);
+            var test1 = new FiveBlock(2);
             Assert.AreEqual(CuttingRectangle.HowManyUnitCuts(test1),4);
-            var test2 = new FiveBlock(5);
+            var test2 = new FiveBlock(6);
             Assert.AreEqual(CuttingRectangle.HowManyUnitCuts(test2), 3);
         }
         [Test]
         public void ExactFitTest()
         {
-            var block1 = new FiveBlock(5);
+            var block1 = new FiveBlock(6);
             var mtrx1 = new ConsoleColor?[2, 3]
             {
                  {null,null,null },
                  { null,null,ConsoleColor.Red}
             };
             var gap1 = new Gap((2, 3), (0, 0), new List < (int y, int x) >{ (0,0),(0,1),(0,2),(1,0),(1,1) });
-            var block2 = new FiveBlock(1);
+            var block2 = new FiveBlock(2);
             var mtrx2 = new ConsoleColor?[3, 3]
             {
                  { ConsoleColor.Red, null, null},
@@ -45,7 +45,7 @@ namespace TetrisOptimization.Tests
              { ConsoleColor.Red, null, ConsoleColor.Red}
             };
             var gap2 = new Gap( (3, 3), (2, 3),new List<(int y, int x)> { (2,4),(2,5),(3,3),(3,4),(4,4) });
-            var block3 = new FiveBlock(6);//od 5
+            var block3 = new FiveBlock(5);
             var gap3 = new Gap( (3, 3), (5, 0),new List<(int y, int x)> { (5,1),(5,2),(6,0),(6,1),(7,1) });
             var boardTest = new Board(10, 10);
             var ef = CuttingRectangle.ExactFit(new List<Gap> { gap1, gap2, gap3 }, new List<Block> { block1, block2, block3 }, boardTest);
@@ -56,8 +56,8 @@ namespace TetrisOptimization.Tests
         public void GetCutBlockTest()
         {
             var boardTest5 = new Board(5, 5);
-            boardTest5.TryToAdd(0, 0, new FiveBlock(6));
-            boardTest5.TryToAdd(2, 0, new FiveBlock(9));
+            boardTest5.TryToAdd(0, 0, new FiveBlock(7));
+            boardTest5.TryToAdd(2, 0, new FiveBlock(10));
             //boardTest5.Print();
             var cb = CuttingRectangle.GetCutBlock(boardTest5);
             var board6 = new Board(10, 10);
@@ -85,14 +85,14 @@ namespace TetrisOptimization.Tests
         public void UnitCutTest()
         {
             Console.WriteLine("Exxact Fit test");
-            var block1 = new FiveBlock(5);
+            var block1 = new FiveBlock(6);
             var mtrx1 = new ConsoleColor?[2, 3]
             {
                  {null,null,null },
                  { null,null,ConsoleColor.Red}
             };
             var gap1 = new Gap( (2, 3), (0, 0),new List<(int y, int x)> { (0,0),(0,1),(0,2),(1,0),(1,1)});
-            var block2 = new FiveBlock(1);
+            var block2 = new FiveBlock(2);
             var mtrx2 = new ConsoleColor?[3, 3]
             {
                  { ConsoleColor.Red, null, null},
@@ -151,7 +151,7 @@ namespace TetrisOptimization.Tests
         [Test]
         public void DoesBlockFitTest()
         {
-            var block = new FiveBlock(5);
+            var block = new FiveBlock(6);
             var mtrx = new ConsoleColor?[2, 3]
             {
                  {null,null,null},

@@ -1,7 +1,7 @@
 ﻿using NUnit.Framework;
 using System.Collections.Generic;
 
-namespace TetrisOptimization.Tests
+namespace TetrisOptimization.UnitTests
 {
     class SquareHeuristicTest
     {

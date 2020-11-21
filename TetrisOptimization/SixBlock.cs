@@ -16,7 +16,7 @@ namespace TetrisOptimization
         /// </summary>
         /// <param name="i"></param>
         /// <returns></returns>
-        public SixBlock(int i): base(SixBlocks.Blocks[i + 1]) { }
+        public SixBlock(int i): base(SixBlocks.Blocks[i]) { }
 
         /// <summary>
         /// Gets a random TetrisBlock
