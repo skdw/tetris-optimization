@@ -30,7 +30,7 @@ namespace TetrisOptimization.UnitTests
         public void TestPrepareMatrix()
         {
             List<(int, int)> fields = new List<(int, int)>() { (0, 0), (1, 0), (1, 1), (2, 1), (2, 0) };
-            int[,] matrix = TetrisOptimization.FindingGaps.prepareMatrix((3,2), (0,0), fields);
+            int[,] matrix = TetrisOptimization.FindingGaps.PrepareMatrix((3,2), (0,0), fields);
             int[,] tmpmatrix = new int[3, 2];
             for (int i = 0; i < 3; i++)
                 for (int j = 0; j < 2; j++)

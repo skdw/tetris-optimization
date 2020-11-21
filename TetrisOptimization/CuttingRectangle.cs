@@ -10,10 +10,8 @@ namespace TetrisOptimization
 {
     public static class CuttingRectangle
     {
-        public static Board baseBoard;
+        private static Board _baseBoard;
         
-     
-
         /// <summary>
         /// This function checks each possible recangle place and the cutting length
         ///
@@ -25,7 +23,7 @@ namespace TetrisOptimization
         /// <returns></returns>
         public static (int, Board) Cutting(Board board, (int y, int x) rectangle, (int y0, int y1) y, (int x0, int x1) x)
         {
-            baseBoard = new Board(board);
+            _baseBoard = new Board(board);
             var cutBoard = new Board(board);
             int xDif = x.x1 - x.x0;
             int yDif = y.y1 - y.y0;
@@ -37,7 +35,7 @@ namespace TetrisOptimization
             {
                 for (int yAx = 0; yAx <= boarderY; yAx++)
                 {                    
-                    var newBoard = new Board(baseBoard);
+                    var newBoard = new Board(_baseBoard);
                     (int y1, int y2,int x0, int x1) frame = (yAx + y.y0, yAx + y.y0 + rectangle.y-1,xAx + x.x0, xAx + x.x0 + rectangle.x-1);
                     var achivedCut = CountCuttingLine(newBoard, frame,y,x);
                     //baseBoard.Print();
@@ -69,7 +67,7 @@ namespace TetrisOptimization
             List<Gap> gaps = findingGaps.FindGaps(frame);
             foreach (var gap in gaps)
             {
-                gap.matrix = FindingGaps.prepareMatrix(gap.size, gap.position, gap.fields);
+                gap.matrix = FindingGaps.PrepareMatrix(gap.size, gap.position, gap.fields);
             }
             //dodac klocki ktore sa na zewnatrz ramki
             //int l = LengthCut(board, frame, x, y, gaps);
@@ -384,7 +382,7 @@ namespace TetrisOptimization
             {
                 if (gap.matrix == null)
                 {
-                    gap.matrix = FindingGaps.prepareMatrix(gap.size, gap.position, gap.fields);
+                    gap.matrix = FindingGaps.PrepareMatrix(gap.size, gap.position, gap.fields);
                 }
                 for (int y=gap.position.y;y<gap.matrix.GetLength(0)+ gap.position.y; y++)
                 {
@@ -418,7 +416,7 @@ namespace TetrisOptimization
         /// <returns></returns>
         public static bool DoesBlockFit(Block rot, Gap gap)
         {
-            gap.matrix = FindingGaps.prepareMatrix(gap.size, gap.position, gap.fields);
+            gap.matrix = FindingGaps.PrepareMatrix(gap.size, gap.position, gap.fields);
             if (rot.matrix.GetLength(0)!= gap.matrix.GetLength(0) || rot.matrix.GetLength(1) != gap.matrix.GetLength(1)) return false;
             for(int i=0;i<gap.matrix.GetLength(0);i++)
             {
@@ -475,8 +473,5 @@ namespace TetrisOptimization
             }
             return (newBlocks,gps);
         }
-
-        
-
     }
 }

@@ -37,9 +37,9 @@ namespace TetrisOptimization
             else
                 return block.Rotate().Rotate().Rotate();
         }
-        public static int MinSqareSize(int num_block, int size)
+        public static int MinSqareSize(int numBlock, int size)
         {
-            return (int)Math.Ceiling(Math.Sqrt(num_block * size));
+            return (int)Math.Ceiling(Math.Sqrt(numBlock * size));
         }
 
         /// <summary>

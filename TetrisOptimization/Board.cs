@@ -14,37 +14,35 @@ namespace TetrisOptimization
         public Board(Board b)
         {
             B = b.B.Clone() as int?[,];
-            Size = (B.GetLength(0), B.GetLength(1));
+            if (B != null)
+                Size = (B.GetLength(0), B.GetLength(1));
         }
 
         public readonly int?[,] B;
         public int? this[int i, int j]
         {
-            get { return B[i, j]; }
-            set { B[i, j] = value; }
+            get => B[i, j];
+            set => B[i, j] = value;
         }
 
-        public (int Y, int X) Size { get; }
+        private (int Y, int X) Size { get; }
 
-        int colorID = 0;
+        int _colorId = 0;
 
         /// <summary>
         /// Get ConsoleColor for printing blocks
         /// </summary>
-        /// <param name="colorID">integer ID of color</param>
+        /// <param name="colorId">integer ID of color</param>
         /// <returns>console color</returns>
-        static ConsoleColor GetColor(int colorID) => (ConsoleColor)((colorID * 2) % 15 + 1);
+        private static ConsoleColor GetColor(int colorId) => (ConsoleColor)(colorId * 2 % 15 + 1);
 
         /// <summary>
         /// Print the size of the board
         /// </summary>
-        void PrintSize(bool forceSquare, (int, int, int, int) bounds)
+        static void PrintSize(bool forceSquare, (int, int, int, int) bounds)
         {
-            var size = GetSize(bounds);
-            if (forceSquare)
-                Console.WriteLine($"Square of side: {size.h}");
-            else
-                Console.WriteLine($"Rectangle of size: h={size.h} w={size.w}");
+            var (h, w) = GetSize(bounds);
+            Console.WriteLine(forceSquare ? $"Square of side: {h}" : $"Rectangle of size: h={h} w={w}");
         }
 
         /// <summary>
@@ -59,9 +57,9 @@ namespace TetrisOptimization
 
             for (int i = bounds.minY; i < bounds.maxY; ++i)
             {
-                Console.Write(String.Format("{0,5}", i));
+                Console.Write($"{i,5}");
                 Console.Write("|");
-                for (int j = bounds.minX; j < bounds.maxX; ++j)
+                for (var j = bounds.minX; j < bounds.maxX; ++j)
                 {
                     try
                     {
@@ -178,7 +176,7 @@ namespace TetrisOptimization
                     }
 
             // Add block to the board
-            int colortmpID = ++colorID;
+            int colortmpID = ++_colorId;
             for (int cy = 0; cy < block.Size.Y; ++cy)
                 for (int cx = 0; cx < block.Size.X; ++cx)
                     if (block.matrix[cy, cx])
@@ -227,7 +225,7 @@ namespace TetrisOptimization
             return true;
         }
 
-        public int SumIDs()
+        public int Badness()
         {
             int sum = 0;
             for (int i = 0; i < Size.Y; ++i)
@@ -240,14 +238,14 @@ namespace TetrisOptimization
         /// <summary>
         /// Moves overlapped blocks into blank locations
         /// </summary>
-        /// <param name="force_override_id">override id - base of the numeral system</param>
-        public int MoveOverlapped(int force_override_id)
+        /// <param name="forceOverrideId">override id - base of the numeral system</param>
+        public int MoveOverlapped(int forceOverrideId)
         {
             var finding = new FindingGaps(this);
             List<Gap> gaps = finding.FindGaps((0, Size.Y - 1, 0, Size.X - 1));
 
-            List<(int, int)> holes = new List<(int, int)>();
-            List<(int, int, int)> overlaps = new List<(int, int, int)>();
+            var holes = new List<(int, int)>();
+            var overlaps = new List<(int, int, int)>();
 
             for (int i = 0; i < Size.Y; ++i)
                 for (int j = 0; j < Size.X; ++j)
@@ -256,23 +254,12 @@ namespace TetrisOptimization
                     {
                         holes.Add((i, j));
                     }
-                    while (B[i, j].HasValue && B[i, j].Value > force_override_id)
+                    while (B[i, j].HasValue && B[i, j].Value > forceOverrideId)
                     {
-                        overlaps.Add((i, j, B[i, j].Value % force_override_id));
-                        B[i, j] /= force_override_id;
+                        overlaps.Add((i, j, B[i, j].Value % forceOverrideId));
+                        B[i, j] /= forceOverrideId;
                     }
                 }
-
-            // to podejście jest złe - jeden klocek może być rozcięty innym
-            // wtedy mamy dwa oddzielne obszary do poukładania
-            // int max_id = overlaps.Max(x => x.Item3);
-            // List<(int, int)>[] overlapBlocks = new List<(int, int)>[max_id + 1];
-            // for(int i = 0; i < max_id + 1; ++i)
-            //     overlapBlocks[i] = new List<(int, int)>();
-            // overlaps.ForEach(x => {
-            //     overlapBlocks[x.Item3].Add((x.Item1, x.Item2));
-            // });
-
 
             List<List<int>> adjacentOverlapsIDs = new List<List<int>>();
 
@@ -314,42 +301,16 @@ namespace TetrisOptimization
                     var union = x.First;
                     var minmax = x.Second;
                     var matrix = new bool[minmax.Item3 - minmax.Item1 + 1, minmax.Item4 - minmax.Item2 + 1];
-                    union.ForEach(p => matrix[overlaps[p].Item1 - minmax.Item1, overlaps[p].Item2 - minmax.Item2] = true);
+                    union?.ForEach(p =>
+                        matrix[overlaps[p].Item1 - minmax.Item1, overlaps[p].Item2 - minmax.Item2] = true);
                     return matrix;
                 }
             ).ToList();
 
-            List<Block> overlapsBlocks = overlapsMatrices.Select(m => new Block(m)).ToList();
-
-            (var ovBlocks, var ovGaps) = CuttingRectangle.ExactFit(gaps, overlapsBlocks, this);
-
-            int result = CuttingRectangle.UnitCut((ovBlocks, ovGaps), this, 0);
-
-            // // sort the gaps descending by the number of fields
-            // gaps.Sort((Gap x, Gap y) => y.fields.Count.CompareTo(x.fields.Count));
-
-            // foreach (Gap gap in gaps)
-            // {
-            //     // pair the gaps with overlapsMatrices !!!
-
-            //     // czy któryś klocek pasuje idealnie? - ExactFit
-            //     // zapisujemy listę klocków, które zostały
-
-            //     // 1) idziemy i wciskamy mniejsze klocki w większe dziury
-            //     // 2) wciskamy inne mniejsze w większe - na początek pojedyncze
-            //     // te klocki, które się nie zmieszczą, trzeba ciachnąć na wszystkie możliwe sposoby
-
-            // }
-
-            // var zzip = overlaps.Zip(holes);
-            // // invent a good way to place overlapped blocks (minimize the cuts!)
-            // foreach ((var overlap, var hole) in zzip)
-            // {
-            //     B[hole.Item1, hole.Item2] = overlap.Item3;
-            // }
-
-            return SumIDs(); // replace with the number of cuts
-            //return result;
+            var overlapsBlocks = overlapsMatrices.Select(m => new Block(m)).ToList();
+            var (ovBlocks, ovGaps) = CuttingRectangle.ExactFit(gaps, overlapsBlocks, this);
+            var result = CuttingRectangle.UnitCut((ovBlocks, ovGaps), this, 0);
+            return Badness();
         }
 
         /// <summary>
@@ -362,7 +323,7 @@ namespace TetrisOptimization
         /// <returns></returns>
         private static int GetDistance((int y, int x, int id) b1, (int y, int x, int id) b2)
         {
-            int differentBlocks = b1.id == b2.id ? 0 : 2;
+            var differentBlocks = b1.id == b2.id ? 0 : 2;
             return Math.Abs(b1.y - b2.y) + Math.Abs(b1.x - b2.x) + differentBlocks;
         }
     }
