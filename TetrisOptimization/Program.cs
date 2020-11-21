@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Text.RegularExpressions;
 using Microsoft.Extensions.Configuration;
 
 namespace TetrisOptimization
@@ -120,15 +121,17 @@ namespace TetrisOptimization
 
         private static string GetConfigPath(string inputPath)
         {
+            const string pattern = @"TetrisOptimization(?:\.Tests)?\/bin\/(Debug|Release)\/.+$";
+            var curDir = Regex.Replace(Directory.GetCurrentDirectory(), pattern, string.Empty);
             var firstChar = inputPath.Substring(0, 1);
-            var basePath = firstChar == "/" ? "" : Directory.GetCurrentDirectory();
-            var configPath = Path.GetFullPath(Path.Combine(basePath ?? string.Empty, inputPath));
+            var basePath = firstChar == "/" ? "" : curDir;
+            var configPath = Path.GetFullPath(Path.Combine(basePath, inputPath));
             if (!File.Exists(configPath))
-                throw new FileNotFoundException("Cannot load the solver configuration", configPath);
+                throw new FileNotFoundException($"Cannot load the solver configuration {configPath}", configPath);
             Console.WriteLine($"Config path: {configPath}");
             return configPath;
         }
-        
+
         private static void SetConfiguration(string inputPath = "solverconfig.json")
         {
             BlocksSolverFactory.Configuration = new ConfigurationBuilder()
