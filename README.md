@@ -12,9 +12,13 @@ The optimal algorithms, working on consecutive combinations, take a ParallelStep
 The heuristic algorithms accept following additional arguments:
 
 HPnumPermutation - a number of random block permutations (rectangle heuristic & square heuristic)
+
 HPmultiplier - a multiplier of board area with respect to coveted rectangle area (rectangle heuristic)
+
 HKnumLists - a number of block lists consisting of block position and rotation (square heuristic)
+
 HKpercentage - a fraction of best block lists accepted in each while loop (square heuristic)
+
 HPercentageBoardSize - a fraction of max board area, on which the blocks will be put (square heuristic)
 
 # Stages
