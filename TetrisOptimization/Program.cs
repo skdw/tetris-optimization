@@ -46,6 +46,7 @@ namespace TetrisOptimization
                         .Where(x => x.First > 0)
                         .ToList();
                 }
+                Console.WriteLine("\nCalling the solver: {0}", solverType);
                 BlocksSolver solver = BlocksSolverFactory.GetSolver(solverType, blocks, blockSize);
                 if(printBlocks)
                 {
@@ -65,7 +66,12 @@ namespace TetrisOptimization
         {
             try
             {
-                Queue<string> lines = new Queue<string>(File.ReadAllLines(path));
+                var linesArray = File.ReadAllLines(path);
+                Console.WriteLine("Reading input from file: {0}", path);
+                foreach(var line in linesArray)
+                    Console.WriteLine(line);
+                Console.WriteLine();
+                Queue<string> lines = new Queue<string>(linesArray);
                 CallAlgorithms(lines, printBlocks);
             }
             catch
