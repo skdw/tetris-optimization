@@ -9,6 +9,8 @@ namespace TetrisOptimization
 {
     public static class Program
     {
+        public static bool KeyToPass = true;
+
         /// <summary>
         /// Call algorithms given lines of input data
         /// </summary>
@@ -54,6 +56,13 @@ namespace TetrisOptimization
                     printBlocks = false;
                 }
                 solver.SolveMeasurePrint();
+                if(KeyToPass && lines.Count > 0)
+                {
+                    Console.WriteLine("Press 'q' to quit or press any other key to solve the next problem...");
+                    var key = Console.ReadKey();
+                    if(key.KeyChar == 'q')
+                        break;
+                }
             }
         }
 
