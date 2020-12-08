@@ -10,6 +10,7 @@ namespace TetrisOptimization.UnitTests
         [SetUp]
         public void Setup()
         {
+            Program.KeyToPass = false;
         }
 
         [Test]
