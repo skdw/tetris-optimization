@@ -54,6 +54,13 @@ namespace TetrisOptimization
                     printBlocks = false;
                 }
                 solver.SolveMeasurePrint();
+                if(lines.Count > 0)
+                {
+                    Console.WriteLine("Press 'q' to quit or press any other key to solve the next problem...");
+                    var key = Console.ReadKey();
+                    if(key.KeyChar == 'q')
+                        break;
+                }
             }
         }
 
