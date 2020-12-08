@@ -33,10 +33,6 @@ jobs:
       - name: Build solution
         run: dotnet build --configuration Release --no-restore
 
-      # Runs a single command using the runners shell
-      - name: Run an app
-        run: dotnet run --project TetrisOptimization
-
       # Runs unit tests
       - name: Run unit tests
         run: |

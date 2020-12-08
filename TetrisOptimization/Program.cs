@@ -93,24 +93,10 @@ namespace TetrisOptimization
         static void ExampleCallback()
         {
             Console.WriteLine("Processing the example callback");
-            List<(int, Block)> blocks = new List<(int, Block)>() { (2, new FiveBlock(1)), (5, new FiveBlock(3)), (10, new FiveBlock(6)) };
-            List<(int, Block)> blocks2 = new List<(int, Block)>() { (2, new FiveBlock(1)), (1, new FiveBlock(3)) };
-            int blockSize = 5;
-
-            var preciseSquareSolver = BlocksSolverFactory.GetSolver("ok", blocks2, blockSize);
-            preciseSquareSolver.PrintBlocks();
-            preciseSquareSolver.SolveMeasurePrint();
-
-            var preciseRectangleSolver = BlocksSolverFactory.GetSolver("op", blocks2, blockSize);
-            preciseRectangleSolver.SolveMeasurePrint();
-
-            var heuristicSquareSolver = (HeuristicSquareSolver)BlocksSolverFactory.GetSolver("hk", blocks, blockSize);
-            heuristicSquareSolver.PrintBlocks();
-            heuristicSquareSolver.SolveMeasurePrint();
-            Console.WriteLine("Minimal square calculated by heuristic algorithm: " + heuristicSquareSolver.minimalAchivedSize);
-
-            var heuristicRectangleSolver = BlocksSolverFactory.GetSolver("hp", blocks, blockSize);
-            heuristicRectangleSolver.SolveMeasurePrint();
+            var linesArray = new string[] { "5", "hk", "20", "5", "ok", "0 2 1 1" };
+            Console.WriteLine();
+            Queue<string> lines = new Queue<string>(linesArray);
+            CallAlgorithms(lines, true);
         }
 
         public static void Main(string[] args)
