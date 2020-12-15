@@ -76,12 +76,9 @@ namespace TetrisOptimization
         static void ExampleCallback()
         {
             Console.WriteLine("Processing the example callback");
-            Board board = new Board(6, 5);
-            board.TryToAdd(1, 0, new FiveBlock(2));
-            board.TryToAdd(0, 2, new FiveBlock(4));
-            board.TryToAdd(3, 0, new FiveBlock(2));
-            board.Print(false, false);
-            CuttingRectangle.Cutting(board, (6, 5), (0, 6), (0, 5));
+            HeuristicRectangleSolver heuristicRectangleSolver = new HeuristicRectangleSolver(new List<(int, Block)> { (10,new FiveBlock(10)) }, 5, 5, 10);
+            heuristicRectangleSolver.PrintBlocks();
+            heuristicRectangleSolver.SolveMeasurePrint();
 
 
             List<(int, Block)> blocks = new List<(int, Block)>() { (2, new FiveBlock(1)), (1, new FiveBlock(3)), (1, new FiveBlock(6)) };
