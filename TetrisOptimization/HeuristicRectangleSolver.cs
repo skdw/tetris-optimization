@@ -27,7 +27,7 @@ namespace TetrisOptimization
             rectangleHeight = 0;
             currentAngle = 0;
             numPermutation = _numPermutation;
-            multiplier = hmultiplier;
+            multiplier = hmultiplier<10?10:hmultiplier;
         }
 
         public override Board Solve()
@@ -81,7 +81,7 @@ namespace TetrisOptimization
                         //jak blad dodawania - wychodzimy
                         if (err) return (-1,boardFinal);
                         //zaktualizuj wymiary figury
-                        UpdateTempDim(planeX / 2 - blck.matrix.GetLength(0) / 2, planeY / 2 - blck.matrix.GetLength(1) / 2, blck.matrix.GetLength(0) + planeX / 2 - blck.matrix.GetLength(0) / 2, blck.matrix.GetLength(1) + planeY / 2 - blck.matrix.GetLength(1) / 2 + 1);
+                        UpdateTempDim(board,planeX / 2 - blck.matrix.GetLength(0) / 2, planeY / 2 - blck.matrix.GetLength(1) / 2, blck.matrix.GetLength(0) + planeX / 2 - blck.matrix.GetLength(0) / 2, blck.matrix.GetLength(1) + planeY / 2 - blck.matrix.GetLength(1) / 2 + 1);
                         first = !first;
                     }
                     else
@@ -187,12 +187,17 @@ namespace TetrisOptimization
         }
 
         //funkcja ktora updatuje wymiary xmin, xmax, ... ostatnio polozonego bloku
-        public void UpdateTempDim(int x, int y, int xmax, int ymax)
+        public void UpdateTempDim(Board board,int x, int y, int xmax, int ymax)
         {
-            tempFigure[0] = x;
-            tempFigure[1] = xmax;
-            tempFigure[2] = y;
-            tempFigure[3] = ymax;
+            var b = board.GetBoundsPublic(true, false);
+            tempFigure[0] = b.minY;
+            tempFigure[1] = b.maxY;
+            tempFigure[2] = b.minX;
+            tempFigure[3] = b.maxX;
+            //tempFigure[0] = x;
+            //tempFigure[1] = xmax;
+            //tempFigure[2] = y;
+            //tempFigure[3] = ymax;
         }
         //funkcja ktora updateuje wymiary aktualnej figury na podstawie ostatnio polozonego bloczku
         public void UpdateCurrentDim()
@@ -254,7 +259,7 @@ namespace TetrisOptimization
                 bool err1 = board.TryToAdd(start.Item1, start.Item2, block);
                 if (err1) return false;
                 //updateujemy 
-                UpdateTempDim(start.Item1, start.Item2, start.Item1+block.matrix.GetLength(0), start.Item2+block.matrix.GetLength(1));
+                UpdateTempDim(board, start.Item1, start.Item2, start.Item1+block.matrix.GetLength(0), start.Item2+block.matrix.GetLength(1));
                 //
                 startPrev = start;
                 distPrev = dist;

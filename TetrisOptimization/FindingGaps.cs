@@ -29,7 +29,7 @@ namespace TetrisOptimization
             {
                 for (int y = frame.y0; y <= frame.y1; y++)
                 {
-                    if (!changedBoard[y, x].HasValue)
+                    if (y >= 0 && y < changedBoard.B.GetLength(0) && x >= 0 && x < changedBoard.B.GetLength(1) && !changedBoard[y, x].HasValue)
                     {
                         int[,] matrix = new int[1, 1];
                         matrix[0, 0] = 1;
@@ -56,13 +56,13 @@ namespace TetrisOptimization
             int color = 12;
             changedBoard[position.y, position.x] = color;
             gap.fields.Add((position.y, position.x));
-            if (position.x - 1 < frame.x0 || changedBoard[position.y, position.x - 1].HasValue)
+            if (position.x - 1 < frame.x0 || (position.y >= 0 && position.y < changedBoard.B.GetLength(0) && position.x - 1 >= 0 && position.x - 1 < changedBoard.B.GetLength(1) && changedBoard[position.y, position.x - 1].HasValue))
             {
-                if (position.x + 1 >= frame.x1 || changedBoard[position.y, position.x + 1].HasValue)
+                if (position.x + 1 >= frame.x1 || (position.y >= 0 && position.y < changedBoard.B.GetLength(0) && position.x + 1 >= 0 && position.x + 1 < changedBoard.B.GetLength(1) && changedBoard[position.y, position.x + 1].HasValue))
                 {
-                    if (position.y - 1 < frame.y0 || changedBoard[position.y - 1, position.x].HasValue)
+                    if (position.y - 1 < frame.y0 || (position.y - 1 >= 0 && position.y - 1 < changedBoard.B.GetLength(0) && position.x >= 0 && position.x < changedBoard.B.GetLength(1) && changedBoard[position.y - 1, position.x].HasValue))
                     {
-                        if (position.y + 1 >= frame.y1 || changedBoard[position.y + 1, position.x].HasValue)
+                        if (position.y + 1 >= frame.y1 || (position.y + 1 >= 0 && position.y + 1 < changedBoard.B.GetLength(0) && position.x >= 0 && position.x < changedBoard.B.GetLength(1) && changedBoard[position.y + 1, position.x].HasValue))
                         {
                             return gap;
                         }
@@ -70,7 +70,7 @@ namespace TetrisOptimization
                 }
             }
             Gap gapTmp = new Gap(gap);
-            if (position.x - 1 >= frame.x0 && !changedBoard[position.y, position.x - 1].HasValue)
+            if (position.x - 1 >= frame.x0 && position.y >= 0 && position.y < changedBoard.B.GetLength(0) && position.x - 1 >= 0 && position.x - 1 < changedBoard.B.GetLength(1) && !changedBoard[position.y, position.x - 1].HasValue)
             {
                 if (position.x - 1 < gapTmp.position.x)
                 {
@@ -86,7 +86,7 @@ namespace TetrisOptimization
                 }
 
             }
-            if (position.x + 1 < frame.x1 && !changedBoard[position.y, position.x + 1].HasValue)
+            if (position.x + 1 < frame.x1 && position.y >= 0 && position.y < changedBoard.B.GetLength(0) && position.x + 1 >= 0 && position.x + 1 < changedBoard.B.GetLength(1) && !changedBoard[position.y, position.x + 1].HasValue)
             {
                 if (position.x + 1 >= gapTmp.position.x + gapTmp.size.x)
                 {
@@ -102,7 +102,7 @@ namespace TetrisOptimization
 
 
             }
-            if (position.y - 1 >= frame.y0 && !changedBoard[position.y - 1, position.x].HasValue)
+            if (position.y - 1 >= frame.y0 && position.y - 1 >= 0 && position.y - 1 < changedBoard.B.GetLength(0) && position.x >= 0 && position.x < changedBoard.B.GetLength(1) && !changedBoard[position.y - 1, position.x].HasValue)
             {
                 if (position.y - 1 < gapTmp.position.y)
                 {
@@ -117,7 +117,7 @@ namespace TetrisOptimization
                 }
 
             }
-            if (position.y + 1 < frame.y1 && !changedBoard[position.y + 1, position.x].HasValue)
+            if (position.y + 1 < frame.y1 && position.y + 1 >= 0 && position.y + 1 < changedBoard.B.GetLength(0) && position.x >= 0 && position.x < changedBoard.B.GetLength(1) && !changedBoard[position.y + 1, position.x].HasValue)
             {
                 if (position.y + 1 >= gapTmp.position.y + gapTmp.size.y)
                 {

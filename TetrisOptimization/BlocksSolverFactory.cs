@@ -34,7 +34,7 @@ namespace TetrisOptimization
                 case "op":
                     return new PreciseRectangleSolver(blocks, blockSize, ParallelStep);
                 case "hp":
-                    return new HeuristicRectangleSolver(blocks, blockSize, HPnumPermutation, HPmultiplier);
+                    return new HeuristicRectangleSolver(blocks, blockSize, HPnumPermutation, HPmultiplier<10?10:HPmultiplier);
                 default:
                     throw new ArgumentException("Unknown solver type");
             }

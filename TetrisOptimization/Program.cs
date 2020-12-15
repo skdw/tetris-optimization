@@ -93,7 +93,7 @@ namespace TetrisOptimization
         static void ExampleCallback()
         {
             Console.WriteLine("Processing the example callback");
-            var linesArray = new string[] { "5", "hk", "20", "5", "ok", "0 2 1 1" };
+            var linesArray = new string[] { "5", "hp", "20", "5", "ok", "0 2 1 1" };
             Console.WriteLine();
             Queue<string> lines = new Queue<string>(linesArray);
             CallAlgorithms(lines, true);
