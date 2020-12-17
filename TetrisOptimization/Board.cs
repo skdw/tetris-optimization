@@ -185,6 +185,17 @@ namespace TetrisOptimization
         /// <returns>True if an error occurs</returns>
         public bool TryToAdd(int y, int x, Block block, int? force_override_id = null)
         {
+            int maxBoardSize = Math.Max(Size.X, Size.Y);
+            if(force_override_id.HasValue && (block.Size.X > maxBoardSize || block.Size.Y > maxBoardSize))
+            {
+                Board board1 = new Board(this);
+                bool status = board1.TryToAddCutBlock(y, x, new Block(block), force_override_id.Value);
+                for(int cy = 0; cy < Size.Y; cy++)
+                    for(int cx = 0; cx < Size.X; cx++)
+                        B[cy, cx] = board1.B[cy, cx];
+                return status;
+            }
+
             // Check for errors
             for (int cy = 0; cy < block.Size.Y; ++cy)
                 for (int cx = 0; cx < block.Size.X; ++cx)
@@ -214,6 +225,60 @@ namespace TetrisOptimization
                         else // just adding
                             B[y + cy, x + cx] = colortmpID;
                     }
+            return false;
+        }
+
+        private bool TryToAddCutBlock(int y, int x, Block block, int force_override_id)
+        {
+            Block blockCpy = new Block(block);
+            int colortmpID = ++_colorId;
+
+            if(block.Size.Y > Size.Y)
+            {
+                for(int ccy = 0; ccy + Size.Y - y - 1 < block.Size.Y; ccy += Math.Max(Size.Y - y, 1))// starting row of block to be placed
+                {
+                    for (int cy = 0; cy < Size.Y - y; ++cy) // board rows
+                        for (int cx = 0; cx < block.Size.X; ++cx)
+                            if (block.matrix[cy + ccy, cx])
+                            {
+                                if (B[y + cy, x + cx].HasValue) // overriding
+                                {
+                                    // cuts - different ids for the rows !!!
+                                    B[y + cy, x + cx] *= force_override_id;
+                                    B[y + cy, x + cx] += colortmpID;
+                                }
+                                else // just adding
+                                    B[y + cy, x + cx] = colortmpID;
+                                block.matrix[cy + ccy, cx] = false;
+                                if(x == 0 && y == 0)
+                                    Console.WriteLine($"cy: {cy}   ccy: {ccy}   cx: {cx}");
+                            }
+                    colortmpID = ++_colorId;
+                }
+                // block should be empty
+            }
+
+            else if(block.Size.X > Size.X)
+            {
+                for(int ccx = 0; ccx + Size.X - x - 1 < block.Size.X; ccx += Math.Max(Size.X - x, 1)) // starting column of block to be placed
+                {
+                    for (int cy = 0; cy < block.Size.Y; ++cy) 
+                        for (int cx = 0; cx < Size.X - x; ++cx) // board columns
+                            if (block.matrix[cy, cx + ccx])
+                            {
+                                if (B[y + cy, x + cx].HasValue) // overriding
+                                {
+                                    B[y + cy, x + cx] *= force_override_id;
+                                    B[y + cy, x + cx] += colortmpID;
+                                }
+                                else // just adding
+                                    B[y + cy, x + cx] = colortmpID;
+                                block.matrix[cy, cx + ccx] = false;
+                            }
+                    colortmpID = ++_colorId;
+                }
+                // block should be empty
+            }
             return false;
         }
 

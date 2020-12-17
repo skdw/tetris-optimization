@@ -99,17 +99,30 @@ namespace TetrisOptimization
                 return null;
             }
             
-            var resultCollection = new ConcurrentBag<(Board, int)?>();
-            for (int k = 0; k < combinationsNum; k += parallelStep)
+            bool concurrent = true;
+            if(concurrent)
             {
-                Parallel.For(k, k + parallelStep, i => 
-                    resultCollection.Add(CheckCombination(i)));
-                foreach (var board in resultCollection)
-                    if (board != null)
-                        return board.Value;
-                resultCollection.Clear();
+                var resultCollection = new ConcurrentBag<(Board, int)?>();
+                for (int k = 0; k < combinationsNum; k += parallelStep)
+                {
+                    Parallel.For(k, k + parallelStep, i => 
+                        resultCollection.Add(CheckCombination(i)));
+                    foreach (var board in resultCollection)
+                        if (board != null)
+                            return board.Value;
+                    resultCollection.Clear();
+                }
             }
-            
+            else
+            {
+                for(int i = 0; i < combinationsNum; ++i)
+                {
+                    var board = CheckCombination(i);
+                    if(board != null)
+                        return board.Value;
+                }
+            }
+
             Console.WriteLine($"Badness: {bestLength}");
             return (bestBoard, bestLength);
         }
@@ -142,7 +155,7 @@ namespace TetrisOptimization
         /// <returns>(Board, int) - optimal board, minimal cuts number</returns>
         private (Board, int) CreateCutBoard(IEnumerable<Tuple<int, Block>> perm_block, int a, int b)
         {
-            int force_override_id = perm_block.Count() + 1;
+            int force_override_id = perm_block.Count() + blockSize + 1;
             Board board = new Board(a, b);
 
             // At first, place the blocks which do not conflict each other
