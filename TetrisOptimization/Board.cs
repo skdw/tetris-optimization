@@ -52,8 +52,19 @@ namespace TetrisOptimization
         /// <param name="forceSquare">Force the board to be a square</param>
         public void Print(bool cutBounds = true, bool forceSquare = false)
         {
+            if(CountElems() == 0)
+            {
+                Console.WriteLine("All of the board's elements are nulls!");
+                return;
+            }
             var bounds = GetBounds(cutBounds, forceSquare);
             PrintSize(forceSquare, bounds);
+
+            if(bounds.minX < 0 || bounds.minY < 0)
+            {
+                Console.WriteLine("Wrong bounds! {0} {1} {2} {3}", bounds.minY, bounds.maxY, bounds.minX, bounds.maxX);
+                return;
+            }
 
             for (int i = bounds.minY; i < bounds.maxY; ++i)
             {
@@ -75,6 +86,20 @@ namespace TetrisOptimization
                 }
                 Console.Write("|\n");
             }
+        }
+
+        /// <summary>
+        /// Counts the board's elements
+        /// </summary>
+        /// <returns>int</returns>
+        public int CountElems()
+        {
+            int elems = 0;
+            for(int i = 0; i < Size.Y; ++i)
+                for(int j = 0; j < Size.X; ++j)
+                    if(B[i, j].HasValue)
+                        elems++;
+            return elems;
         }
 
         int GetMinYFilled()
