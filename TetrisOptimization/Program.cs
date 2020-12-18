@@ -93,7 +93,7 @@ namespace TetrisOptimization
         static void ExampleCallback()
         {
             Console.WriteLine("Processing the example callback");
-            var linesArray = new string[] { "5", "hk", "20", "5", "ok", "0 2 1 1" };
+            var linesArray = new string[] { "6", "hp", "2 1", "5", "hk", "0 20 1 1","6","op","0 2", "6","ok","0 6" };
             Console.WriteLine();
             Queue<string> lines = new Queue<string>(linesArray);
             CallAlgorithms(lines, true);
@@ -104,45 +104,17 @@ namespace TetrisOptimization
             switch(args.Length)
             {
                 case 0:
-                    SetConfiguration();
                     ExampleCallback();
                     break;
                 case 1:
-                    SetConfiguration();
-                    ParseInput(args[0], true);
-                    break;
-                case 2:
-                    SetConfiguration(args[1]);
                     ParseInput(args[0], true);
                     break;
                 default:
-                    throw new ArgumentException("Usage: TetrisOptimization [data_path] [config_path]");
+                    throw new ArgumentException("Usage: TetrisOptimization [data_path]");
             }
         }
 
-        private static string GetConfigPath(string inputPath)
-        {
-            const string pattern = @"TetrisOptimization(?:\.Tests)?\/bin\/(Debug|Release)\/.+$";
-            const string patternWindows = @"TetrisOptimization(?:\.Tests)?\\bin\\(Debug|Release)\\.+$";
-            var curDir1 = Regex.Replace(Directory.GetCurrentDirectory(), pattern, string.Empty);
-            var curDir =  Regex.Replace(curDir1, patternWindows, string.Empty);
-            var firstChar = inputPath.Substring(0, 1);
-            var basePath = firstChar == "/" ? "" : curDir;
-            var configPath = Path.GetFullPath(Path.Combine(basePath, inputPath));
-            if (!File.Exists(configPath))
-                throw new FileNotFoundException($"Cannot load the solver configuration {configPath}", configPath);
-            Console.WriteLine($"Config path: {configPath}");
-            return configPath;
-        }
+       
 
-        private static void SetConfiguration(string inputPath = "solverconfig.json")
-        {
-            BlocksSolverFactory.Configuration = new ConfigurationBuilder()
-                .SetBasePath(Directory.GetCurrentDirectory())
-                .AddJsonFile(GetConfigPath(inputPath),
-                    optional: false,
-                    reloadOnChange: true)
-                .Build();
-        }
     }
 }
