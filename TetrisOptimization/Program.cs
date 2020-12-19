@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Diagnostics.CodeAnalysis;
 
 namespace TetrisOptimization
 {
@@ -16,7 +17,7 @@ namespace TetrisOptimization
         /// <param name="printBlocks"></param>
         static void CallAlgorithms(Queue<string> lines, bool printBlocks)
         {
-            while(lines.Count > 0)
+            while (lines.Count > 0)
             {
                 int blockSize = int.Parse(lines.Dequeue());
                 string solverType = lines.Dequeue();
@@ -28,7 +29,7 @@ namespace TetrisOptimization
                     .ToList();
 
                 List<(int, Block)> blocks;
-                if(blocksNumbers.Count == 1)
+                if (blocksNumbers.Count == 1)
                 {
                     int number = blocksNumbers.First();
                     blocks = Enumerable
@@ -48,14 +49,14 @@ namespace TetrisOptimization
                 }
                 Console.WriteLine("\nCalling the solver: {0}", solverType);
                 BlocksSolver solver = BlocksSolverFactory.GetSolver(solverType, blocks, blockSize);
-                if(printBlocks)
+                if (printBlocks)
                 {
                     solver.PrintBlocks();
                     printBlocks = false;
                 }
                 solver.SolveMeasurePrint();
-                if(KeyToPass && lines.Count > 0)
-                    if(AskForQuit() == 'q')
+                if (KeyToPass && lines.Count > 0)
+                    if (AskForQuit() == 'q')
                         break;
             }
         }
@@ -71,7 +72,7 @@ namespace TetrisOptimization
             {
                 var linesArray = File.ReadAllLines(path);
                 Console.WriteLine("Reading input from file: {0}", path);
-                foreach(var line in linesArray)
+                foreach (var line in linesArray)
                     Console.WriteLine(line);
                 Console.WriteLine();
                 Queue<string> lines = new Queue<string>(linesArray);
@@ -87,9 +88,10 @@ namespace TetrisOptimization
         /// <summary>
         /// Parse input from keyboard
         /// </summary>
+        [ExcludeFromCodeCoverage]
         static void ParseFromKeyboard()
         {
-            while(true)
+            while (true)
             {
                 var input = new Queue<string>();
                 Console.WriteLine("Pass an entry from keyboard");
@@ -103,11 +105,12 @@ namespace TetrisOptimization
                 string blocksIds = Console.ReadLine();
                 input.Enqueue(blocksIds);
                 CallAlgorithms(input, true);
-                if(AskForQuit() == 'q')
+                if (AskForQuit() == 'q')
                     break;
             }
         }
 
+        [ExcludeFromCodeCoverage]
         static char AskForQuit()
         {
             Console.WriteLine("Press 'q' to quit or press any other key to solve the next problem...");
@@ -117,7 +120,7 @@ namespace TetrisOptimization
 
         public static void Main(string[] args)
         {
-            switch(args.Length)
+            switch (args.Length)
             {
                 case 0:
                     ParseFromKeyboard();

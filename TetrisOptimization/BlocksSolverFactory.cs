@@ -9,13 +9,13 @@ namespace TetrisOptimization
     {
         private static int ParallelStep = 1000;
 
-        private static int HKnumLists =600;
+        private static int HKnumLists = 600;
 
-        private static double HKpercentage =0.5;
+        private static double HKpercentage = 0.5;
 
         private static int HKnumPermutation = 2;
 
-        private static int HPnumPermutation =1;
+        private static int HPnumPermutation = 1;
 
         private static int HPmultiplier = 10;
 
