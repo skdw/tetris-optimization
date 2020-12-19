@@ -2,8 +2,6 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Text.RegularExpressions;
-using Microsoft.Extensions.Configuration;
 
 namespace TetrisOptimization
 {
@@ -57,12 +55,8 @@ namespace TetrisOptimization
                 }
                 solver.SolveMeasurePrint();
                 if(KeyToPass && lines.Count > 0)
-                {
-                    Console.WriteLine("Press 'q' to quit or press any other key to solve the next problem...");
-                    var key = Console.ReadKey();
-                    if(key.KeyChar == 'q')
+                    if(AskForQuit() == 'q')
                         break;
-                }
             }
         }
 
@@ -71,7 +65,7 @@ namespace TetrisOptimization
         /// </summary>
         /// <param name="path">Input file path</param>
         /// <param name="printBlocks"></param>
-        static void ParseInput(string path, bool printBlocks)
+        static void ParseInputFile(string path, bool printBlocks)
         {
             try
             {
@@ -90,13 +84,35 @@ namespace TetrisOptimization
             }
         }
 
-        static void ExampleCallback()
+        /// <summary>
+        /// Parse input from keyboard
+        /// </summary>
+        static void ParseFromKeyboard()
         {
-            Console.WriteLine("Processing the example callback");
-            var linesArray = new string[] { "6", "hp", "2 1", "5", "hk", "0 20 1 1","6","op","0 2", "6","ok","0 6" };
-            Console.WriteLine();
-            Queue<string> lines = new Queue<string>(linesArray);
-            CallAlgorithms(lines, true);
+            while(true)
+            {
+                var input = new Queue<string>();
+                Console.WriteLine("Pass an entry from keyboard");
+                Console.WriteLine("Type the blocks size [4-6]:");
+                string blocks = Console.ReadLine();
+                input.Enqueue(blocks);
+                Console.WriteLine("Type the solver type [ok/hk/op/hp]:");
+                string solverType = Console.ReadLine();
+                input.Enqueue(solverType);
+                Console.WriteLine("Type the blocks ID-s:");
+                string blocksIds = Console.ReadLine();
+                input.Enqueue(blocksIds);
+                CallAlgorithms(input, true);
+                if(AskForQuit() == 'q')
+                    break;
+            }
+        }
+
+        static char AskForQuit()
+        {
+            Console.WriteLine("Press 'q' to quit or press any other key to solve the next problem...");
+            var key = Console.ReadKey();
+            return key.KeyChar;
         }
 
         public static void Main(string[] args)
@@ -104,17 +120,14 @@ namespace TetrisOptimization
             switch(args.Length)
             {
                 case 0:
-                    ExampleCallback();
+                    ParseFromKeyboard();
                     break;
                 case 1:
-                    ParseInput(args[0], true);
+                    ParseInputFile(args[0], true);
                     break;
                 default:
                     throw new ArgumentException("Usage: TetrisOptimization [data_path]");
             }
         }
-
-       
-
     }
 }
