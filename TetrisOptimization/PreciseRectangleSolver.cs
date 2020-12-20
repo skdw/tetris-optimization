@@ -101,7 +101,7 @@ namespace TetrisOptimization
                 return null;
             }
             
-            bool concurrent = false;
+            bool concurrent = true;
             if(concurrent)
             {
                 var resultCollection = new ConcurrentBag<(Board, int)?>();
