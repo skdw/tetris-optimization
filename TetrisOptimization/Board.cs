@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -50,7 +50,7 @@ namespace TetrisOptimization
         /// </summary>
         /// <param name="cutBounds">Cuts the board's bounds</param>
         /// <param name="forceSquare">Force the board to be a square</param>
-        public void Print(bool cutBounds = true, bool forceSquare = false)
+        public void Print(bool cutBounds = true, bool forceSquare = false, bool monochrome = false)
         {
             if(CountElems() == 0)
             {
@@ -70,18 +70,26 @@ namespace TetrisOptimization
             {
                 Console.Write($"{i,5}");
                 Console.Write("|");
+                char consoleChar = ' ';
                 for (var j = bounds.minX; j < bounds.maxX; ++j)
                 {
                     try
                     {
                         if (B[i, j].HasValue)
+                        {
                             Console.BackgroundColor = GetColor(B[i, j].Value);
+                            if(monochrome)
+                                consoleChar = B[i, j].Value.ToString().First();
+                            else
+                                consoleChar = ' ';
+                        }
                     }
                     catch (System.IndexOutOfRangeException)
                     {
                         Console.BackgroundColor = ConsoleColor.Black;
+                        consoleChar = ' ';
                     }
-                    Console.Write("  ");
+                    Console.Write(new String(consoleChar, 2));
                     Console.ResetColor();
                 }
                 Console.Write("|\n");
