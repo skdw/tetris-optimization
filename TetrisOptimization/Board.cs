@@ -83,6 +83,8 @@ namespace TetrisOptimization
                             else
                                 consoleChar = ' ';
                         }
+                        else
+                            consoleChar = ' ';
                     }
                     catch (System.IndexOutOfRangeException)
                     {
@@ -193,8 +195,8 @@ namespace TetrisOptimization
         /// <returns>True if an error occurs</returns>
         public bool TryToAdd(int y, int x, Block block, int? force_override_id = null)
         {
-            int maxBoardSize = Math.Max(Size.X, Size.Y);
-            if(force_override_id.HasValue && (block.Size.X > maxBoardSize || block.Size.Y > maxBoardSize))
+            int minBoardSize = Math.Min(Size.X, Size.Y);
+            if(force_override_id.HasValue && (block.Size.X > minBoardSize || block.Size.Y > minBoardSize))
             {
                 Board board1 = new Board(this);
                 bool status = board1.TryToAddCutBlock(y, x, new Block(block), force_override_id.Value);
@@ -243,11 +245,11 @@ namespace TetrisOptimization
 
             if(block.Size.Y > Size.Y)
             {
-                for(int ccy = 0; ccy + Size.Y - y - 1 < block.Size.Y; ccy += Math.Max(Size.Y - y, 1))// starting row of block to be placed
+                for(int ccy = 0; ccy + Size.Y - y - Math.Max(Size.Y - y, 1) < block.Size.Y; ccy += Math.Max(Size.Y - y, 1))// starting row of block to be placed
                 {
                     for (int cy = 0; cy < Size.Y - y; ++cy) // board rows
                         for (int cx = 0; cx < block.Size.X; ++cx)
-                            if (block.matrix[cy + ccy, cx])
+                            if (cy+ccy< block.matrix.GetLength(0) && cx< block.matrix.GetLength(1) && block.matrix[cy + ccy, cx] && y+cy <B.GetLength(0) && x+cx<B.GetLength(1))
                             {
                                 if (B[y + cy, x + cx].HasValue) // overriding
                                 {
@@ -257,7 +259,7 @@ namespace TetrisOptimization
                                 }
                                 else // just adding
                                     B[y + cy, x + cx] = colortmpID;
-                                block.matrix[cy + ccy, cx] = false;
+                                //block.matrix[cy + ccy, cx] = false;
                                 if(x == 0 && y == 0)
                                     Console.WriteLine($"cy: {cy}   ccy: {ccy}   cx: {cx}");
                             }
@@ -268,11 +270,11 @@ namespace TetrisOptimization
 
             else if(block.Size.X > Size.X)
             {
-                for(int ccx = 0; ccx + Size.X - x - 1 < block.Size.X; ccx += Math.Max(Size.X - x, 1)) // starting column of block to be placed
+                for(int ccx = 0; ccx + Size.X - x - Math.Max(Size.X - x, 1) < block.Size.X; ccx += Math.Max(Size.X - x, 1)) // starting column of block to be placed
                 {
                     for (int cy = 0; cy < block.Size.Y; ++cy) 
                         for (int cx = 0; cx < Size.X - x; ++cx) // board columns
-                            if (block.matrix[cy, cx + ccx])
+                            if (cy  < block.matrix.GetLength(0) && cx + ccx < block.matrix.GetLength(1) && block.matrix[cy, cx + ccx] && y + cy < B.GetLength(0) && x + cx < B.GetLength(1))
                             {
                                 if (B[y + cy, x + cx].HasValue) // overriding
                                 {
@@ -281,7 +283,7 @@ namespace TetrisOptimization
                                 }
                                 else // just adding
                                     B[y + cy, x + cx] = colortmpID;
-                                block.matrix[cy, cx + ccx] = false;
+                                //block.matrix[cy, cx + ccx] = false;
                             }
                     colortmpID = ++_colorId;
                 }
