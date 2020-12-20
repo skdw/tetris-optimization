@@ -34,13 +34,13 @@ namespace TetrisOptimization
             return board;
         }
 
-        public void SolveMeasurePrint()
+        public void SolveMeasurePrint(bool monochrome = false)
         {
             Board board = SolveAndMeasure();
-            board.Print(cutBounds, forceSquare);
+            board.Print(cutBounds, forceSquare, monochrome);
         }
 
-        public void PrintBlocks()
+        public void PrintBlocks(bool monochrome = false)
         {
             Console.WriteLine("Processed blocks");
             foreach((int no, Block block) in blocks)
@@ -48,7 +48,7 @@ namespace TetrisOptimization
                 Console.WriteLine($"{no} times:");
                 var blBoard = new Board(block.Size.Y, block.Size.X);
                 blBoard.TryToAdd(0, 0, block);
-                blBoard.Print();
+                blBoard.Print(true, false, monochrome);
             }
         }
     }

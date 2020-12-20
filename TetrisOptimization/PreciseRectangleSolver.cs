@@ -13,7 +13,7 @@ namespace TetrisOptimization
     /// </summary>
     public class PreciseRectangleSolver : PreciseSolver
     {
-        public PreciseRectangleSolver(List<(int, Block)> _blocks, int _blockSize, int _parallelStep) : base(_blocks, _blockSize, _parallelStep)
+        public PreciseRectangleSolver(List<(int, Block)> _blocks, int _blockSize, int _parallelStep = 1) : base(_blocks, _blockSize, _parallelStep)
         {
             forceSquare = false;
         }
@@ -67,6 +67,7 @@ namespace TetrisOptimization
                 int k = 0;
                 foreach (var combBlockType in chosen_comb) // for each block type
                 {
+                    // board elements which are not filled yet
                     var blank_ids = Enumerable
                         .Range(0, a * b)
                         .Where(i => !choose.Contains(i))

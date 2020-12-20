@@ -11,6 +11,7 @@ namespace TetrisOptimization.UnitTests
         public void Setup()
         {
             Program.KeyToPass = false;
+            Program.MonochromeConsole = true;
         }
 
         [Test]
@@ -125,6 +126,16 @@ namespace TetrisOptimization.UnitTests
             Program.Main(args);
             Assert.Pass();
         }
+
+        [Test]
+        public void TestProgram1PreciseRectangle()
+        {
+            string path = "../../../../Data/op511.txt";
+            string[] args = { path };
+            Program.Main(args);
+            Assert.Pass();
+        }
+
         [Test]
         public void TestProgramMain12()
         {
