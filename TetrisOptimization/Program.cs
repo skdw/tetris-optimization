@@ -11,9 +11,6 @@ namespace TetrisOptimization
     {
         public static bool KeyToPass = true;
 
-        // print the numbers instead of colorful blocks in a console which does not support colors
-        public static bool MonochromeConsole = false;
-
         /// <summary>
         /// Call algorithms given lines of input data
         /// </summary>
@@ -55,10 +52,10 @@ namespace TetrisOptimization
                 BlocksSolver solver = BlocksSolverFactory.GetSolver(solverType, blocks, blockSize);
                 if(printBlocks)
                 {
-                    solver.PrintBlocks(MonochromeConsole);
+                    solver.PrintBlocks();
                     printBlocks = false;
                 }
-                solver.SolveMeasurePrint(MonochromeConsole);
+                solver.SolveMeasurePrint();
                 if(KeyToPass && lines.Count > 0)
                 {
                     Console.WriteLine("Press 'q' to quit or press any other key to solve the next problem...");
