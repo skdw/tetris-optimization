@@ -195,7 +195,7 @@ namespace TetrisOptimization
         {
             int maxBoardSize = Math.Max(Size.X, Size.Y);
             int minBoardSize = Math.Min(Size.X, Size.Y);
-            if(force_override_id.HasValue && (block.Size.X > maxBoardSize || block.Size.Y > minBoardSize))
+            if(force_override_id != null && (block.Size.X > maxBoardSize || block.Size.Y > minBoardSize))
             {
                 Board board1 = new Board(this);
                 bool status = board1.TryToAddCutBlock(y, x, new Block(block), force_override_id.Value);
