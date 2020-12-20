@@ -83,7 +83,7 @@ namespace TetrisOptimization
             }
             catch
             {
-                Console.WriteLine($"Cannot read the input file: {path}");
+                Console.WriteLine($"Error raised when calling the algorithm under: {path}");
                 throw;
             }
         }
