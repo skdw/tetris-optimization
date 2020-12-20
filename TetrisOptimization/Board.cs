@@ -194,7 +194,8 @@ namespace TetrisOptimization
         public bool TryToAdd(int y, int x, Block block, int? force_override_id = null)
         {
             int maxBoardSize = Math.Max(Size.X, Size.Y);
-            if(force_override_id.HasValue && (block.Size.X > maxBoardSize || block.Size.Y > maxBoardSize))
+            int minBoardSize = Math.Min(Size.X, Size.Y);
+            if(force_override_id.HasValue && (block.Size.X > maxBoardSize || block.Size.Y > minBoardSize))
             {
                 Board board1 = new Board(this);
                 bool status = board1.TryToAddCutBlock(y, x, new Block(block), force_override_id.Value);
