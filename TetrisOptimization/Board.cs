@@ -77,6 +77,7 @@ namespace TetrisOptimization
                     {
                         if (B[i, j].HasValue)
                         {
+                            // print values if setting colors is not possible
                             Console.BackgroundColor = GetColor(B[i, j].Value);
                             if(monochrome)
                                 consoleChar = B[i, j].Value.ToString().First();

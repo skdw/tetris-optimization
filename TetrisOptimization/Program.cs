@@ -11,6 +11,7 @@ namespace TetrisOptimization
     {
         public static bool KeyToPass = true;
 
+        // print the numbers instead of colorful blocks in a console which does not support colors
         public static bool MonochromeConsole = false;
 
         /// <summary>
