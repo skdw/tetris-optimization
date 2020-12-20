@@ -2,8 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Text.RegularExpressions;
-using Microsoft.Extensions.Configuration;
+using System.Diagnostics.CodeAnalysis;
 
 namespace TetrisOptimization
 {
@@ -21,7 +20,7 @@ namespace TetrisOptimization
         /// <param name="printBlocks"></param>
         static void CallAlgorithms(Queue<string> lines, bool printBlocks)
         {
-            while(lines.Count > 0)
+            while (lines.Count > 0)
             {
                 int blockSize = int.Parse(lines.Dequeue());
                 string solverType = lines.Dequeue();
@@ -33,7 +32,7 @@ namespace TetrisOptimization
                     .ToList();
 
                 List<(int, Block)> blocks;
-                if(blocksNumbers.Count == 1)
+                if (blocksNumbers.Count == 1)
                 {
                     int number = blocksNumbers.First();
                     blocks = Enumerable
@@ -53,19 +52,15 @@ namespace TetrisOptimization
                 }
                 Console.WriteLine("\nCalling the solver: {0}", solverType);
                 BlocksSolver solver = BlocksSolverFactory.GetSolver(solverType, blocks, blockSize);
-                if(printBlocks)
+                if (printBlocks)
                 {
                     solver.PrintBlocks(MonochromeConsole);
                     printBlocks = false;
                 }
                 solver.SolveMeasurePrint(MonochromeConsole);
                 if(KeyToPass && lines.Count > 0)
-                {
-                    Console.WriteLine("Press 'q' to quit or press any other key to solve the next problem...");
-                    var key = Console.ReadKey();
-                    if(key.KeyChar == 'q')
+                    if (AskForQuit() == 'q')
                         break;
-                }
             }
         }
 
@@ -74,13 +69,13 @@ namespace TetrisOptimization
         /// </summary>
         /// <param name="path">Input file path</param>
         /// <param name="printBlocks"></param>
-        static void ParseInput(string path, bool printBlocks)
+        static void ParseInputFile(string path, bool printBlocks)
         {
             try
             {
                 var linesArray = File.ReadAllLines(path);
                 Console.WriteLine("Reading input from file: {0}", path);
-                foreach(var line in linesArray)
+                foreach (var line in linesArray)
                     Console.WriteLine(line);
                 Console.WriteLine();
                 Queue<string> lines = new Queue<string>(linesArray);
@@ -93,59 +88,52 @@ namespace TetrisOptimization
             }
         }
 
-        static void ExampleCallback()
+        /// <summary>
+        /// Parse input from keyboard
+        /// </summary>
+        [ExcludeFromCodeCoverage]
+        static void ParseFromKeyboard()
         {
-            Console.WriteLine("Processing the example callback");
-            var linesArray = new string[] { "5", "hp", "20", "5", "ok", "0 2 1 1" };
-            Console.WriteLine();
-            Queue<string> lines = new Queue<string>(linesArray);
-            CallAlgorithms(lines, true);
+            while (true)
+            {
+                var input = new Queue<string>();
+                Console.WriteLine("Pass an entry from keyboard");
+                Console.WriteLine("Type the blocks size [4-6]:");
+                string blocks = Console.ReadLine();
+                input.Enqueue(blocks);
+                Console.WriteLine("Type the solver type [ok/hk/op/hp]:");
+                string solverType = Console.ReadLine();
+                input.Enqueue(solverType);
+                Console.WriteLine("Type the blocks ID-s:");
+                string blocksIds = Console.ReadLine();
+                input.Enqueue(blocksIds);
+                CallAlgorithms(input, true);
+                if (AskForQuit() == 'q')
+                    break;
+            }
+        }
+
+        [ExcludeFromCodeCoverage]
+        static char AskForQuit()
+        {
+            Console.WriteLine("Press 'q' to quit or press any other key to solve the next problem...");
+            var key = Console.ReadKey();
+            return key.KeyChar;
         }
 
         public static void Main(string[] args)
         {
-            switch(args.Length)
+            switch (args.Length)
             {
                 case 0:
-                    SetConfiguration();
-                    ExampleCallback();
+                    ParseFromKeyboard();
                     break;
                 case 1:
-                    SetConfiguration();
-                    ParseInput(args[0], true);
-                    break;
-                case 2:
-                    SetConfiguration(args[1]);
-                    ParseInput(args[0], true);
+                    ParseInputFile(args[0], true);
                     break;
                 default:
-                    throw new ArgumentException("Usage: TetrisOptimization [data_path] [config_path]");
+                    throw new ArgumentException("Usage: TetrisOptimization [data_path]");
             }
-        }
-
-        private static string GetConfigPath(string inputPath)
-        {
-            const string pattern = @"TetrisOptimization(?:\.Tests)?\/bin\/(Debug|Release)\/.+$";
-            const string patternWindows = @"TetrisOptimization(?:\.Tests)?\\bin\\(Debug|Release)\\.+$";
-            var curDir1 = Regex.Replace(Directory.GetCurrentDirectory(), pattern, string.Empty);
-            var curDir =  Regex.Replace(curDir1, patternWindows, string.Empty);
-            var firstChar = inputPath.Substring(0, 1);
-            var basePath = firstChar == "/" ? "" : curDir;
-            var configPath = Path.GetFullPath(Path.Combine(basePath, inputPath));
-            if (!File.Exists(configPath))
-                throw new FileNotFoundException($"Cannot load the solver configuration {configPath}", configPath);
-            Console.WriteLine($"Config path: {configPath}");
-            return configPath;
-        }
-
-        private static void SetConfiguration(string inputPath = "solverconfig.json")
-        {
-            BlocksSolverFactory.Configuration = new ConfigurationBuilder()
-                .SetBasePath(Directory.GetCurrentDirectory())
-                .AddJsonFile(GetConfigPath(inputPath),
-                    optional: false,
-                    reloadOnChange: true)
-                .Build();
         }
     }
 }

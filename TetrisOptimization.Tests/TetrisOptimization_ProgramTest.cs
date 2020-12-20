@@ -14,6 +14,7 @@ namespace TetrisOptimization.UnitTests
             Program.MonochromeConsole = true;
         }
 
+        [Ignore("keyboard input")]
         [Test]
         /// <summary>
         /// Default call
@@ -149,7 +150,7 @@ namespace TetrisOptimization.UnitTests
         {
             string[] args = { "", "", "" };
             var ex = Assert.Throws<ArgumentException>(() => Program.Main(args));
-            Assert.That(ex.Message, Is.EqualTo("Usage: TetrisOptimization [data_path] [config_path]"));
+            Assert.That(ex.Message, Is.EqualTo("Usage: TetrisOptimization [data_path]"));
         }
     }
 }

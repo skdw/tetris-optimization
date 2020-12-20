@@ -7,21 +7,19 @@ namespace TetrisOptimization
 {
     public static class BlocksSolverFactory
     {
-        public static IConfiguration Configuration { private get; set; }
+        private static int ParallelStep = 1000;
 
-        private static int ParallelStep => int.Parse(Configuration["Precise:ParallelStep"]);
+        private static int HKnumLists = 600;
 
-        private static int HKnumLists => int.Parse(Configuration["HeuristicSquare:NumLists"]);
+        private static double HKpercentage = 0.5;
 
-        private static double HKpercentage => double.Parse(Configuration["HeuristicSquare:Percentage"], CultureInfo.InvariantCulture);
+        private static int HKnumPermutation = 2;
 
-        private static int HKnumPermutation => int.Parse(Configuration["HeuristicSquare:NumPermutation"]);
+        private static int HPnumPermutation = 1;
 
-        private static int HPnumPermutation => int.Parse(Configuration["HeuristicRectangle:NumPermutation"]);
+        private static int HPmultiplier = 10;
 
-        private static int HPmultiplier => int.Parse(Configuration["HeuristicRectangle:Multiplier"]);
-
-        private static double HPercentageBoardSize => 0.6;
+        private static double HPercentageBoardSize = 0.6;
 
         public static BlocksSolver GetSolver(string solverType, List<(int, Block)> blocks, int blockSize)
         {
