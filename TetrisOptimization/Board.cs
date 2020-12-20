@@ -195,7 +195,7 @@ namespace TetrisOptimization
         /// <returns>True if an error occurs</returns>
         public bool TryToAdd(int y, int x, Block block, int? force_override_id = null)
         {
-            int startElems = CountElems();
+            //int startElems = CountElems();
             int maxBoardSize = Math.Max(Size.X, Size.Y);
             int minBoardSize = Math.Min(Size.X, Size.Y);
             if(force_override_id != null && (block.Size.X > maxBoardSize || block.Size.Y > minBoardSize))
@@ -238,16 +238,17 @@ namespace TetrisOptimization
                             B[y + cy, x + cx] = colortmpID;
                     }
 
-            if (CountElems() - startElems == 0)
-            {
-                Print(true, false, true);
-                throw new Exception("The block has not been added!");
-            }
+            // if (CountElems() - startElems == 0)
+            // {
+            //     Print(true, false, true);
+            //     throw new Exception("The block has not been added!");
+            // }
             return false;
         }
 
         private bool TryToAddCutBlock(int y, int x, Block block, int force_override_id)
         {
+            //int startElems = CountElems();
             Block blockCpy = new Block(block);
             int colortmpID = ++_colorId;
 
@@ -297,6 +298,12 @@ namespace TetrisOptimization
                 }
                 // block should be empty
             }
+
+            // if (CountElems() - startElems == 0)
+            // {
+            //     Print(true, false, true);
+            //     throw new Exception("The cut block has not been added!");
+            // }
             return false;
         }
 
