@@ -238,16 +238,17 @@ namespace TetrisOptimization
                             B[y + cy, x + cx] = colortmpID;
                     }
 
-            if (CountElems() - startElems == 0)
-            {
-                Print(true, false, true);
-                throw new Exception("The block has not been added!");
-            }
+            // if (CountElems() - startElems == 0)
+            // {
+            //     Print(true, false, true);
+            //     throw new Exception("The block has not been added!");
+            // }
             return false;
         }
 
         private bool TryToAddCutBlock(int y, int x, Block block, int force_override_id)
         {
+            //int startElems = CountElems();
             Block blockCpy = new Block(block);
             int colortmpID = ++_colorId;
 
@@ -297,6 +298,12 @@ namespace TetrisOptimization
                 }
                 // block should be empty
             }
+
+            // if (CountElems() - startElems == 0)
+            // {
+            //     Print(true, false, true);
+            //     throw new Exception("The cut block has not been added!");
+            // }
             return false;
         }
 
