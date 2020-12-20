@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -195,6 +195,8 @@ namespace TetrisOptimization
         /// <returns>True if an error occurs</returns>
         public bool TryToAdd(int y, int x, Block block, int? force_override_id = null)
         {
+            //int startElems = CountElems();
+            int maxBoardSize = Math.Max(Size.X, Size.Y);
             int minBoardSize = Math.Min(Size.X, Size.Y);
             if(force_override_id.HasValue && (block.Size.X > minBoardSize || block.Size.Y > minBoardSize))
             {
@@ -235,6 +237,12 @@ namespace TetrisOptimization
                         else // just adding
                             B[y + cy, x + cx] = colortmpID;
                     }
+
+            if (CountElems() - startElems == 0)
+            {
+                Print(true, false, true);
+                throw new Exception("The block has not been added!");
+            }
             return false;
         }
 
@@ -260,8 +268,8 @@ namespace TetrisOptimization
                                 else // just adding
                                     B[y + cy, x + cx] = colortmpID;
                                 //block.matrix[cy + ccy, cx] = false;
-                                if(x == 0 && y == 0)
-                                    Console.WriteLine($"cy: {cy}   ccy: {ccy}   cx: {cx}");
+                                //if(x == 0 && y == 0)
+                                //    Console.WriteLine($"cy: {cy}   ccy: {ccy}   cx: {cx}");
                             }
                     colortmpID = ++_colorId;
                 }
