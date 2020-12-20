@@ -57,6 +57,7 @@ namespace TetrisOptimization
             //for (long i = 0; i < combinationsNum; ++i)
             (Board, int)? CheckCombination(long i)
             {
+             
                 if (i % 1e3 == 0)
                     Console.WriteLine($"Analyzing combination #{i}...");
 
@@ -88,9 +89,9 @@ namespace TetrisOptimization
                     {
                         var comb_block = combination.Zip(blocks_choice, Tuple.Create);
                         (Board board, int cutLength) = CreateCutBoard(comb_block, a, b);
-                        if (cutLength == 0)
+                        if (cutLength == 0 && board.CountElems() == board.B.GetLength(0) * board.B.GetLength(1))
                             return (board, cutLength);
-                        if (cutLength < bestLength)
+                        if (cutLength < bestLength && board.CountElems() == board.B.GetLength(0)*board.B.GetLength(1))
                         {
                             bestBoard = board;
                             bestLength = cutLength;
@@ -100,7 +101,7 @@ namespace TetrisOptimization
                 return null;
             }
             
-            bool concurrent = true;
+            bool concurrent = false;
             if(concurrent)
             {
                 var resultCollection = new ConcurrentBag<(Board, int)?>();
