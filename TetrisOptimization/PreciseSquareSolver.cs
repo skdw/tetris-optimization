@@ -119,8 +119,8 @@ namespace TetrisOptimization
             foreach ((int index, Block block) in perm_block)
             {
                 var coords = CommonMethods.DecodeCoords(index, a, a);
-                bool failure = board.TryToAdd(coords.Item1, coords.Item2, block);
-                if (failure)
+                int flag = board.TryToAdd(coords.Item1, coords.Item2, block);
+                if (flag < 0)
                     return null;
             }
             return board;

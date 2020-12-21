@@ -226,8 +226,8 @@ namespace TetrisOptimization
         /// <param name="y"></param>
         /// <param name="x"></param>
         /// <param name="force_override_id">Null to prevent overriding. Number of blocks to code the block id.</param>
-        /// <returns>True if an error occurs</returns>
-        public bool TryToAdd(int y, int x, Block block, int? force_override_id = null)
+        /// <returns>Number of cuts / -1 if the block is not placed</returns>
+        public int TryToAdd(int y, int x, Block block, int? force_override_id = null)
         {
             //int startElems = CountElems();
             int shortBlockSize = Math.Min(block.Size.X, block.Size.Y);
@@ -237,7 +237,7 @@ namespace TetrisOptimization
             if(force_override_id.HasValue && (block.Size.X > shortBoardSize || block.Size.Y > shortBoardSize))
             {
                 Board board1 = new Board(this);
-                bool status = board1.TryToAddCutBlock(y, x, new Block(block), force_override_id.Value);
+                int status = board1.TryToAddCutBlock(y, x, new Block(block), force_override_id.Value);
                 for(int cy = 0; cy < Size.Y; cy++)
                     for(int cx = 0; cx < Size.X; cx++)
                         B[cy, cx] = board1.B[cy, cx];
@@ -250,13 +250,13 @@ namespace TetrisOptimization
                     if ((y + cy >= Size.Y) || (x + cx >= Size.X))
                     {
                         // Out of the board
-                        return true;
+                        return -1;
                     }
                     else if (B[y + cy, x + cx].HasValue && block.matrix[cy, cx])
                     {
                         // Trying to override the block
                         if (force_override_id is null) // prevent overriding (square)
-                            return true;
+                            return -1;
                     }
 
             // Add block to the board
@@ -279,14 +279,15 @@ namespace TetrisOptimization
             //     Print(true, false, true);
             //     throw new Exception("The block has not been added!");
             // }
-            return false;
+            return 0;
         }
 
-        private bool TryToAddCutBlock(int y, int x, Block block, int force_override_id)
+        private int TryToAddCutBlock(int y, int x, Block block, int force_override_id)
         {
             //int startElems = CountElems();
             Block blockCpy = new Block(block);
             int colortmpID = ++_colorId;
+            int cutsCount = 0;
 
             if(block.Size.Y > Size.Y)
             {
@@ -309,6 +310,7 @@ namespace TetrisOptimization
                                 //    Console.WriteLine($"cy: {cy}   ccy: {ccy}   cx: {cx}");
                             }
                     colortmpID = ++_colorId;
+                    cutsCount++;
                 }
                 // block should be empty
             }
@@ -331,6 +333,7 @@ namespace TetrisOptimization
                                 //block.matrix[cy, cx + ccx] = false;
                             }
                     colortmpID = ++_colorId;
+                    cutsCount++;
                 }
                 // block should be empty
             }
@@ -340,7 +343,7 @@ namespace TetrisOptimization
             //     Print(true, false, true);
             //     throw new Exception("The cut block has not been added!");
             // }
-            return false;
+            return cutsCount;
         }
 
         public bool TryToRemove(int y, int x, Block block)

@@ -166,8 +166,8 @@ namespace TetrisOptimization
             {
                 (int index, Block block) = ind_bl;
                 var coords = CommonMethods.DecodeCoords(index, a, b);
-                bool failure = board.TryToAdd(coords.Item1, coords.Item2, block);
-                if (failure)
+                int cutsFlag = board.TryToAdd(coords.Item1, coords.Item2, block);
+                if (cutsFlag < 0)
                     overlappingBlocks.Add(ind_bl);
             }
 
@@ -177,8 +177,8 @@ namespace TetrisOptimization
             {
                 (int index, Block block) = ind_bl;
                 var coords = CommonMethods.DecodeCoords(index, a, b);
-                bool failure = board.TryToAdd(coords.Item1, coords.Item2, block, force_override_id);
-                if (failure)
+                int cutsFlag = board.TryToAdd(coords.Item1, coords.Item2, block, force_override_id);
+                if (cutsFlag < 0)
                     return (board, Int32.MaxValue);
             }
 

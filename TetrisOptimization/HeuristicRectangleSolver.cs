@@ -77,9 +77,9 @@ namespace TetrisOptimization
                     if (first) // pierwszy klocek kladziemy na srodku glownego prostokata
                     {
                         //poloz klocek na srodku
-                        bool err = board.TryToAdd(planeY / 2, planeX / 2, blck);
+                        int cuts = board.TryToAdd(planeY / 2, planeX / 2, blck);
                         //jak blad dodawania - wychodzimy
-                        if (err) return (-1,boardFinal);
+                        if (cuts < 0) return (-1, boardFinal);
                         //zaktualizuj wymiary figury
                         UpdateTempDim(board,planeX / 2 - blck.matrix.GetLength(0) / 2, planeY / 2 - blck.matrix.GetLength(1) / 2, blck.matrix.GetLength(0) + planeX / 2 - blck.matrix.GetLength(0) / 2, blck.matrix.GetLength(1) + planeY / 2 - blck.matrix.GetLength(1) / 2 + 1);
                         first = !first;
@@ -256,8 +256,8 @@ namespace TetrisOptimization
             while (scanned && howFarFromCenter>=0)
             {
                 //jesli zeskanowalismy ze da sie dodac ale sie nie dodalo to konczymy z bledem
-                bool err1 = board.TryToAdd(start.Item1, start.Item2, block);
-                if (err1) return false;
+                int cuts = board.TryToAdd(start.Item1, start.Item2, block);
+                if (cuts < 0) return false;
                 //updateujemy 
                 UpdateTempDim(board, start.Item1, start.Item2, start.Item1+block.matrix.GetLength(0), start.Item2+block.matrix.GetLength(1));
                 //
@@ -273,8 +273,8 @@ namespace TetrisOptimization
                 scanned = board.ScanBoard(start.Item1, start.Item2, block);
 
             }
-            bool err = board.TryToAdd(startPrev.Item1, startPrev.Item2, block);
-            return !err;
+            int cuts2 = board.TryToAdd(startPrev.Item1, startPrev.Item2, block);
+            return cuts2 > -1;
         }
        
         
