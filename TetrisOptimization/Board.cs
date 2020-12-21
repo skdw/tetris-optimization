@@ -1,6 +1,9 @@
 using System;
+using System.Buffers.Binary;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text;
+using System.Security.Cryptography;
 
 namespace TetrisOptimization
 {
@@ -29,6 +32,34 @@ namespace TetrisOptimization
 
         int _colorId = 0;
 
+        // Hash algorithm
+        private static SHA256 sha256Hash = SHA256.Create();
+
+        public string GetHash()
+        {
+            var S = Size;            
+            var buffer = new byte[S.X * S.Y * 4];
+            var span = new Span<byte>(buffer);
+            for(int i = 0; i < S.Y; ++i)
+                for(int j = 0; j < S.X; ++j)
+                    BinaryPrimitives.WriteInt32LittleEndian(span.Slice((i * S.X + j) * 4, 4), B[i, j] ?? 0);
+
+            // Convert the input string to a byte array and compute the hash.
+            byte[] data = sha256Hash.ComputeHash(buffer);
+
+            // Create a new Stringbuilder to collect the bytes
+            // and create a string.
+            var sBuilder = new StringBuilder();
+
+            // Loop through each byte of the hashed data
+            // and format each one as a hexadecimal string.
+            for (int i = 0; i < data.Length; i++)
+                sBuilder.Append(data[i].ToString("x2"));
+
+            // Return the hexadecimal string.
+            return sBuilder.ToString();
+        }
+
         /// <summary>
         /// Get ConsoleColor for printing blocks
         /// </summary>
@@ -52,6 +83,9 @@ namespace TetrisOptimization
         /// <param name="forceSquare">Force the board to be a square</param>
         public void Print(bool cutBounds = true, bool forceSquare = false, bool monochrome = false)
         {
+            var hash = GetHash();
+            Console.WriteLine($"board SHA256 hash: {hash}");
+
             if(CountElems() == 0)
             {
                 Console.WriteLine("All of the board's elements are nulls!");
