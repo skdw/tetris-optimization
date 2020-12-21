@@ -379,7 +379,7 @@ namespace TetrisOptimization
             return true;
         }
 
-        public int Badness()
+        public int Badness(int forceOverrideId)
         {
             int sum = 0;
             for (int i = 0; i < Size.Y; ++i)
@@ -395,59 +395,41 @@ namespace TetrisOptimization
         /// <param name="forceOverrideId">override id - base of the numeral system</param>
         public int MoveOverlapped(int forceOverrideId)
         {
+            // Find the gaps
             var finding = new FindingGaps(this);
             List<Gap> gaps = finding.FindGaps((0, Size.Y - 1, 0, Size.X - 1));
 
-            var holes = new List<(int, int)>();
-            var overlaps = new List<(int, int, int)>();
+            // Get the coords of blank and overlapped points.
+            (var holes, var overlaps) = GetHolesAndOverlaps(forceOverrideId);
 
-            for (int i = 0; i < Size.Y; ++i)
-                for (int j = 0; j < Size.X; ++j)
-                {
-                    if (B[i, j] == null)
-                    {
-                        holes.Add((i, j));
-                    }
-                    while (B[i, j].HasValue && B[i, j].Value > forceOverrideId)
-                    {
-                        overlaps.Add((i, j, B[i, j].Value % forceOverrideId));
-                        B[i, j] /= forceOverrideId;
-                    }
-                }
+            // Construct consistent blocks from the overlapping points.
+            var overlapsBlocks = GetOverlapsBlocks(overlaps);
 
-            List<List<int>> adjacentOverlapsIDs = new List<List<int>>();
+            // Fit the overlapping blocks into the gaps.
+            var (ovBlocks, ovGaps) = CuttingRectangle.ExactFit(gaps, overlapsBlocks, this);
+            var result = CuttingRectangle.UnitCut((ovBlocks, ovGaps), this, 0);
 
-            int?[,] overlapsDistances = new int?[overlaps.Count, overlaps.Count];
-            for (int i = 0; i < overlaps.Count; ++i)
-                for (int j = 0; j <= i; ++j)
-                {
-                    overlapsDistances[i, j] = GetDistance(overlaps[i], overlaps[j]);
+            // [TODO] Replace it with the number of cuts.
+            return Badness(forceOverrideId);
+        }
 
-                    // dist = 1 -> many cells of the same blocks are overlapping
-                    if (overlapsDistances[i, j] <= 1)
-                        adjacentOverlapsIDs.Add(new List<int>() { i, j });
-                }
+        /// <summary>
+        /// Construct consistent blocks from the overlapping points.
+        /// </summary>
+        /// <param name="overlaps">(i, j, l): (i, j) - coords with overlaps, l - level of overlapped block at (i, j) point</param>
+        /// <returns></returns>
+        private List<Block> GetOverlapsBlocks(List<(int, int, int)> overlaps)
+        {
+            // Get the union overlaps ID-s lists (these which come from the same block)
+            var unionOverlaps = GetUnionOverlaps(overlaps);
 
-            for (int i = 1; i < adjacentOverlapsIDs.Count; ++i)
-                for (int j = 0; j < i; ++j)
-                    if (adjacentOverlapsIDs[j].Intersect(adjacentOverlapsIDs[i]).Any())
-                    {
-                        adjacentOverlapsIDs[j].AddRange(adjacentOverlapsIDs[i]);
-                        adjacentOverlapsIDs[i].Clear();
-                    }
-
-            List<List<int>> unionOverlaps = adjacentOverlapsIDs
-                .Where(x => x.Any())
-                .Select(x => x.Distinct())
-                .Select(x => x.ToList())
-                .ToList();
-
-            unionOverlaps.ForEach(x => x.Sort());
-            // min X, Y coords of overlapping cells
+            // Get the boundary of each overlapping area.
+            // Map each unionOverlaps ID to minimum and maximum (Y, X) coords of overlapping cells.
             var minmaxYX = unionOverlaps.Select(ids =>
                 (ids.Min(x => overlaps[x].Item1), (ids.Min(x => overlaps[x].Item2)), ids.Max(x => overlaps[x].Item1), (ids.Max(x => overlaps[x].Item2)))
                 ).ToList();
 
+            // Get the overlap matrix for each overlapping area
             List<bool[,]> overlapsMatrices = unionOverlaps
                 .Zip(minmaxYX)
                 .Select(x =>
@@ -461,10 +443,95 @@ namespace TetrisOptimization
                 }
             ).ToList();
 
+            // Map the overlap matrices to the Block instances
             var overlapsBlocks = overlapsMatrices.Select(m => new Block(m)).ToList();
-            var (ovBlocks, ovGaps) = CuttingRectangle.ExactFit(gaps, overlapsBlocks, this);
-            var result = CuttingRectangle.UnitCut((ovBlocks, ovGaps), this, 0);
-            return Badness();
+            return overlapsBlocks;
+        }
+
+        /// <summary>
+        /// Gets the coords of blank and overlapped points.
+        /// <para>(i, j) - coords with holes</para>
+        /// <para>(i, j, l): (i, j) - coords with overlaps, l - level of overlapped block at (i, j) point</para>
+        /// </summary>
+        /// <param name="forceOverrideId">override id - base of the numeral system</param>
+        /// <returns>
+        /// ((i, j), (i, j, l)) - (holes, overlaps)
+        /// </returns>
+        private (List<(int, int)>, List<(int, int, int)>) GetHolesAndOverlaps(int forceOverrideId)
+        {
+            // (i, j) - coords with holes
+            var holes = new List<(int, int)>();
+
+            // (i, j, l): (i, j) - coords with overlaps, l - level of overlapped block at (i, j) point
+            var overlaps = new List<(int, int, int)>(); 
+
+            // Get the holes and overlapped points
+            for (int i = 0; i < Size.Y; ++i)
+                for (int j = 0; j < Size.X; ++j)
+                {
+                    // For each board point
+                    if (B[i, j] == null)
+                    {
+                        // Add the point coord to the holes list
+                        holes.Add((i, j));
+                    }
+                    while (B[i, j].HasValue && B[i, j].Value > forceOverrideId)
+                    {
+                        // Add the coord at each overlapped level to the overlapped points list
+                        overlaps.Add((i, j, B[i, j].Value % forceOverrideId));
+                        B[i, j] /= forceOverrideId;
+                    }
+                }
+
+            return (holes, overlaps);
+        }
+
+        /// <summary>
+        /// <para>ID-s of union overlapped points</para>
+        /// <para>(i. e. [1, 3, 7] means that overlaps[1], overlaps[3] and overlaps[7] come from the same block)</para>
+        /// </summary>
+        /// <param name="overlaps"></param>
+        /// <returns></returns>
+        private static List<List<int>> GetUnionOverlaps(List<(int, int, int)> overlaps)
+        {
+            // ID-s of adjacent overlapped points 
+            // (i. e. [1, 3, 7] means that overlaps[1], overlaps[3] and overlaps[7] come from the same block)
+            List<List<int>> adjacentOverlapsIDs = new List<List<int>>();
+
+            // Distances between the coordinations of overlapped points pairs
+            int?[,] overlapsDistances = new int?[overlaps.Count, overlaps.Count];
+
+            // For each overlapped coords pair, get the distance between them
+            for (int i = 0; i < overlaps.Count; ++i)
+                for (int j = 0; j <= i; ++j)
+                {
+                    overlapsDistances[i, j] = GetDistance(overlaps[i], overlaps[j]);
+
+                    // dist = 1 -> many cells of the same blocks are overlapping
+                    if (overlapsDistances[i, j] <= 1)
+                        adjacentOverlapsIDs.Add(new List<int>() { i, j });
+                }
+
+            // Group the overlaps
+            // (i. e. if overlaps[0] and overlaps[2] come from the same block along with overlaps[1] and overlaps[2],
+            //  then all of these make simply one consistent block)
+            for (int i = 1; i < adjacentOverlapsIDs.Count; ++i)
+                for (int j = 0; j < i; ++j)
+                    if (adjacentOverlapsIDs[j].Intersect(adjacentOverlapsIDs[i]).Any())
+                    {
+                        adjacentOverlapsIDs[j].AddRange(adjacentOverlapsIDs[i]);
+                        adjacentOverlapsIDs[i].Clear();
+                    }
+
+            // Clean the blank indices and perform distinction
+            List<List<int>> unionOverlaps = adjacentOverlapsIDs
+                .Where(x => x.Any())
+                .Select(x => x.Distinct())
+                .Select(x => x.ToList())
+                .ToList();
+
+            unionOverlaps.ForEach(x => x.Sort());
+            return unionOverlaps;
         }
 
         /// <summary>
