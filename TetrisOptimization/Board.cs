@@ -393,6 +393,7 @@ namespace TetrisOptimization
         /// Moves overlapped blocks into blank locations
         /// </summary>
         /// <param name="forceOverrideId">override id - base of the numeral system</param>
+        /// <returns>Number of cuts made to move the overlapped blocks into blank positions.</returns>
         public int MoveOverlapped(int forceOverrideId)
         {
             // Find the gaps

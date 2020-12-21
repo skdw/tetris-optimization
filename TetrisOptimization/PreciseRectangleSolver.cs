@@ -157,6 +157,7 @@ namespace TetrisOptimization
         /// <returns>(Board, int) - optimal board, minimal cuts number</returns>
         private (Board, int) CreateCutBoard(IEnumerable<Tuple<int, Block>> perm_block, int a, int b)
         {
+            int cutsSum = 0;
             int force_override_id = perm_block.Count() + blockSize + 1;
             Board board = new Board(a, b);
 
@@ -177,13 +178,15 @@ namespace TetrisOptimization
             {
                 (int index, Block block) = ind_bl;
                 var coords = CommonMethods.DecodeCoords(index, a, b);
-                int cutsFlag = board.TryToAdd(coords.Item1, coords.Item2, block, force_override_id);
-                if (cutsFlag < 0)
+                int cuts = board.TryToAdd(coords.Item1, coords.Item2, block, force_override_id);
+                if (cuts < 0)
                     return (board, Int32.MaxValue);
+                else
+                    cutsSum += cuts;
             }
 
-            int cuts = board.MoveOverlapped(force_override_id);
-            return (board, cuts);
+            cutsSum += board.MoveOverlapped(force_override_id);
+            return (board, cutsSum);
         }
     }
 }
