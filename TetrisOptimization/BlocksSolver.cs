@@ -34,10 +34,11 @@ namespace TetrisOptimization
             return board;
         }
 
-        public void SolveMeasurePrint(bool monochrome = false)
+        public Board SolveMeasurePrint(bool monochrome = false)
         {
             Board board = SolveAndMeasure();
             board.Print(cutBounds, forceSquare, monochrome);
+            return board;
         }
 
         public void PrintBlocks(bool monochrome = false)
