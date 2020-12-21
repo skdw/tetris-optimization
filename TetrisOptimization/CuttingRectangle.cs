@@ -473,5 +473,60 @@ namespace TetrisOptimization
             }
             return (newBlocks,gps);
         }
+
+        public static List<(int, List<Block>)> OuterGenerateCuts(Block block)
+        {
+            List<(int,List<Block>)> tmp_block_list= new List<(int, List<Block>)>();
+            static List<(int, List<Block>)> GenerateCuts(Block block)
+            {
+                List<(int, List<Block>)> results = new List<(int, List<Block>)>();
+                var s = block.Size;
+
+                if(s.X == 1 && s.Y == 1)
+                    return new List<(int, List<Block>)>() { (0, new List<Block>() { block }) };
+
+                // Horizontal cuts
+                for(int y = 1; y < s.Y; ++y)
+                {
+                    int cutLength = 0;
+                    var mat1 = new bool[y, s.X];
+                    for(int i = 0; i < y; ++i)
+                        for(int j = 0; j < s.X; ++j)
+                        {
+                            mat1[i, j] = block.matrix[i, j];
+                            if(block.matrix[i, j] && block.matrix[i + 1, j])
+                                cutLength++;
+                        }
+                    var bl1 = TrimBlock(mat1, false);
+
+                    var mat2 = new bool[s.Y - y, s.X];
+                    for(int i = y; i < s.Y; ++i)
+                        for(int j = 0; j < s.X; ++j)
+                            mat2[i - y, j] = block.matrix[i, j];
+                    var bl2 = TrimBlock(mat2, false);
+                    var gen1 = GenerateCuts(bl1);
+                    var gen2 = GenerateCuts(bl2);
+
+                    //tmp_block_list.Add()
+
+                }
+                
+                // Vertical cuts
+                for(int x = 1; x < s.X; ++x)
+                {
+
+                }
+
+                return results;
+            }
+
+            static Block TrimBlock(bool[,] matrix, bool isVerticalCut)
+            {
+                return new Block(matrix);
+            }
+
+            return tmp_block_list;
+        }
+
     }
 }
