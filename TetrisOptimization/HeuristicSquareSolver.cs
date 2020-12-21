@@ -83,13 +83,13 @@ namespace TetrisOptimization
             {
                 int x = arrange[i].Item1;
                 Block b = CommonMethods.GetSpecyficRotation(blocks[i], arrange[i].Item2);
-                bool flag = false;
+                int flag = 0;
                 int y = 0;
                 do
                 {
                     flag = board.TryToAdd(y, x, b);
                     y++;
-                } while (flag);
+                } while (flag < 0);
                 if (x1 > x)
                     x1 = x;
                 if (x2 < b.Size.X + x)

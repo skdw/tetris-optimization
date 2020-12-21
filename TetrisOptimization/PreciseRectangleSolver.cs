@@ -101,7 +101,7 @@ namespace TetrisOptimization
                 return null;
             }
             
-            bool concurrent = false;
+            bool concurrent = true;
             if(concurrent)
             {
                 var resultCollection = new ConcurrentBag<(Board, int)?>();
@@ -157,6 +157,7 @@ namespace TetrisOptimization
         /// <returns>(Board, int) - optimal board, minimal cuts number</returns>
         private (Board, int) CreateCutBoard(IEnumerable<Tuple<int, Block>> perm_block, int a, int b)
         {
+            int cutsSum = 0;
             int force_override_id = perm_block.Count() + blockSize + 1;
             Board board = new Board(a, b);
 
@@ -166,8 +167,8 @@ namespace TetrisOptimization
             {
                 (int index, Block block) = ind_bl;
                 var coords = CommonMethods.DecodeCoords(index, a, b);
-                bool failure = board.TryToAdd(coords.Item1, coords.Item2, block);
-                if (failure)
+                int cutsFlag = board.TryToAdd(coords.Item1, coords.Item2, block);
+                if (cutsFlag < 0)
                     overlappingBlocks.Add(ind_bl);
             }
 
@@ -177,13 +178,15 @@ namespace TetrisOptimization
             {
                 (int index, Block block) = ind_bl;
                 var coords = CommonMethods.DecodeCoords(index, a, b);
-                bool failure = board.TryToAdd(coords.Item1, coords.Item2, block, force_override_id);
-                if (failure)
+                int cuts = board.TryToAdd(coords.Item1, coords.Item2, block, force_override_id);
+                if (cuts < 0)
                     return (board, Int32.MaxValue);
+                else
+                    cutsSum += cuts;
             }
 
-            int cuts = board.MoveOverlapped(force_override_id);
-            return (board, cuts);
+            cutsSum += board.MoveOverlapped(force_override_id);
+            return (board, cutsSum);
         }
     }
 }
