@@ -33,6 +33,10 @@ namespace TetrisOptimization
             }
         }
 
+        /// <summary>
+        /// Generate the list of rotated blocks knowing the input blocks with the number of repetitions
+        /// </summary>
+        /// <returns>List of lists of blocks</returns>
         protected List<List<Block>> BlocksRot()
         {
             var block_rotations = CommonMethods.GetRotations(blocks.Select(b => b.Item2).ToList());
