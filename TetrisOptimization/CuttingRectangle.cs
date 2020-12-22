@@ -473,37 +473,35 @@ namespace TetrisOptimization
             }
             return (newBlocks,gps);
         }
-
-        public static List<(int, List<Block>)> OuterGenerateCuts(Block block)
+        public static List<(int, List<Block>)> GenerateCuts(Block block)
         {
-            List<(int,List<Block>)> tmp_block_list= new List<(int, List<Block>)>();
-            static List<(int, List<Block>)> GenerateCuts(Block block)
+            List<(int, List<Block>)> results = new List<(int, List<Block>)>();
+            var s = block.Size;
+
+            if (s.X == 1 && s.Y == 1)
+                return new List<(int, List<Block>)>() { (0, new List<Block>() { block }) };
+
+            // Horizontal cuts
+            for (int y = 1; y < s.Y; ++y)
             {
-                List<(int, List<Block>)> results = new List<(int, List<Block>)>();
-                var s = block.Size;
+                int cutLength = 0;
+                var mat1 = new bool[y, s.X];
+                for (int i = 0; i < y; ++i)
+                    for (int j = 0; j < s.X; ++j)
+                    {
+                        mat1[i, j] = block.matrix[i, j];
+                        if (block.matrix[i, j] && block.matrix[i + 1, j])
+                            cutLength++;
+                    }
+                var bl1 = TrimBlock(mat1, false);
 
-                if(s.X == 1 && s.Y == 1)
-                    return new List<(int, List<Block>)>() { (0, new List<Block>() { block }) };
-
-                // Horizontal cuts
-                for(int y = 1; y < s.Y; ++y)
+                var mat2 = new bool[s.Y - y, s.X];
+                for (int i = y; i < s.Y; ++i)
+                    for (int j = 0; j < s.X; ++j)
+                        mat2[i - y, j] = block.matrix[i, j];
+                var bl2 = TrimBlock(mat2, false);
+                if (bl1.matrix.GetLength(0) > 0 && bl2.matrix.GetLength(1) > 0 && bl1.matrix.GetLength(1) > 0 && bl2.matrix.GetLength(0) > 0)
                 {
-                    int cutLength = 0;
-                    var mat1 = new bool[y, s.X];
-                    for(int i = 0; i < y; ++i)
-                        for(int j = 0; j < s.X; ++j)
-                        {
-                            mat1[i, j] = block.matrix[i, j];
-                            if(block.matrix[i, j] && block.matrix[i + 1, j])
-                                cutLength++;
-                        }
-                    var bl1 = TrimBlock(mat1, false);
-
-                    var mat2 = new bool[s.Y - y, s.X];
-                    for(int i = y; i < s.Y; ++i)
-                        for(int j = 0; j < s.X; ++j)
-                            mat2[i - y, j] = block.matrix[i, j];
-                    var bl2 = TrimBlock(mat2, false);
                     var gen1 = GenerateCuts(bl1);
                     var gen2 = GenerateCuts(bl2);
 
@@ -512,56 +510,131 @@ namespace TetrisOptimization
 
                     // add bl1 to each bl2 partition and add cutLength
                     var resgen2 = gen2.Select(x => (x.Item1 + cutLength, x.Item2.Concat(new[] { bl1 }).ToList()));
-                    
+
                     // how many cuts and for which blocks is this divided into
                     results.Add((cutLength, new List<Block>() { bl1, bl2 }));
                     results.AddRange(resgen1);
                     results.AddRange(resgen2);
                 }
-                
-                // Vertical cuts
-                for(int x = 1; x < s.X; ++x)
-                {
-                    int cutLength = 0;
-                    var mat1 = new bool[s.Y, x];
-                    for(int i = 0; i < s.Y; ++i)
-                        for(int j = 0; j < s.X; ++j)
-                        {
-                            mat1[i, j] = block.matrix[i, j];
-                            if(block.matrix[i, j] && block.matrix[i, j + 1])
-                                cutLength++;
-                        }
-                    var bl1 = TrimBlock(mat1, true);
+            }
 
-                    var mat2 = new bool[s.Y, s.X - x];
-                    for(int i = 0; i < s.Y; ++i)
-                        for(int j = x; j < s.X; ++j)
-                            mat2[i, j - x] = block.matrix[i, j];
-                    var bl2 = TrimBlock(mat2, true);
+            // Vertical cuts
+            for (int x = 1; x < s.X; ++x)
+            {
+                int cutLength = 0;
+                var mat1 = new bool[s.Y, x];
+                for (int i = 0; i < s.Y; ++i)
+                    for (int j = 0; j < s.X-1; ++j) //changed j<s.X to j<s.X-1
+                    {
+                        if(j<x)//added if so that index doesnt go out of the array
+                            mat1[i, j] = block.matrix[i, j];
+                        if (block.matrix[i, j] && block.matrix[i, j + 1])
+                            cutLength++;
+                    }
+                var bl1 = TrimBlock(mat1, true);
+
+                var mat2 = new bool[s.Y, s.X - x];
+                for (int i = 0; i < s.Y; ++i)
+                    for (int j = x; j < s.X; ++j)
+                        mat2[i, j - x] = block.matrix[i, j];
+                var bl2 = TrimBlock(mat2, true);
+                if (bl1.matrix.GetLength(0) > 0 && bl2.matrix.GetLength(1) > 0 && bl1.matrix.GetLength(1)>0 && bl2.matrix.GetLength(0)>0)
+                {
                     var gen1 = GenerateCuts(bl1);
                     var gen2 = GenerateCuts(bl2);
-                    
+
                     // add bl2 to each bl1 partition and add cutLength
                     var resgen1 = gen1.Select(x => (x.Item1 + cutLength, x.Item2.Concat(new[] { bl2 }).ToList()));
 
                     // add bl1 to each bl2 partition and add cutLength
                     var resgen2 = gen2.Select(x => (x.Item1 + cutLength, x.Item2.Concat(new[] { bl1 }).ToList()));
-                    
+
                     // how many cuts and for which blocks is this divided into
                     results.Add((cutLength, new List<Block>() { bl1, bl2 }));
                     results.AddRange(resgen1);
                     results.AddRange(resgen2);
                 }
-
-                return results;
             }
 
-            static Block TrimBlock(bool[,] matrix, bool isVerticalCut)
+            return results;
+        }
+        public static bool[,] DeleteRow(bool[,] matrix,int row)
+        {
+            var newMatrix = new bool[matrix.GetLength(0) - 1, matrix.GetLength(1)];
+            for (int i = 0; i < newMatrix.GetLength(0); i++)
             {
-                return new Block(matrix);
+                int k = i >= row ? i+1 : i ;
+                int l = i;
+                for (int j = 0; j < newMatrix.GetLength(1); j++)
+                {
+                    newMatrix[l, j] = matrix[k, j];
+                }
+            }
+            return newMatrix;
+        }
+        public static bool[,] DeleteColumn(bool[,] matrix, int column)
+        {
+            var newMatrix = new bool[matrix.GetLength(0), matrix.GetLength(1)-1];
+            for (int j = 0; j < newMatrix.GetLength(1); j++)
+            {
+                int k = j >= column ? j +1: j ;
+                int l = j;
+                for (int i = 0; i < newMatrix.GetLength(0); i++)
+                {
+                    newMatrix[i, l] = matrix[i, k];
+                }
+            }
+            return newMatrix;
+        }
+        public static Block TrimBlock(bool[,] matrix, bool isVerticalCut)
+        {
+            //po wierszach
+            int stop = 0;
+            while(true)
+            {
+                stop = 0;
+                for (int i = 0; i < matrix.GetLength(0); i++)
+                {
+                    for (int j = 0; j < matrix.GetLength(1); j++)
+                    {
+                        if (matrix[i, j] == true)
+                        {
+                            break;
+                        }
+                        else if (matrix[i, j] == false && j == matrix.GetLength(1) - 1)
+                        {
+                            matrix= DeleteRow(matrix, i);
+                            stop++;
+                        }
+                    }
+                }
+                if (stop == 0) break;
             }
 
-            return tmp_block_list;
+            //po kolumnach
+            stop = 0;
+            while(true)
+            {
+                stop = 0;
+                for (int j = 0; j < matrix.GetLength(1); j++)
+                {
+                    for (int i = 0; i < matrix.GetLength(0); i++)
+                    {
+                        if (matrix[i, j] == true)
+                        {
+                            break;
+                        }
+                        else if (matrix[i, j] == false && i == matrix.GetLength(0) - 1)
+                        {
+                            matrix = DeleteColumn(matrix, j);
+                            stop++;
+                        }
+                    }
+                }
+                if (stop == 0) break;
+            }
+            
+            return new Block(matrix);
         }
 
     }

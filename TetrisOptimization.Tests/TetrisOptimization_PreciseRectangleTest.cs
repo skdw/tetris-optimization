@@ -17,7 +17,23 @@ namespace TetrisOptimization.UnitTests
             var hash = board.GetHash();
             Assert.AreEqual("c8c362c52a33bdd8c9fa09b44caf5284e23fd17e4976103c51b9f2fadf957033", hash);
         }
-
+        [Test]
+        public void TestTrimBlock()
+        {
+            var matrix = new bool[10, 3];
+            matrix[0, 0] = true;
+            matrix[1, 1] = true;
+            matrix[2, 2] = true;
+            var test = CuttingRectangle.TrimBlock(matrix,true);
+            Assert.IsNotNull(test);
+        }
+        [Test]
+        public void TestCuttingBlock()
+        {
+            var testBlock = new FiveBlock(7);
+            var test = CuttingRectangle.GenerateCuts(testBlock);
+            Assert.IsNotNull(test);
+        }
         [Test]
         public void TestPreciseRect2()
         {
