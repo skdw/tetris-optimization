@@ -96,7 +96,7 @@ namespace TetrisOptimization.UnitTests
             var solver = new PreciseRectangleSolver(blocks, 5);
             var board = solver.SolveMeasurePrint(true);
             var hash = board.GetHash();
-            Assert.AreEqual("bae7577f4468e897cc8c308f10cb40e8aef92cbf75ad6f6dd774dbbc2f1ae655", hash);
+            Assert.AreEqual("bd258b00971be2a0c1dfd220267823fbc563ae67b963f9bcd3baae1e91fdfbb2", hash);
         }
         
         [Test]
@@ -106,7 +106,7 @@ namespace TetrisOptimization.UnitTests
             var solver = new PreciseRectangleSolver(blocks, 5);
             var board = solver.SolveMeasurePrint(true);
             var hash = board.GetHash();
-            Assert.AreEqual("c8c362c52a33bdd8c9fa09b44caf5284e23fd17e4976103c51b9f2fadf957033", hash);
+            Assert.AreEqual("908d2df398967a693321dd569ad746988e53ea99b7b37fc9c931fa58f876afac", hash);
         }
     }
 }

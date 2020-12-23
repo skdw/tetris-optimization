@@ -34,6 +34,7 @@ namespace TetrisOptimization.UnitTests
         {
             string path = "../../../../Data/Example2.txt";
             string[] args = { path };
+            Program.KeyToPass = false;
             Program.Main(args);
             Assert.Pass();
         }
