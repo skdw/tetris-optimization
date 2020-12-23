@@ -542,7 +542,7 @@ namespace TetrisOptimization
                 return sizex.CompareTo(sizey);
             }
         }
-        public static (bool, List<Gap>) NotExactFit(List<Gap> gaps, List<Block> blocks, Board board,int? forceOverrideId)
+        public static (bool, List<Gap>) NotExactFit(List<Gap> gaps, List<Block> blocks, Board board)
         {
             var newBlocks = new List<Block>(blocks);
             var newGaps = new Dictionary<Gap, int>();
@@ -567,7 +567,7 @@ namespace TetrisOptimization
                             var put = SmallerBlockFit(rot, gap);
                             if (put.position != (-1, -1))
                             {
-                                if (board.TryToAdd(put.position.y, put.position.x, rot,forceOverrideId,false)>-1)
+                                if (board.TryToAdd(put.position.y, put.position.x, rot)>-1)
                                 {
                                     newBlocks.Remove(block);
                                     newGaps[gap]++;

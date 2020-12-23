@@ -165,7 +165,6 @@ namespace TetrisOptimization
         private (Board, int) CreateCutBoard(IEnumerable<Tuple<int, Block>> perm_block, int a, int b)
         {
             int cutsSum = 0;
-            int force_override_id = perm_block.Count() + blockSize + 1;
             Board board = new Board(a, b);
 
             // At first, place the blocks which do not conflict each other
@@ -183,8 +182,6 @@ namespace TetrisOptimization
             // mamy planszę z 1 poziomem
             overlappingBlocks.Sort((x, y) => x.Item1.CompareTo(y.Item1));
 
-
-
             var cutBlocks = new List<Block>();
             // Then force to place the blocks which did not fit earlier
             // (place them on top of previous blocks)
@@ -193,7 +190,7 @@ namespace TetrisOptimization
                 (int index, Block block) = ind_bl;
                 cutBlocks.Add(block);
             }
-            var res = MoveOverlapped(force_override_id, board, cutBlocks);
+            var res = MoveOverlapped(board, cutBlocks);
             cutsSum += res.Item1;
             return (res.Item2, cutsSum);
         }
@@ -201,16 +198,15 @@ namespace TetrisOptimization
         /// <summary>
         /// Moves overlapped blocks into blank locations
         /// </summary>
-        /// <param name="forceOverrideId">override id - base of the numeral system</param>
         /// <returns>Number of cuts made to move the overlapped blocks into blank positions.</returns>
-        public (int,Board) MoveOverlapped(int forceOverrideId, Board board, List<Block> cutBlocks)
+        public (int,Board) MoveOverlapped(Board board, List<Block> cutBlocks)
         {
             int cutsNumber = 0;
 
             // Find the gaps
             var finding = new FindingGaps(board);
             var Size = board.Size;
-            List<Gap> gaps = finding.FindGaps((0, Size.Y - 1, 0, Size.X - 1)); // 1x4 + 1x1 zamiast 1x5 !!!
+            List<Gap> gaps = finding.FindGaps((0, Size.Y - 1, 0, Size.X - 1));
 
             foreach (var block in cutBlocks)
             {
@@ -231,8 +227,8 @@ namespace TetrisOptimization
                     }
                     else
                     {
-                        // not exact fit - czy uda�o si� wrzuci� ca�� reszt� do dziur wi�kszych?
-                        var res = CuttingRectangle.NotExactFit(tmp_gaps, bls, brd1, forceOverrideId);
+                        // not exact fit - czy udalo sie wrzucic cala reszte do dziur wiekszych?
+                        var res = CuttingRectangle.NotExactFit(tmp_gaps, bls, brd1);
                         if (res.Item1)
                         {
                             gaps = tmp_gaps;
@@ -241,7 +237,6 @@ namespace TetrisOptimization
                             break;
                         }
                     }
-                    
                 }
             }
             return (cutsNumber, board);

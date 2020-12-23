@@ -236,24 +236,9 @@ namespace TetrisOptimization
         /// </summary>
         /// <param name="y"></param>
         /// <param name="x"></param>
-        /// <param name="force_override_id">Null to prevent overriding. Number of blocks to code the block id.</param>
         /// <returns>Number of cuts / -1 if the block is not placed</returns>
-        public int TryToAdd(int y, int x, Block block, int? force_override_id = null,bool cut = true)
+        public int TryToAdd(int y, int x, Block block)
         {
-            int shortBlockSize = Math.Min(block.Size.X, block.Size.Y);
-            int longBlockSize = Math.Max(block.Size.X, block.Size.Y);
-            int shortBoardSize = Math.Min(Size.X, Size.Y);
-            int longBoardSize = Math.Max(Size.X, Size.Y);
-            if(force_override_id.HasValue && (block.Size.X > shortBoardSize || block.Size.Y > shortBoardSize) && cut)
-            {
-                Board board1 = new Board(this, ref _colorId);
-                int status = board1.TryToAddCutBlock(y, x, new Block(block), force_override_id.Value);
-                for(int cy = 0; cy < Size.Y; cy++)
-                    for(int cx = 0; cx < Size.X; cx++)
-                        B[cy, cx] = board1.B[cy, cx];
-                return status;
-            }
-
             // Check for errors
             for (int cy = 0; cy < block.Size.Y; ++cy)
                 for (int cx = 0; cx < block.Size.X; ++cx)
@@ -265,8 +250,7 @@ namespace TetrisOptimization
                     else if (B[y + cy, x + cx].HasValue && block.matrix[cy, cx])
                     {
                         // Trying to override the block
-                        if (force_override_id is null) // prevent overriding (square)
-                            return -1;
+                        return -1;
                     }
 
             // Add block to the board
@@ -274,73 +258,9 @@ namespace TetrisOptimization
             for (int cy = 0; cy < block.Size.Y; ++cy)
                 for (int cx = 0; cx < block.Size.X; ++cx)
                     if (block.matrix[cy, cx])
-                    {
-                        if (B[y + cy, x + cx].HasValue) // overriding
-                        {
-                            B[y + cy, x + cx] *= force_override_id;
-                            B[y + cy, x + cx] += colortmpID;
-                        }
-                        else // just adding
-                            B[y + cy, x + cx] = colortmpID;
-                    }
+                        B[y + cy, x + cx] = colortmpID;
 
             return 0;
-        }
-
-        private int TryToAddCutBlock(int y, int x, Block block, int force_override_id)
-        {
-            //int startElems = CountElems();
-            Block blockCpy = new Block(block);
-            int colortmpID = ++_colorId;
-            int cutsCount = 0;
-
-            if(block.Size.Y > Size.Y)
-            {
-                for(int ccy = 0; ccy + Size.Y - y - Math.Max(Size.Y - y, 1) < block.Size.Y; ccy += Math.Max(Size.Y - y, 1))// starting row of block to be placed
-                {
-                    for (int cy = 0; cy < Size.Y - y; ++cy) // board rows
-                        for (int cx = 0; cx < block.Size.X; ++cx)
-                            if (cy+ccy< block.matrix.GetLength(0) && cx< block.matrix.GetLength(1) && block.matrix[cy + ccy, cx] && y+cy <B.GetLength(0) && x+cx<B.GetLength(1))
-                            {
-                                if (B[y + cy, x + cx].HasValue) // overriding
-                                {
-                                    // cuts - different ids for the rows !!!
-                                    B[y + cy, x + cx] *= force_override_id;
-                                    B[y + cy, x + cx] += colortmpID;
-                                }
-                                else // just adding
-                                    B[y + cy, x + cx] = colortmpID;
-                            }
-                    colortmpID = ++_colorId;
-                    if(ccy > 0)
-                        cutsCount++;
-                }
-                // block should be empty
-            }
-
-            else if(block.Size.X > Size.X)
-            {
-                for(int ccx = 0; ccx + Size.X - x - Math.Max(Size.X - x, 1) < block.Size.X; ccx += Math.Max(Size.X - x, 1)) // starting column of block to be placed
-                {
-                    for (int cy = 0; cy < block.Size.Y; ++cy) 
-                        for (int cx = 0; cx < Size.X - x; ++cx) // board columns
-                            if (cy  < block.matrix.GetLength(0) && cx + ccx < block.matrix.GetLength(1) && block.matrix[cy, cx + ccx] && y + cy < B.GetLength(0) && x + cx < B.GetLength(1))
-                            {
-                                if (B[y + cy, x + cx].HasValue) // overriding
-                                {
-                                    B[y + cy, x + cx] *= force_override_id;
-                                    B[y + cy, x + cx] += colortmpID;
-                                }
-                                else // just adding
-                                    B[y + cy, x + cx] = colortmpID;
-                            }
-                    colortmpID = ++_colorId;
-                    if(ccx > 0)
-                        cutsCount++;
-                }
-            }
-
-            return cutsCount;
         }
 
         public bool TryToRemove(int y, int x, Block block)
