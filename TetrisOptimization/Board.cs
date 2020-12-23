@@ -19,6 +19,15 @@ namespace TetrisOptimization
             B = b.B.Clone() as int?[,];
             if (B != null)
                 Size = (B.GetLength(0), B.GetLength(1));
+            _colorId = b._colorId;
+        }
+
+        public Board(Board b, ref int colorId)
+        {
+            B = b.B.Clone() as int?[,];
+            if (B != null)
+                Size = (B.GetLength(0), B.GetLength(1));
+            _colorId = colorId;
         }
 
         public readonly int?[,] B;
@@ -30,7 +39,7 @@ namespace TetrisOptimization
 
         public (int Y, int X) Size { get; }
 
-        int _colorId = 0;
+        public int _colorId = 0;
 
         // Hash algorithm
         private static SHA256 sha256Hash = SHA256.Create();
@@ -236,7 +245,7 @@ namespace TetrisOptimization
             int longBoardSize = Math.Max(Size.X, Size.Y);
             if(force_override_id.HasValue && (block.Size.X > shortBoardSize || block.Size.Y > shortBoardSize) && cut)
             {
-                Board board1 = new Board(this);
+                Board board1 = new Board(this, ref _colorId);
                 int status = board1.TryToAddCutBlock(y, x, new Block(block), force_override_id.Value);
                 for(int cy = 0; cy < Size.Y; cy++)
                     for(int cx = 0; cx < Size.X; cx++)
@@ -281,7 +290,16 @@ namespace TetrisOptimization
             // }
             return 0;
         }
-        public (int,Block) TryToAddCutOutstanding(int y, int x, Block block,int force_override_id)
+
+        /// <summary>
+        /// If the block does not fit into the board, cut it
+        /// </summary>
+        /// <param name="y"></param>
+        /// <param name="x"></param>
+        /// <param name="block"></param>
+        /// <param name="force_override_id"></param>
+        /// <returns></returns>
+        public (int, Block) TryToAddCutOutstanding(int y, int x, Block block, int force_override_id)
         {
             var blockTemp = new Block(block);
             var matrixOut = new bool[block.matrix.GetLength(0), block.matrix.GetLength(1)];
@@ -344,7 +362,8 @@ namespace TetrisOptimization
                                 //    Console.WriteLine($"cy: {cy}   ccy: {ccy}   cx: {cx}");
                             }
                     colortmpID = ++_colorId;
-                    cutsCount++;
+                    if(ccy > 0)
+                        cutsCount++;
                 }
                 // block should be empty
             }
@@ -367,7 +386,8 @@ namespace TetrisOptimization
                                 //block.matrix[cy, cx + ccx] = false;
                             }
                     colortmpID = ++_colorId;
-                    cutsCount++;
+                    if(ccx > 0)
+                        cutsCount++;
                 }
                 // block should be empty
             }

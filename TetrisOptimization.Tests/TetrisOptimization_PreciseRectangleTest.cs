@@ -17,6 +17,7 @@ namespace TetrisOptimization.UnitTests
             var hash = board.GetHash();
             Assert.AreEqual("c8c362c52a33bdd8c9fa09b44caf5284e23fd17e4976103c51b9f2fadf957033", hash);
         }
+
         [Test]
         public void TestTrimBlock()
         {
@@ -96,6 +97,16 @@ namespace TetrisOptimization.UnitTests
             var board = solver.SolveMeasurePrint(true);
             var hash = board.GetHash();
             Assert.AreEqual("bae7577f4468e897cc8c308f10cb40e8aef92cbf75ad6f6dd774dbbc2f1ae655", hash);
+        }
+        
+        [Test]
+        public void TestPreciseRect3()
+        {
+            var blocks = new List<(int, Block)>() { (1, new FiveBlock(1)), (1, new FiveBlock(2)) };
+            var solver = new PreciseRectangleSolver(blocks, 5);
+            var board = solver.SolveMeasurePrint(true);
+            var hash = board.GetHash();
+            Assert.AreEqual("c8c362c52a33bdd8c9fa09b44caf5284e23fd17e4976103c51b9f2fadf957033", hash);
         }
     }
 }

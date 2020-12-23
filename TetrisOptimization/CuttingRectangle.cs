@@ -555,7 +555,7 @@ namespace TetrisOptimization
                 return sizex.CompareTo(sizey);
             }
         }
-        public static (bool ,List<Gap>) NotExactFit(List<Gap> gaps, List<Block> blocks, Board board,int? forceOverrideId)
+        public static (bool, List<Gap>) NotExactFit(List<Gap> gaps, List<Block> blocks, Board board,int? forceOverrideId)
         {
             var newBlocks = new List<Block>(blocks);
             var newGaps = new Dictionary<Gap, int>();
