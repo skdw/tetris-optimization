@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace TetrisOptimization
 {
@@ -120,25 +121,17 @@ namespace TetrisOptimization
         }
         public (int,int) GetMainRectangleDim()
         {
-            List<Block> firstList = new List<Block>();
-            foreach (var t in blocks)
+            int blocks_count = blocks.Sum(b => b.Item1);
+            int area = blocks_count * blockSize;
+            int sqrt = (int)Math.Sqrt(area);
+            for (int i = sqrt; i > 0; --i)
             {
-                for (int i = 0; i < t.Item1; i++)
-                {
-                    firstList.Add(t.Item2);
-                }
+                int a = i;
+                int b = area / a;
+                if (a * b == area)
+                    return (a, b);
             }
-            int howManyOnes = 0;
-            foreach(Block block in firstList)
-                for (int i = 0; i < block.matrix.GetLength(0); ++i)
-                    for (int j = 0; j < block.matrix.GetLength(1); ++j)
-                        if (block.matrix[i, j])
-                            howManyOnes++;
-            var divs = GetDivisors(howManyOnes);
-            if(divs.Count%2==1)
-                return (divs[(int)Math.Round((double)divs.Count/2)],divs[(int)Math.Round((double)divs.Count/2)]);
-            else
-                 return (divs[divs.Count/2 - 1],divs[divs.Count/2]);
+            return (1, area);
         }
         static List<int> GetDivisors(int n)
         {

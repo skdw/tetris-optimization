@@ -53,10 +53,7 @@ namespace TetrisOptimization
                 Console.WriteLine("\nCalling the solver: {0}", solverType);
                 BlocksSolver solver = BlocksSolverFactory.GetSolver(solverType, blocks, blockSize);
                 if (printBlocks)
-                {
                     solver.PrintBlocks(MonochromeConsole);
-                    printBlocks = false;
-                }
                 solver.SolveMeasurePrint(MonochromeConsole);
                 if(KeyToPass && lines.Count > 0)
                     if (AskForQuit() == 'q')
