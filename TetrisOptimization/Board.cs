@@ -39,6 +39,8 @@ namespace TetrisOptimization
 
         public (int Y, int X) Size { get; }
 
+        public int CutsNumber { get; set; }
+
         public int _colorId = 0;
 
         // Hash algorithm

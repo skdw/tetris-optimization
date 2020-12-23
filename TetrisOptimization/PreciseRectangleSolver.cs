@@ -21,7 +21,9 @@ namespace TetrisOptimization
         public override Board Solve()
         {
             Console.WriteLine("Solving the precise rectangle problem");
-            return InternalSolve().Item1;
+            var res = InternalSolve();
+            res.Item1.CutsNumber = res.Item2;
+            return res.Item1;
         }
 
         /// <summary>
