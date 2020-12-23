@@ -60,7 +60,7 @@ namespace TetrisOptimization.UnitTests
             var board = solver.SolveMeasurePrint(true);
             Assert.AreEqual(1, board.CutsNumber);
             var hash = board.GetHash();
-            Assert.AreEqual("39e62b6bb7269b2fb4a788191d003a795438da21470ea12561520a926bcd6c65", hash);
+            Assert.AreEqual("0b34ad0511d0a9bb2f8ee6befab4dd933690463abce8935a489305144d6ae693", hash);
         }
 
         [Test]
