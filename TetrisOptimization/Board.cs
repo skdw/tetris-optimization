@@ -28,7 +28,7 @@ namespace TetrisOptimization
             set => B[i, j] = value;
         }
 
-        private (int Y, int X) Size { get; }
+        public (int Y, int X) Size { get; }
 
         int _colorId = 0;
 
@@ -389,59 +389,13 @@ namespace TetrisOptimization
             return sum;
         }
 
-        /// <summary>
-        /// Moves overlapped blocks into blank locations
-        /// </summary>
-        /// <param name="forceOverrideId">override id - base of the numeral system</param>
-        /// <returns>Number of cuts made to move the overlapped blocks into blank positions.</returns>
-        public int MoveOverlapped(int forceOverrideId)
-        {
-            int cutsNumber = 0;
-
-            // Find the gaps
-            var finding = new FindingGaps(this);
-            List<Gap> gaps = finding.FindGaps((0, Size.Y - 1, 0, Size.X - 1));
-
-            // Get the coords of blank and overlapped points.
-            (var holes, var overlaps) = GetHolesAndOverlaps(forceOverrideId);
-
-            // Construct consistent blocks from the overlapping points.
-            var overlapsBlocks = GetOverlapsBlocks(overlaps);
-
-            // Fit the overlapping blocks into the gaps.
-            (overlapsBlocks, gaps) = CuttingRectangle.ExactFit(gaps, overlapsBlocks, this);
-            // var result = CuttingRectangle.UnitCut((ovBlocks, ovGaps), this, 0);
-
-            // All other blocks
-            foreach(var block in overlapsBlocks)
-            {
-                var cuts = block.Cuts;
-                foreach(var cut in cuts)
-                {
-                    var bls = cut.Item2;
-                    var brd1 = new Board(this);
-                    (overlapsBlocks, gaps) = CuttingRectangle.ExactFit(gaps, bls, brd1);
-                    // not exact fit - czy udało się wrzucić całą resztę do dziur większych?
-                    // bool res = ...
-                    // if(res)
-                    // { this = brd1;
-                    //    cutsNumber += cut.Item1;
-                    //    break; 
-                    // }
-                }
-            }
-
-            // [TODO] Replace it with the number of cuts.
-            //return Badness(forceOverrideId);
-            return cutsNumber;
-        }
 
         /// <summary>
         /// Construct consistent blocks from the overlapping points.
         /// </summary>
         /// <param name="overlaps">(i, j, l): (i, j) - coords with overlaps, l - level of overlapped block at (i, j) point</param>
         /// <returns></returns>
-        private List<Block> GetOverlapsBlocks(List<(int, int, int)> overlaps)
+        public List<Block> GetOverlapsBlocks(List<(int, int, int)> overlaps)
         {
             // Get the union overlaps ID-s lists (these which come from the same block)
             var unionOverlaps = GetUnionOverlaps(overlaps);
@@ -480,7 +434,7 @@ namespace TetrisOptimization
         /// <returns>
         /// ((i, j), (i, j, l)) - (holes, overlaps)
         /// </returns>
-        private (List<(int, int)>, List<(int, int, int)>) GetHolesAndOverlaps(int forceOverrideId)
+        public (List<(int, int)>, List<(int, int, int)>) GetHolesAndOverlaps(int forceOverrideId)
         {
             // (i, j) - coords with holes
             var holes = new List<(int, int)>();

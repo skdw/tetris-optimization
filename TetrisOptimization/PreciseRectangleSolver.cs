@@ -185,8 +185,60 @@ namespace TetrisOptimization
                     cutsSum += cuts;
             }
 
-            cutsSum += board.MoveOverlapped(force_override_id);
+            cutsSum += MoveOverlapped(force_override_id,board);
             return (board, cutsSum);
+        }
+
+        /// <summary>
+        /// Moves overlapped blocks into blank locations
+        /// </summary>
+        /// <param name="forceOverrideId">override id - base of the numeral system</param>
+        /// <returns>Number of cuts made to move the overlapped blocks into blank positions.</returns>
+        public int MoveOverlapped(int forceOverrideId, Board board)
+        {
+            int cutsNumber = 0;
+
+            // Find the gaps
+            var finding = new FindingGaps(board);
+            var Size = board.Size;
+            List<Gap> gaps = finding.FindGaps((0, Size.Y - 1, 0, Size.X - 1));
+
+            // Get the coords of blank and overlapped points.
+            (var holes, var overlaps) = board.GetHolesAndOverlaps(forceOverrideId);
+
+            // Construct consistent blocks from the overlapping points.
+            var overlapsBlocks = board.GetOverlapsBlocks(overlaps);
+
+            // Fit the overlapping blocks into the gaps.
+            (overlapsBlocks, gaps) = CuttingRectangle.ExactFit(gaps, overlapsBlocks, board);
+            // var result = CuttingRectangle.UnitCut((ovBlocks, ovGaps), this, 0);
+
+            // All other blocks
+            foreach (var block in overlapsBlocks)
+            {
+                var cuts = block.Cuts;
+                foreach (var cut in cuts)
+                {
+                    var bls = cut.Item2;
+                    var brd1 = new Board(board);
+                    List<Gap> tmp_gaps = new List<Gap>(gaps);
+
+                    (overlapsBlocks, tmp_gaps) = CuttingRectangle.ExactFit(tmp_gaps, bls, brd1);
+                    // not exact fit - czy uda³o siê wrzuciæ ca³¹ resztê do dziur wiêkszych?
+                    var res = CuttingRectangle.NotExactFit(gaps, bls, brd1);
+                    if (res.Item1)
+                    {
+                        gaps = tmp_gaps;
+                        board = brd1;
+                        cutsNumber += cut.Item1;
+                        break;
+                    }
+                }
+            }
+
+            // [TODO] Replace it with the number of cuts.
+            //return Badness(forceOverrideId);
+            return cutsNumber;
         }
     }
 }
