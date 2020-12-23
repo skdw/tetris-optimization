@@ -132,35 +132,6 @@ namespace TetrisOptimization
             }
             return (1, area);
         }
-        static List<int> GetDivisors(int n)
-        {
-            // Vector to store half
-            // of the divisors
-            var v = new List<int>();
-            var v2 = new List<int>();
-            for (int i = 1;
-                i <= Math.Sqrt(n); i++) {
-                if (n % i == 0) {
-
-                    // check if divisors are equal
-                    if (n / i == i)
-                        v.Add(i);
-                    else
-                    {
-                        v.Add(i);
-
-                        // push the second divisor
-                        // in the vector
-                        v2.Add(n / i);
-                    }
-                }
-            }
-            v2.Reverse();
-            v.AddRange(v2);
-            // The vector will be
-            // printed in reverse
-            return v;
-        }
 
         public int GetCircleRadius(int centerX,int centerY)
         {

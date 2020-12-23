@@ -13,7 +13,7 @@ namespace TetrisOptimization
     /// </summary>
     public class PreciseRectangleSolver : PreciseSolver
     {
-        public PreciseRectangleSolver(List<(int, Block)> _blocks, int _blockSize, int _parallelStep = 1) : base(_blocks, _blockSize, _parallelStep)
+        public PreciseRectangleSolver(List<(int, Block)> _blocks, int _blockSize, bool _concurrent = true, int _parallelStep = 1) : base(_blocks, _blockSize, _concurrent, _parallelStep)
         {
             forceSquare = false;
         }
@@ -102,7 +102,6 @@ namespace TetrisOptimization
                 return null;
             }
             
-            bool concurrent = false;
             if(concurrent)
             {
                 var resultCollection = new ConcurrentBag<(Board, int)?>();
