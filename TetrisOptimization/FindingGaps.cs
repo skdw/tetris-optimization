@@ -145,8 +145,7 @@ namespace TetrisOptimization
             int[,] matrix = new int[size.y, size.x];
             foreach (var p in fields)
             {
-                //if ((p.y - position.y) > 0 && (p.x - position.x) > 0 && (p.y - position.y) < matrix.GetLength(0) && (p.x - position.x) < matrix.GetLength(1))
-                    matrix[p.y - position.y, p.x - position.x] = 1;
+                   matrix[p.y - position.y, p.x - position.x] = 1;
             }
 
             return matrix;

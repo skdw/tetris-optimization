@@ -10,7 +10,6 @@ namespace TetrisOptimization
         public int[] currentFigure,tempFigure;
 
         //wymiary, polozenie ramki
-        //int rectangleX, rectangleY;
         int rectangleWidth,rectangleHeight;
 
         //aktualny kat zegara
@@ -187,10 +186,6 @@ namespace TetrisOptimization
             tempFigure[1] = b.maxY;
             tempFigure[2] = b.minX;
             tempFigure[3] = b.maxX;
-            //tempFigure[0] = x;
-            //tempFigure[1] = xmax;
-            //tempFigure[2] = y;
-            //tempFigure[3] = ymax;
         }
         //funkcja ktora updateuje wymiary aktualnej figury na podstawie ostatnio polozonego bloczku
         public void UpdateCurrentDim()
@@ -269,10 +264,6 @@ namespace TetrisOptimization
             int cuts2 = board.TryToAdd(startPrev.Item1, startPrev.Item2, block);
             return cuts2 > -1;
         }
-       
-        
-	
-        
 
     }
    

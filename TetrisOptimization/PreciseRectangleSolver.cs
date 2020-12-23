@@ -56,7 +56,6 @@ namespace TetrisOptimization
             long combinationsNum = CombsNum(combsCounts);
 
             // Iterate over board positions' combinations
-            //for (long i = 0; i < combinationsNum; ++i)
             (Board, int)? CheckCombination(long i)
             {
              
@@ -182,8 +181,6 @@ namespace TetrisOptimization
 
             // tu mamy klocki, które nie weszły
             // mamy planszę z 1 poziomem
-            //var finding = new FindingGaps(board);
-            //var gapsList = finding.FindGaps((0, board.Size.Y, 0, board.Size.X));
             overlappingBlocks.Sort((x, y) => x.Item1.CompareTo(y.Item1));
 
 
@@ -195,14 +192,6 @@ namespace TetrisOptimization
             {
                 (int index, Block block) = ind_bl;
                 cutBlocks.Add(block);
-            //     var coords = CommonMethods.DecodeCoords(index, a, b);
-            //     int cuts = board.TryToAdd(coords.Item1, coords.Item2, block, force_override_id);
-            //     // (int cuts, Block ot) = board.TryToAddCutOutstanding(coords.Item1, coords.Item2, block, force_override_id);
-            //     cutBlocks.Add(CuttingRectangle.TrimBlock(ot.matrix,false));
-            //     if (cuts < 0)
-            //         return (board, Int32.MaxValue);
-            //     else
-            //         cutsSum += cuts;
             }
             var res = MoveOverlapped(force_override_id, board, cutBlocks);
             cutsSum += res.Item1;

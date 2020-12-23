@@ -39,8 +39,6 @@ namespace TetrisOptimization
                     var newBoard = new Board(_baseBoard);
                     (int y1, int y2,int x0, int x1) frame = (yAx + y.y0, yAx + y.y0 + rectangle.y-1,xAx + x.x0, xAx + x.x0 + rectangle.x-1);
                     var achivedCut = CountCuttingLine(newBoard, frame,y,x);
-                    //baseBoard.Print();
-                    //newBoard.Print();
                     if (achivedCut.Item1 < minimalcutting && achivedCut.Item1 > 0 /*&& error!=-1*/)
                     {
                         cutBoard = achivedCut.Item2;
@@ -70,9 +68,6 @@ namespace TetrisOptimization
             {
                 gap.matrix = FindingGaps.PrepareMatrix(gap.size, gap.position, gap.fields);
             }
-            //dodac klocki ktore sa na zewnatrz ramki
-            //int l = LengthCut(board, frame, x, y, gaps);
-            //trying to fill gaps maby ++ way
             return LengthCut(board, frame, y, x, gaps); ;
         }
         //maja
@@ -216,8 +211,6 @@ namespace TetrisOptimization
         public static (int,Board) LengthCut(Board board, (int y0, int y1, int x0, int x1) frame, (int y0, int y1) y,(int x0,int x1) x, List<Gap> gaps)
         {
             int cuts = 0;
-            //ConsoleColor? lastColor = ConsoleColor.Red;
-            //czym jest x i y?
             List<Block> cutOffBlocks = new List<Block>();
             //przejscie po ramce 
             for(int i=frame.y0;i<=frame.y1;i++)
@@ -268,9 +261,6 @@ namespace TetrisOptimization
                     cuts++;
                 }
             }
-            //Console.WriteLine("board po obcieciu ramki");
-            //board.Print(false,false);
-            //Console.ReadLine();
             ////usuwanie z poza ramki
             for(int a = 0;a<board.B.GetLength(0);a++)
             {
@@ -417,7 +407,6 @@ namespace TetrisOptimization
         /// <returns></returns>
         public static bool DoesBlockFit(Block rot, Gap gap)
         {
-            //gap.matrix = FindingGaps.PrepareMatrix(gap.size, gap.position, gap.fields);
             if (rot.matrix.GetLength(0)!= gap.matrix.GetLength(0) || rot.matrix.GetLength(1) != gap.matrix.GetLength(1)) return false;
             for(int i=0;i<gap.matrix.GetLength(0);i++)
             {
@@ -432,8 +421,6 @@ namespace TetrisOptimization
         }
         public static ((int x, int y) position, List<Gap> new_gaps) SmallerBlockFit(Block rot, Gap gap)
         {
-            //gap.matrix = FindingGaps.PrepareMatrix(gap.size, gap.position, gap.fields);
-            // if (rot.matrix.GetLength(0) != gap.matrix.GetLength(0) || rot.matrix.GetLength(1) != gap.matrix.GetLength(1)) return false;
             var block_size=rot.Size;
             int x0=0;
             int x1 = gap.size.x + 1- block_size.X;
