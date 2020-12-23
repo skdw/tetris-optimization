@@ -10,11 +10,14 @@ namespace TetrisOptimization
     /// </summary>
     public abstract class PreciseSolver : BlocksSolver
     {
-        protected PreciseSolver(List<(int, Block)> _blocks, int _blockSize, int _parallelStep) : base(_blocks, _blockSize)
+        protected PreciseSolver(List<(int, Block)> _blocks, int _blockSize, bool _concurrent, int _parallelStep) : base(_blocks, _blockSize)
         {
             cutBounds = true;
+            concurrent = _concurrent;
             parallelStep = _parallelStep;
         }
+
+        protected bool concurrent;
 
         protected int parallelStep;
 

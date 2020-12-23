@@ -37,6 +37,7 @@ namespace TetrisOptimization.UnitTests
                  { null,null,ConsoleColor.Red}
             };
             var gap1 = new Gap((2, 3), (0, 0), new List < (int y, int x) >{ (0,0),(0,1),(0,2),(1,0),(1,1) });
+            gap1.PrepareMatrix();
             var block2 = new FiveBlock(2);
             var mtrx2 = new ConsoleColor?[3, 3]
             {
@@ -45,8 +46,10 @@ namespace TetrisOptimization.UnitTests
              { ConsoleColor.Red, null, ConsoleColor.Red}
             };
             var gap2 = new Gap( (3, 3), (2, 3),new List<(int y, int x)> { (2,4),(2,5),(3,3),(3,4),(4,4) });
+            gap2.PrepareMatrix();
             var block3 = new FiveBlock(5);
             var gap3 = new Gap( (3, 3), (5, 0),new List<(int y, int x)> { (5,1),(5,2),(6,0),(6,1),(7,1) });
+            gap3.PrepareMatrix();
             var boardTest = new Board(10, 10);
             var ef = CuttingRectangle.ExactFit(new List<Gap> { gap1, gap2, gap3 }, new List<Block> { block1, block2, block3 }, boardTest);
             Assert.AreEqual(ef.Item1.Count, 1);
@@ -76,6 +79,7 @@ namespace TetrisOptimization.UnitTests
             board7.TryToAdd(2, 0, new FiveBlock(6));
             var gaps = new List<Gap>();
             var g = new Gap( (2, 2), (4, 4),new List<(int y, int x)> { (4,4),(4,5),(5,4),(5,5)});
+            g.PrepareMatrix();
             gaps.Add(g);
             board7.Print();
             var lc = CuttingRectangle.LengthCut(board7, (2, 5, 2, 4), (0, 5), (0, 5), gaps);
@@ -92,6 +96,7 @@ namespace TetrisOptimization.UnitTests
                  { null,null,ConsoleColor.Red}
             };
             var gap1 = new Gap( (2, 3), (0, 0),new List<(int y, int x)> { (0,0),(0,1),(0,2),(1,0),(1,1)});
+            gap1.PrepareMatrix();
             var block2 = new FiveBlock(2);
             var mtrx2 = new ConsoleColor?[3, 3]
             {
@@ -100,8 +105,10 @@ namespace TetrisOptimization.UnitTests
              { ConsoleColor.Red, null, ConsoleColor.Red}
             };
             var gap2 = new Gap((3, 3), (2, 3),new List<(int y, int x)> { (2,4),(2,5),(3,3),(3,4),(4,4)});
+            gap2.PrepareMatrix();
             var block3 = new FiveBlock(6);//od 5
             var gap3 = new Gap((3, 3), (5, 0),new List<(int y, int x)> { (5,1),(5,2),(6,0),(6,1),(7,1)});
+            gap3.PrepareMatrix();
             var boardTest3 = new Board(10, 10);
             var ef = CuttingRectangle.ExactFit(new List<Gap> { gap1, gap2, gap3 }, new List<Block> { block1, block2, block3 }, boardTest3);
             //boardTest3.PrintBoard();
@@ -157,7 +164,8 @@ namespace TetrisOptimization.UnitTests
                  {null,null,null},
                  { null,null,ConsoleColor.Red }
             };
-            var gap = new Gap( (2, 3), (2, 3),new List<(int y, int x)> { (2,3),(2,4),(2,5),(3,3),(3,4)});
+            var gap = new Gap( (2, 3), (2, 3),new List<(int y, int x)> { (2,3),(2,4),(2,5),(3,3),(3,4)});  
+            gap.PrepareMatrix();
             Assert.IsTrue(CuttingRectangle.DoesBlockFit(block, gap));
         }
         [Test]
@@ -172,6 +180,7 @@ namespace TetrisOptimization.UnitTests
             Block b = new Block(m);
             List<(int, int)> f = new List<(int, int)>() { (1, 1), (2, 1), (2, 2), (3, 1), (3, 2), (4, 1) };
             Gap gap = new Gap((4, 2), (1, 1), f);
+            gap.PrepareMatrix();
             var wynik = CuttingRectangle.SmallerBlockFit(b, gap);
             Assert.AreEqual(wynik.position, (1, 1));
             Assert.AreEqual(wynik.new_gaps.Count, 1);

@@ -13,7 +13,7 @@ namespace TetrisOptimization
     /// </summary>
     public class PreciseRectangleSolver : PreciseSolver
     {
-        public PreciseRectangleSolver(List<(int, Block)> _blocks, int _blockSize, int _parallelStep = 1) : base(_blocks, _blockSize, _parallelStep)
+        public PreciseRectangleSolver(List<(int, Block)> _blocks, int _blockSize, bool _concurrent = true, int _parallelStep = 1) : base(_blocks, _blockSize, _concurrent, _parallelStep)
         {
             forceSquare = false;
         }
@@ -21,7 +21,9 @@ namespace TetrisOptimization
         public override Board Solve()
         {
             Console.WriteLine("Solving the precise rectangle problem");
-            return InternalSolve().Item1;
+            var res = InternalSolve();
+            res.Item1.CutsNumber = res.Item2;
+            return res.Item1;
         }
 
         /// <summary>
@@ -54,7 +56,6 @@ namespace TetrisOptimization
             long combinationsNum = CombsNum(combsCounts);
 
             // Iterate over board positions' combinations
-            //for (long i = 0; i < combinationsNum; ++i)
             (Board, int)? CheckCombination(long i)
             {
              
@@ -89,9 +90,9 @@ namespace TetrisOptimization
                     {
                         var comb_block = combination.Zip(blocks_choice, Tuple.Create);
                         (Board board, int cutLength) = CreateCutBoard(comb_block, a, b);
-                        if (cutLength == 0 && board.CountElems() == board.B.GetLength(0) * board.B.GetLength(1))
+                        if (cutLength == 0 && board.CountElems() == a * b)
                             return (board, cutLength);
-                        if (cutLength < bestLength && board.CountElems() == board.B.GetLength(0)*board.B.GetLength(1))
+                        if (cutLength < bestLength && board.CountElems() == a * b)
                         {
                             bestBoard = board;
                             bestLength = cutLength;
@@ -101,7 +102,6 @@ namespace TetrisOptimization
                 return null;
             }
             
-            bool concurrent = true;
             if(concurrent)
             {
                 var resultCollection = new ConcurrentBag<(Board, int)?>();
@@ -111,7 +111,10 @@ namespace TetrisOptimization
                         resultCollection.Add(CheckCombination(i)));
                     foreach (var board in resultCollection)
                         if (board != null)
+                        {
+                            Console.WriteLine($"Number of cuts: {bestLength}");
                             return board.Value;
+                        }
                     resultCollection.Clear();
                 }
             }
@@ -120,12 +123,15 @@ namespace TetrisOptimization
                 for(int i = 0; i < combinationsNum; ++i)
                 {
                     var board = CheckCombination(i);
-                    if(board != null)
+                    if (board != null)
+                    {
+                        Console.WriteLine($"Number of cuts: {board.Value.Item2}");
                         return board.Value;
+                    }
                 }
             }
 
-            Console.WriteLine($"Badness: {bestLength}");
+            Console.WriteLine($"Number of cuts: {bestLength}");
             return (bestBoard, bestLength);
         }
 
@@ -158,7 +164,6 @@ namespace TetrisOptimization
         private (Board, int) CreateCutBoard(IEnumerable<Tuple<int, Block>> perm_block, int a, int b)
         {
             int cutsSum = 0;
-            int force_override_id = perm_block.Count() + blockSize + 1;
             Board board = new Board(a, b);
 
             // At first, place the blocks which do not conflict each other
@@ -172,29 +177,28 @@ namespace TetrisOptimization
                     overlappingBlocks.Add(ind_bl);
             }
 
+            // tu mamy klocki, ktÃ³re nie weszÅ‚y
+            // mamy planszÄ™ z 1 poziomem
+            overlappingBlocks.Sort((x, y) => x.Item1.CompareTo(y.Item1));
+
+            var cutBlocks = new List<Block>();
             // Then force to place the blocks which did not fit earlier
             // (place them on top of previous blocks)
             foreach (var ind_bl in overlappingBlocks)
             {
                 (int index, Block block) = ind_bl;
-                var coords = CommonMethods.DecodeCoords(index, a, b);
-                int cuts = board.TryToAdd(coords.Item1, coords.Item2, block, force_override_id);
-                if (cuts < 0)
-                    return (board, Int32.MaxValue);
-                else
-                    cutsSum += cuts;
+                cutBlocks.Add(block);
             }
-
-            cutsSum += MoveOverlapped(force_override_id,board);
-            return (board, cutsSum);
+            var res = MoveOverlapped(board, cutBlocks);
+            cutsSum += res.Item1;
+            return (res.Item2, cutsSum);
         }
 
         /// <summary>
         /// Moves overlapped blocks into blank locations
         /// </summary>
-        /// <param name="forceOverrideId">override id - base of the numeral system</param>
         /// <returns>Number of cuts made to move the overlapped blocks into blank positions.</returns>
-        public int MoveOverlapped(int forceOverrideId, Board board)
+        public (int,Board) MoveOverlapped(Board board, List<Block> cutBlocks)
         {
             int cutsNumber = 0;
 
@@ -203,18 +207,7 @@ namespace TetrisOptimization
             var Size = board.Size;
             List<Gap> gaps = finding.FindGaps((0, Size.Y - 1, 0, Size.X - 1));
 
-            // Get the coords of blank and overlapped points.
-            (var holes, var overlaps) = board.GetHolesAndOverlaps(forceOverrideId);
-
-            // Construct consistent blocks from the overlapping points.
-            var overlapsBlocks = board.GetOverlapsBlocks(overlaps);
-
-            // Fit the overlapping blocks into the gaps.
-            (overlapsBlocks, gaps) = CuttingRectangle.ExactFit(gaps, overlapsBlocks, board);
-            // var result = CuttingRectangle.UnitCut((ovBlocks, ovGaps), this, 0);
-
-            // All other blocks
-            foreach (var block in overlapsBlocks)
+            foreach (var block in cutBlocks)
             {
                 var cuts = block.Cuts;
                 foreach (var cut in cuts)
@@ -223,22 +216,29 @@ namespace TetrisOptimization
                     var brd1 = new Board(board);
                     List<Gap> tmp_gaps = new List<Gap>(gaps);
 
-                    (overlapsBlocks, tmp_gaps) = CuttingRectangle.ExactFit(tmp_gaps, bls, brd1);
-                    // not exact fit - czy uda³o siê wrzuciæ ca³¹ resztê do dziur wiêkszych?
-                    var res = CuttingRectangle.NotExactFit(gaps, bls, brd1);
-                    if (res.Item1)
+                    (bls, tmp_gaps) = CuttingRectangle.ExactFit(tmp_gaps, bls, brd1);
+                    if(bls.Count==0 && tmp_gaps.Count==0)
                     {
                         gaps = tmp_gaps;
                         board = brd1;
                         cutsNumber += cut.Item1;
                         break;
                     }
+                    else
+                    {
+                        // not exact fit - czy udalo sie wrzucic cala reszte do dziur wiekszych?
+                        var res = CuttingRectangle.NotExactFit(tmp_gaps, bls, brd1);
+                        if (res.Item1)
+                        {
+                            gaps = tmp_gaps;
+                            board = brd1;
+                            cutsNumber += cut.Item1;
+                            break;
+                        }
+                    }
                 }
             }
-
-            // [TODO] Replace it with the number of cuts.
-            //return Badness(forceOverrideId);
-            return cutsNumber;
+            return (cutsNumber, board);
         }
     }
 }

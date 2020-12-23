@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Buffers.Binary;
-using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Security.Cryptography;
@@ -14,14 +13,17 @@ namespace TetrisOptimization
             B = new int?[y, x];
             Size = (y, x);
         }
+
         public Board(Board b)
         {
             B = b.B.Clone() as int?[,];
             if (B != null)
                 Size = (B.GetLength(0), B.GetLength(1));
+            _colorId = b._colorId;
         }
 
         public readonly int?[,] B;
+
         public int? this[int i, int j]
         {
             get => B[i, j];
@@ -30,7 +32,9 @@ namespace TetrisOptimization
 
         public (int Y, int X) Size { get; }
 
-        int _colorId = 0;
+        public int CutsNumber { get; set; }
+
+        public int _colorId = 0;
 
         // Hash algorithm
         private static SHA256 sha256Hash = SHA256.Create();
@@ -225,25 +229,9 @@ namespace TetrisOptimization
         /// </summary>
         /// <param name="y"></param>
         /// <param name="x"></param>
-        /// <param name="force_override_id">Null to prevent overriding. Number of blocks to code the block id.</param>
         /// <returns>Number of cuts / -1 if the block is not placed</returns>
-        public int TryToAdd(int y, int x, Block block, int? force_override_id = null)
+        public int TryToAdd(int y, int x, Block block)
         {
-            //int startElems = CountElems();
-            int shortBlockSize = Math.Min(block.Size.X, block.Size.Y);
-            int longBlockSize = Math.Max(block.Size.X, block.Size.Y);
-            int shortBoardSize = Math.Min(Size.X, Size.Y);
-            int longBoardSize = Math.Max(Size.X, Size.Y);
-            if(force_override_id.HasValue && (block.Size.X > shortBoardSize || block.Size.Y > shortBoardSize))
-            {
-                Board board1 = new Board(this);
-                int status = board1.TryToAddCutBlock(y, x, new Block(block), force_override_id.Value);
-                for(int cy = 0; cy < Size.Y; cy++)
-                    for(int cx = 0; cx < Size.X; cx++)
-                        B[cy, cx] = board1.B[cy, cx];
-                return status;
-            }
-
             // Check for errors
             for (int cy = 0; cy < block.Size.Y; ++cy)
                 for (int cx = 0; cx < block.Size.X; ++cx)
@@ -255,8 +243,7 @@ namespace TetrisOptimization
                     else if (B[y + cy, x + cx].HasValue && block.matrix[cy, cx])
                     {
                         // Trying to override the block
-                        if (force_override_id is null) // prevent overriding (square)
-                            return -1;
+                        return -1;
                     }
 
             // Add block to the board
@@ -264,86 +251,9 @@ namespace TetrisOptimization
             for (int cy = 0; cy < block.Size.Y; ++cy)
                 for (int cx = 0; cx < block.Size.X; ++cx)
                     if (block.matrix[cy, cx])
-                    {
-                        if (B[y + cy, x + cx].HasValue) // overriding
-                        {
-                            B[y + cy, x + cx] *= force_override_id;
-                            B[y + cy, x + cx] += colortmpID;
-                        }
-                        else // just adding
-                            B[y + cy, x + cx] = colortmpID;
-                    }
+                        B[y + cy, x + cx] = colortmpID;
 
-            // if (CountElems() - startElems == 0)
-            // {
-            //     Print(true, false, true);
-            //     throw new Exception("The block has not been added!");
-            // }
             return 0;
-        }
-
-        private int TryToAddCutBlock(int y, int x, Block block, int force_override_id)
-        {
-            //int startElems = CountElems();
-            Block blockCpy = new Block(block);
-            int colortmpID = ++_colorId;
-            int cutsCount = 0;
-
-            if(block.Size.Y > Size.Y)
-            {
-                for(int ccy = 0; ccy + Size.Y - y - Math.Max(Size.Y - y, 1) < block.Size.Y; ccy += Math.Max(Size.Y - y, 1))// starting row of block to be placed
-                {
-                    for (int cy = 0; cy < Size.Y - y; ++cy) // board rows
-                        for (int cx = 0; cx < block.Size.X; ++cx)
-                            if (cy+ccy< block.matrix.GetLength(0) && cx< block.matrix.GetLength(1) && block.matrix[cy + ccy, cx] && y+cy <B.GetLength(0) && x+cx<B.GetLength(1))
-                            {
-                                if (B[y + cy, x + cx].HasValue) // overriding
-                                {
-                                    // cuts - different ids for the rows !!!
-                                    B[y + cy, x + cx] *= force_override_id;
-                                    B[y + cy, x + cx] += colortmpID;
-                                }
-                                else // just adding
-                                    B[y + cy, x + cx] = colortmpID;
-                                //block.matrix[cy + ccy, cx] = false;
-                                //if(x == 0 && y == 0)
-                                //    Console.WriteLine($"cy: {cy}   ccy: {ccy}   cx: {cx}");
-                            }
-                    colortmpID = ++_colorId;
-                    cutsCount++;
-                }
-                // block should be empty
-            }
-
-            else if(block.Size.X > Size.X)
-            {
-                for(int ccx = 0; ccx + Size.X - x - Math.Max(Size.X - x, 1) < block.Size.X; ccx += Math.Max(Size.X - x, 1)) // starting column of block to be placed
-                {
-                    for (int cy = 0; cy < block.Size.Y; ++cy) 
-                        for (int cx = 0; cx < Size.X - x; ++cx) // board columns
-                            if (cy  < block.matrix.GetLength(0) && cx + ccx < block.matrix.GetLength(1) && block.matrix[cy, cx + ccx] && y + cy < B.GetLength(0) && x + cx < B.GetLength(1))
-                            {
-                                if (B[y + cy, x + cx].HasValue) // overriding
-                                {
-                                    B[y + cy, x + cx] *= force_override_id;
-                                    B[y + cy, x + cx] += colortmpID;
-                                }
-                                else // just adding
-                                    B[y + cy, x + cx] = colortmpID;
-                                //block.matrix[cy, cx + ccx] = false;
-                            }
-                    colortmpID = ++_colorId;
-                    cutsCount++;
-                }
-                // block should be empty
-            }
-
-            // if (CountElems() - startElems == 0)
-            // {
-            //     Print(true, false, true);
-            //     throw new Exception("The cut block has not been added!");
-            // }
-            return cutsCount;
         }
 
         public bool TryToRemove(int y, int x, Block block)
@@ -352,7 +262,6 @@ namespace TetrisOptimization
                 for (int cx = 0; cx < block.Size.X; ++cx)//x
                     if ((y + cy >= Size.Y) || (x + cx >= Size.X))
                     {
-                        //Console.Error.WriteLine("Out of the board");
                         return false;
                     }
             for (int cy = 0; cy < block.Size.Y; ++cy)//y
@@ -368,161 +277,13 @@ namespace TetrisOptimization
                 for (int cx = 0; cx < block.Size.X; ++cx)//x
                     if ((y + cy >= Size.Y) || (x + cx >= Size.X))
                     {
-                        //Console.Error.WriteLine("Out of the board");
                         return false;
                     }
                     else if (B[y + cy, x + cx].HasValue && block.matrix[cy, cx])
                     {
-                        //Console.Error.WriteLine("Trying to override the block");
                         return false;
                     }
             return true;
-        }
-
-        public int Badness(int forceOverrideId)
-        {
-            int sum = 0;
-            for (int i = 0; i < Size.Y; ++i)
-                for (int j = 0; j < Size.X; ++j)
-                    if (B[i, j].HasValue)
-                        sum += B[i, j].Value;
-            return sum;
-        }
-
-
-        /// <summary>
-        /// Construct consistent blocks from the overlapping points.
-        /// </summary>
-        /// <param name="overlaps">(i, j, l): (i, j) - coords with overlaps, l - level of overlapped block at (i, j) point</param>
-        /// <returns></returns>
-        public List<Block> GetOverlapsBlocks(List<(int, int, int)> overlaps)
-        {
-            // Get the union overlaps ID-s lists (these which come from the same block)
-            var unionOverlaps = GetUnionOverlaps(overlaps);
-
-            // Get the boundary of each overlapping area.
-            // Map each unionOverlaps ID to minimum and maximum (Y, X) coords of overlapping cells.
-            var minmaxYX = unionOverlaps.Select(ids =>
-                (ids.Min(x => overlaps[x].Item1), (ids.Min(x => overlaps[x].Item2)), ids.Max(x => overlaps[x].Item1), (ids.Max(x => overlaps[x].Item2)))
-                ).ToList();
-
-            // Get the overlap matrix for each overlapping area
-            List<bool[,]> overlapsMatrices = unionOverlaps
-                .Zip(minmaxYX)
-                .Select(x =>
-                {
-                    var union = x.First;
-                    var minmax = x.Second;
-                    var matrix = new bool[minmax.Item3 - minmax.Item1 + 1, minmax.Item4 - minmax.Item2 + 1];
-                    union?.ForEach(p =>
-                        matrix[overlaps[p].Item1 - minmax.Item1, overlaps[p].Item2 - minmax.Item2] = true);
-                    return matrix;
-                }
-            ).ToList();
-
-            // Map the overlap matrices to the Block instances
-            var overlapsBlocks = overlapsMatrices.Select(m => new Block(m)).ToList();
-            return overlapsBlocks;
-        }
-
-        /// <summary>
-        /// Gets the coords of blank and overlapped points.
-        /// <para>(i, j) - coords with holes</para>
-        /// <para>(i, j, l): (i, j) - coords with overlaps, l - level of overlapped block at (i, j) point</para>
-        /// </summary>
-        /// <param name="forceOverrideId">override id - base of the numeral system</param>
-        /// <returns>
-        /// ((i, j), (i, j, l)) - (holes, overlaps)
-        /// </returns>
-        public (List<(int, int)>, List<(int, int, int)>) GetHolesAndOverlaps(int forceOverrideId)
-        {
-            // (i, j) - coords with holes
-            var holes = new List<(int, int)>();
-
-            // (i, j, l): (i, j) - coords with overlaps, l - level of overlapped block at (i, j) point
-            var overlaps = new List<(int, int, int)>(); 
-
-            // Get the holes and overlapped points
-            for (int i = 0; i < Size.Y; ++i)
-                for (int j = 0; j < Size.X; ++j)
-                {
-                    // For each board point
-                    if (B[i, j] == null)
-                    {
-                        // Add the point coord to the holes list
-                        holes.Add((i, j));
-                    }
-                    while (B[i, j].HasValue && B[i, j].Value > forceOverrideId)
-                    {
-                        // Add the coord at each overlapped level to the overlapped points list
-                        overlaps.Add((i, j, B[i, j].Value % forceOverrideId));
-                        B[i, j] /= forceOverrideId;
-                    }
-                }
-
-            return (holes, overlaps);
-        }
-
-        /// <summary>
-        /// <para>ID-s of union overlapped points</para>
-        /// <para>(i. e. [1, 3, 7] means that overlaps[1], overlaps[3] and overlaps[7] come from the same block)</para>
-        /// </summary>
-        /// <param name="overlaps"></param>
-        /// <returns></returns>
-        private static List<List<int>> GetUnionOverlaps(List<(int, int, int)> overlaps)
-        {
-            // ID-s of adjacent overlapped points 
-            // (i. e. [1, 3, 7] means that overlaps[1], overlaps[3] and overlaps[7] come from the same block)
-            List<List<int>> adjacentOverlapsIDs = new List<List<int>>();
-
-            // Distances between the coordinations of overlapped points pairs
-            int?[,] overlapsDistances = new int?[overlaps.Count, overlaps.Count];
-
-            // For each overlapped coords pair, get the distance between them
-            for (int i = 0; i < overlaps.Count; ++i)
-                for (int j = 0; j <= i; ++j)
-                {
-                    overlapsDistances[i, j] = GetDistance(overlaps[i], overlaps[j]);
-
-                    // dist = 1 -> many cells of the same blocks are overlapping
-                    if (overlapsDistances[i, j] <= 1)
-                        adjacentOverlapsIDs.Add(new List<int>() { i, j });
-                }
-
-            // Group the overlaps
-            // (i. e. if overlaps[0] and overlaps[2] come from the same block along with overlaps[1] and overlaps[2],
-            //  then all of these make simply one consistent block)
-            for (int i = 1; i < adjacentOverlapsIDs.Count; ++i)
-                for (int j = 0; j < i; ++j)
-                    if (adjacentOverlapsIDs[j].Intersect(adjacentOverlapsIDs[i]).Any())
-                    {
-                        adjacentOverlapsIDs[j].AddRange(adjacentOverlapsIDs[i]);
-                        adjacentOverlapsIDs[i].Clear();
-                    }
-
-            // Clean the blank indices and perform distinction
-            List<List<int>> unionOverlaps = adjacentOverlapsIDs
-                .Where(x => x.Any())
-                .Select(x => x.Distinct())
-                .Select(x => x.ToList())
-                .ToList();
-
-            unionOverlaps.ForEach(x => x.Sort());
-            return unionOverlaps;
-        }
-
-        /// <summary>
-        /// Gets the distance between two blocks on the board
-        /// </summary>
-        /// <param name="y"></param>
-        /// <param name="b1"></param>
-        /// <param name="y"></param>
-        /// <param name="b2"></param>
-        /// <returns></returns>
-        private static int GetDistance((int y, int x, int id) b1, (int y, int x, int id) b2)
-        {
-            var differentBlocks = b1.id == b2.id ? 0 : 2;
-            return Math.Abs(b1.y - b2.y) + Math.Abs(b1.x - b2.x) + differentBlocks;
         }
     }
 }

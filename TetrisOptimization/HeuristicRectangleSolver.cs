@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace TetrisOptimization
 {
@@ -9,7 +10,6 @@ namespace TetrisOptimization
         public int[] currentFigure,tempFigure;
 
         //wymiary, polozenie ramki
-        //int rectangleX, rectangleY;
         int rectangleWidth,rectangleHeight;
 
         //aktualny kat zegara
@@ -120,54 +120,17 @@ namespace TetrisOptimization
         }
         public (int,int) GetMainRectangleDim()
         {
-            List<Block> firstList = new List<Block>();
-            foreach (var t in blocks)
+            int blocks_count = blocks.Sum(b => b.Item1);
+            int area = blocks_count * blockSize;
+            int sqrt = (int)Math.Sqrt(area);
+            for (int i = sqrt; i > 0; --i)
             {
-                for (int i = 0; i < t.Item1; i++)
-                {
-                    firstList.Add(t.Item2);
-                }
+                int a = i;
+                int b = area / a;
+                if (a * b == area)
+                    return (a, b);
             }
-            int howManyOnes = 0;
-            foreach(Block block in firstList)
-                for (int i = 0; i < block.matrix.GetLength(0); ++i)
-                    for (int j = 0; j < block.matrix.GetLength(1); ++j)
-                        if (block.matrix[i, j])
-                            howManyOnes++;
-            var divs = GetDivisors(howManyOnes);
-            if(divs.Count%2==1)
-                return (divs[(int)Math.Round((double)divs.Count/2)],divs[(int)Math.Round((double)divs.Count/2)]);
-            else
-                 return (divs[divs.Count/2 - 1],divs[divs.Count/2]);
-        }
-        static List<int> GetDivisors(int n)
-        {
-            // Vector to store half
-            // of the divisors
-            var v = new List<int>();
-            var v2 = new List<int>();
-            for (int i = 1;
-                i <= Math.Sqrt(n); i++) {
-                if (n % i == 0) {
-
-                    // check if divisors are equal
-                    if (n / i == i)
-                        v.Add(i);
-                    else
-                    {
-                        v.Add(i);
-
-                        // push the second divisor
-                        // in the vector
-                        v2.Add(n / i);
-                    }
-                }
-            }
-            v2.Reverse();
-            v.AddRange(v2);
-            // The vector will be
-            // printed in reverse
-            return v;
+            return (1, area);
         }
 
         public int GetCircleRadius(int centerX,int centerY)
@@ -194,10 +157,6 @@ namespace TetrisOptimization
             tempFigure[1] = b.maxY;
             tempFigure[2] = b.minX;
             tempFigure[3] = b.maxX;
-            //tempFigure[0] = x;
-            //tempFigure[1] = xmax;
-            //tempFigure[2] = y;
-            //tempFigure[3] = ymax;
         }
         //funkcja ktora updateuje wymiary aktualnej figury na podstawie ostatnio polozonego bloczku
         public void UpdateCurrentDim()
@@ -276,10 +235,6 @@ namespace TetrisOptimization
             int cuts2 = board.TryToAdd(startPrev.Item1, startPrev.Item2, block);
             return cuts2 > -1;
         }
-       
-        
-	
-        
 
     }
    

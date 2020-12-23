@@ -15,12 +15,6 @@ namespace TetrisOptimization
             Size = (matrix.GetLength(0), matrix.GetLength(1));
         }
 
-        public Block(Block block)
-        {
-            matrix = block.matrix;
-            Size = block.Size;
-        }
-
         public (int Y, int X) Size { get; }
 
         private List<(int, List<Block>)> cuts = null;
