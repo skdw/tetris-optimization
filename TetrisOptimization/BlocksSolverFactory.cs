@@ -7,7 +7,9 @@ namespace TetrisOptimization
 {
     public static class BlocksSolverFactory
     {
-        private static bool Concurrent = true;
+        private static bool ConcurrentSquare = true;
+
+        private static bool ConcurrentRectangle = false;
 
         private static int ParallelStep = 1000;
 
@@ -28,11 +30,11 @@ namespace TetrisOptimization
             switch (solverType)
             {
                 case "ok":
-                    return new PreciseSquareSolver(blocks, blockSize, Concurrent, ParallelStep);
+                    return new PreciseSquareSolver(blocks, blockSize, ConcurrentSquare, ParallelStep);
                 case "hk":
                     return new HeuristicSquareSolver(blocks, blockSize, HKnumLists, HKpercentage, HKnumPermutation, HPercentageBoardSize);
                 case "op":
-                    return new PreciseRectangleSolver(blocks, blockSize, Concurrent, ParallelStep);
+                    return new PreciseRectangleSolver(blocks, blockSize, ConcurrentRectangle, ParallelStep);
                 case "hp":
                     return new HeuristicRectangleSolver(blocks, blockSize, HPnumPermutation, HPmultiplier<10?10:HPmultiplier);
                 default:
