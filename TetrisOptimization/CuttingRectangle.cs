@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Microsoft.Extensions.FileProviders.Physical;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.CompilerServices;
@@ -429,6 +430,67 @@ namespace TetrisOptimization
             }
             return true;
         }
+        public static ((int x, int y) position, List<Gap> new_gaps) SmallerBlockFit(Block rot, Gap gap)
+        {
+            gap.matrix = FindingGaps.PrepareMatrix(gap.size, gap.position, gap.fields);
+            // if (rot.matrix.GetLength(0) != gap.matrix.GetLength(0) || rot.matrix.GetLength(1) != gap.matrix.GetLength(1)) return false;
+            var block_size=rot.Size;
+            int x0=0;
+            int x1 = gap.size.x + 1- block_size.X;
+            if (x1 < 0) return ((-1,-1), new List<Gap>());
+            int y0 = 0;
+            int y1 = gap.size.y + 1- block_size.Y;
+            if (y1<0) return ((-1, -1), new List<Gap>());
+            (int x, int y) position = (-1, -1);
+            for(;x0<x1;x0++)
+            {
+                for (;y0<y1;y0++)
+                {
+                    bool if_works = true;
+                    position = (gap.position.x + x0, gap.position.y + y0);
+                    for (int i=0;i<block_size.X;i++)
+                    {
+                        for (int j=0;j<block_size.Y;j++)
+                        {
+                            if(rot.matrix[j,i]&& gap.matrix[j,i]==0)
+                            {
+                                if_works = false;
+                                break;
+                            }
+                        }
+                        if (!if_works) break;
+                    }
+                    if(if_works)
+                    {
+                        List<Gap> new_gaps;
+                        Board b = new Board(gap.size.y, gap.size.x);
+                        bool[,] m = new bool[1, 1];
+                        m[0, 0] = true;
+                        Block blo = new Block(m);
+                        for(int i=0;i<gap.size.x;i++)
+                        {
+                            for(int j=0;j<gap.size.y;j++)
+                            {
+                                if (gap.matrix[j, i] == 0)
+                                    b.TryToAdd(j, i, blo);
+
+                            }
+                        }
+                        b.TryToAdd(y0, x0, rot);
+                        FindingGaps finding= new FindingGaps(b);
+                        new_gaps=finding.FindGaps((0, gap.size.y, 0, gap.size.x));
+                        foreach(var g in new_gaps)
+                        {
+                            g.position = (g.position.y + gap.position.y, g.position.x + gap.position.x);
+                        }
+                        //obszary 4 spójne nowe gapy
+                        return (position, new_gaps);
+
+                    }
+                }
+            }
+            return ((-1,-1),new List<Gap>());
+        }
         //maja
         public static (List<Block>,List<Gap>) ExactFit(List<Gap> gaps,List<Block> blocks, Board board)
         {
@@ -472,6 +534,60 @@ namespace TetrisOptimization
                 if (dc.Value == 0) gps.Add(dc.Key);
             }
             return (newBlocks,gps);
+        }
+        public static (bool ,List<Gap>) NotExactFit(List<Gap> gaps, List<Block> blocks, Board board)
+        {
+            var newBlocks = new List<Block>(blocks);
+            var newGaps = new Dictionary<Gap, int>();
+            foreach (var gap in gaps)
+            {
+                newGaps.Add(gap, 0);
+            }
+            bool breakFrom = false;
+            //dla kazdego bloku
+            foreach (Block block in blocks)
+            {
+                //dla kazdego obrotu
+                for (int i = 0; i < 4; i++)
+                {
+                    Block rot = CommonMethods.GetSpecyficRotation(block, i);
+                    foreach (Gap gap in gaps)
+                    {
+                        if (newGaps[gap] == 0)
+                        {
+                            var put = SmallerBlockFit(rot, gap);
+                            if (put.position != (-1, -1))
+                            {
+                                if (board.TryToAdd(put.position.y, put.position.x, rot)>-1)
+                                {
+                                    newBlocks.Remove(block);
+                                    newGaps[gap]++;
+                                    foreach(var g in put.new_gaps)
+                                    {
+                                        newGaps.Add(g, 0);
+                                    }
+                                    breakFrom = true;
+                                    break;
+                                }
+                            }
+                        }
+                    }
+                    if (breakFrom)
+                    {
+                        breakFrom = false;
+                        break;
+                    }
+                }
+            }
+            var gps = new List<Gap>();
+            foreach (var dc in newGaps)
+            {
+                if (dc.Value == 0) gps.Add(dc.Key);
+            }
+            if (newBlocks.Count == 0)
+                return (true, gps);
+            else
+                return (false, gaps);
         }
         public static List<(int, List<Block>)> GenerateCuts(Block block)
         {
