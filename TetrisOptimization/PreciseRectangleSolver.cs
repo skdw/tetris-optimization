@@ -223,18 +223,6 @@ namespace TetrisOptimization
             var Size = board.Size;
             List<Gap> gaps = finding.FindGaps((0, Size.Y - 1, 0, Size.X - 1)); // 1x4 + 1x1 zamiast 1x5 !!!
 
-            // Get the coords of blank and overlapped points.
-            //(var holes, var overlaps) = board.GetHolesAndOverlaps(forceOverrideId);
-
-            // Construct consistent blocks from the overlapping points.
-            //var overlapsBlocks = board.GetOverlapsBlocks(overlaps);
-
-            // Fit the overlapping blocks into the gaps.
-            //(overlapsBlocks, gaps) = CuttingRectangle.ExactFit(gaps, overlapsBlocks, board);
-            //int c1 = overlapsBlocks.Count;
-            // var result = CuttingRectangle.UnitCut((ovBlocks, ovGaps), this, 0);
-            //overlapsBlocks.AddRange(cutBlocks);
-            // All other blocks
             foreach (var block in cutBlocks)
             {
                 var cuts = block.Cuts;
