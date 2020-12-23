@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Buffers.Binary;
-using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Security.Cryptography;
@@ -14,6 +13,7 @@ namespace TetrisOptimization
             B = new int?[y, x];
             Size = (y, x);
         }
+
         public Board(Board b)
         {
             B = b.B.Clone() as int?[,];
@@ -22,15 +22,8 @@ namespace TetrisOptimization
             _colorId = b._colorId;
         }
 
-        public Board(Board b, ref int colorId)
-        {
-            B = b.B.Clone() as int?[,];
-            if (B != null)
-                Size = (B.GetLength(0), B.GetLength(1));
-            _colorId = colorId;
-        }
-
         public readonly int?[,] B;
+
         public int? this[int i, int j]
         {
             get => B[i, j];
