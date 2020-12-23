@@ -60,7 +60,14 @@ namespace TetrisOptimization
 
         public void generate_list()
         {
-
+            if(numBlocks==1)
+            {
+                EvolutionList.Add(new TetrisList(new List<(int, int)>() { (0, 0) }));
+                bestBoard = new Board(maxBlockSize, maxBlockSize);
+                bestBoard.TryToAdd(0, 0, permutation.blocks[0].Item2);
+                minimalAchivedSize = maxBlockSize;
+                return;
+            }
             for (int i = 0; i < numLists; i++)
             {
                 List<(int x, int rot)> tmp_list = new List<(int, int)>();

@@ -39,8 +39,6 @@ namespace TetrisOptimization
                     var newBoard = new Board(_baseBoard);
                     (int y1, int y2,int x0, int x1) frame = (yAx + y.y0, yAx + y.y0 + rectangle.y-1,xAx + x.x0, xAx + x.x0 + rectangle.x-1);
                     var achivedCut = CountCuttingLine(newBoard, frame,y,x);
-                    //baseBoard.Print();
-                    //newBoard.Print();
                     if (achivedCut.Item1 < minimalcutting && achivedCut.Item1 > 0 /*&& error!=-1*/)
                     {
                         cutBoard = achivedCut.Item2;
@@ -70,9 +68,6 @@ namespace TetrisOptimization
             {
                 gap.matrix = FindingGaps.PrepareMatrix(gap.size, gap.position, gap.fields);
             }
-            //dodac klocki ktore sa na zewnatrz ramki
-            //int l = LengthCut(board, frame, x, y, gaps);
-            //trying to fill gaps maby ++ way
             return LengthCut(board, frame, y, x, gaps); ;
         }
         //maja
@@ -216,8 +211,6 @@ namespace TetrisOptimization
         public static (int,Board) LengthCut(Board board, (int y0, int y1, int x0, int x1) frame, (int y0, int y1) y,(int x0,int x1) x, List<Gap> gaps)
         {
             int cuts = 0;
-            //ConsoleColor? lastColor = ConsoleColor.Red;
-            //czym jest x i y?
             List<Block> cutOffBlocks = new List<Block>();
             //przejscie po ramce 
             for(int i=frame.y0;i<=frame.y1;i++)
@@ -268,9 +261,6 @@ namespace TetrisOptimization
                     cuts++;
                 }
             }
-            //Console.WriteLine("board po obcieciu ramki");
-            //board.Print(false,false);
-            //Console.ReadLine();
             ////usuwanie z poza ramki
             for(int a = 0;a<board.B.GetLength(0);a++)
             {
@@ -417,7 +407,6 @@ namespace TetrisOptimization
         /// <returns></returns>
         public static bool DoesBlockFit(Block rot, Gap gap)
         {
-            gap.matrix = FindingGaps.PrepareMatrix(gap.size, gap.position, gap.fields);
             if (rot.matrix.GetLength(0)!= gap.matrix.GetLength(0) || rot.matrix.GetLength(1) != gap.matrix.GetLength(1)) return false;
             for(int i=0;i<gap.matrix.GetLength(0);i++)
             {
@@ -432,8 +421,6 @@ namespace TetrisOptimization
         }
         public static ((int x, int y) position, List<Gap> new_gaps) SmallerBlockFit(Block rot, Gap gap)
         {
-            gap.matrix = FindingGaps.PrepareMatrix(gap.size, gap.position, gap.fields);
-            // if (rot.matrix.GetLength(0) != gap.matrix.GetLength(0) || rot.matrix.GetLength(1) != gap.matrix.GetLength(1)) return false;
             var block_size=rot.Size;
             int x0=0;
             int x1 = gap.size.x + 1- block_size.X;
@@ -555,7 +542,7 @@ namespace TetrisOptimization
                 return sizex.CompareTo(sizey);
             }
         }
-        public static (bool ,List<Gap>) NotExactFit(List<Gap> gaps, List<Block> blocks, Board board,int? forceOverrideId)
+        public static (bool, List<Gap>) NotExactFit(List<Gap> gaps, List<Block> blocks, Board board)
         {
             var newBlocks = new List<Block>(blocks);
             var newGaps = new Dictionary<Gap, int>();
@@ -580,10 +567,12 @@ namespace TetrisOptimization
                             var put = SmallerBlockFit(rot, gap);
                             if (put.position != (-1, -1))
                             {
-                                if (board.TryToAdd(put.position.y, put.position.x, rot,forceOverrideId,false)>-1)
+                                if (board.TryToAdd(put.position.y, put.position.x, rot)>-1)
                                 {
                                     newBlocks.Remove(block);
                                     newGaps[gap]++;
+                                    gaps.Remove(gap);
+                                    gaps.AddRange(put.new_gaps);
                                     foreach(var g in put.new_gaps)
                                     {
                                         newGaps.Add(g, 0);
@@ -630,9 +619,10 @@ namespace TetrisOptimization
                     for (int j = 0; j < s.X; ++j)
                     {
                         mat1[i, j] = block.matrix[i, j];
-                        if (block.matrix[i, j] && block.matrix[i + 1, j])
-                            cutLength++;
                     }
+                for (int i = 0; i < s.X; i++)
+                    if (block.matrix[y - 1, i] && block.matrix[y, i])
+                        cutLength++;
                 var bl1 = TrimBlock(mat1, false);
 
                 var mat2 = new bool[s.Y - y, s.X];
@@ -640,19 +630,9 @@ namespace TetrisOptimization
                     for (int j = 0; j < s.X; ++j)
                         mat2[i - y, j] = block.matrix[i, j];
                 var bl2 = TrimBlock(mat2, false);
-
-                var gen1 = GenerateCuts(bl1);
                 var gen2 = GenerateCuts(bl2);
-
-                // // add bl2 to each bl1 partition and add cutLength
-                // var resgen1 = gen1.Select(x => (x.Item1 + cutLength, x.Item2.Concat(new[] { bl2 }).ToList()));
-
-                // // add bl1 to each bl2 partition and add cutLength
                 var resgen2 = gen2.Select(x => (x.Item1 + cutLength, x.Item2.Concat(new[] { bl1 }).ToList()));
 
-                // // how many cuts and for which blocks is this divided into
-                // results.Add((cutLength, new List<Block>() { bl1, bl2 }));
-                // results.AddRange(resgen1);
                 results.AddRange(resgen2);
             }
 
@@ -662,13 +642,14 @@ namespace TetrisOptimization
                 int cutLength = 0;
                 var mat1 = new bool[s.Y, x];
                 for (int i = 0; i < s.Y; ++i)
-                    for (int j = 0; j < s.X-1; ++j) //changed j<s.X to j<s.X-1
+                    for (int j = 0; j < s.X - 1; ++j) //changed j<s.X to j<s.X-1
                     {
-                        if(j<x)//added if so that index doesnt go out of the array
-                            mat1[i, j] = block.matrix[i, j];
-                        if (block.matrix[i, j] && block.matrix[i, j + 1])
-                            cutLength++;
+                        if (j < x)//added if so that index doesnt go out of the array
+                            mat1[i, j] = block.matrix[i, j];                        
                     }
+                for (int i = 0; i < s.Y; i++)
+                    if (block.matrix[i, x] && block.matrix[i, x - 1])
+                        cutLength++;
                 var bl1 = TrimBlock(mat1, true);
 
                 var mat2 = new bool[s.Y, s.X - x];
@@ -676,20 +657,11 @@ namespace TetrisOptimization
                     for (int j = x; j < s.X; ++j)
                         mat2[i, j - x] = block.matrix[i, j];
                 var bl2 = TrimBlock(mat2, true);
-                if (bl1.matrix.GetLength(0) > 0 && bl2.matrix.GetLength(1) > 0 && bl1.matrix.GetLength(1)>0 && bl2.matrix.GetLength(0)>0)
+                if (bl1.matrix.GetLength(0) > 0 && bl2.matrix.GetLength(1) > 0 && bl1.matrix.GetLength(1) > 0 && bl2.matrix.GetLength(0) > 0)
                 {
-                    var gen1 = GenerateCuts(bl1);
                     var gen2 = GenerateCuts(bl2);
-
-                    // add bl2 to each bl1 partition and add cutLength
-                    //var resgen1 = gen1.Select(x => (x.Item1 + cutLength, x.Item2.Concat(new[] { bl2 }).ToList()));
-
-                    // add bl1 to each bl2 partition and add cutLength
                     var resgen2 = gen2.Select(x => (x.Item1 + cutLength, x.Item2.Concat(new[] { bl1 }).ToList()));
 
-                    // how many cuts and for which blocks is this divided into
-                    //results.Add((cutLength, new List<Block>() { bl1, bl2 }));
-                    //results.AddRange(resgen1);
                     results.AddRange(resgen2);
                 }
             }
