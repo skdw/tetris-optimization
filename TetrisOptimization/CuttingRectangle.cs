@@ -476,6 +476,8 @@ namespace TetrisOptimization
         public static List<(int, List<Block>)> GenerateCuts(Block block)
         {
             List<(int, List<Block>)> results = new List<(int, List<Block>)>();
+            results.Add((0, new List<Block>() { block }));
+
             var s = block.Size;
 
             if (s.X == 1 && s.Y == 1)
@@ -500,22 +502,20 @@ namespace TetrisOptimization
                     for (int j = 0; j < s.X; ++j)
                         mat2[i - y, j] = block.matrix[i, j];
                 var bl2 = TrimBlock(mat2, false);
-                if (bl1.matrix.GetLength(0) > 0 && bl2.matrix.GetLength(1) > 0 && bl1.matrix.GetLength(1) > 0 && bl2.matrix.GetLength(0) > 0)
-                {
-                    var gen1 = GenerateCuts(bl1);
-                    var gen2 = GenerateCuts(bl2);
 
-                    // add bl2 to each bl1 partition and add cutLength
-                    var resgen1 = gen1.Select(x => (x.Item1 + cutLength, x.Item2.Concat(new[] { bl2 }).ToList()));
+                var gen1 = GenerateCuts(bl1);
+                var gen2 = GenerateCuts(bl2);
 
-                    // add bl1 to each bl2 partition and add cutLength
-                    var resgen2 = gen2.Select(x => (x.Item1 + cutLength, x.Item2.Concat(new[] { bl1 }).ToList()));
+                // // add bl2 to each bl1 partition and add cutLength
+                // var resgen1 = gen1.Select(x => (x.Item1 + cutLength, x.Item2.Concat(new[] { bl2 }).ToList()));
 
-                    // how many cuts and for which blocks is this divided into
-                    results.Add((cutLength, new List<Block>() { bl1, bl2 }));
-                    results.AddRange(resgen1);
-                    results.AddRange(resgen2);
-                }
+                // // add bl1 to each bl2 partition and add cutLength
+                var resgen2 = gen2.Select(x => (x.Item1 + cutLength, x.Item2.Concat(new[] { bl1 }).ToList()));
+
+                // // how many cuts and for which blocks is this divided into
+                // results.Add((cutLength, new List<Block>() { bl1, bl2 }));
+                // results.AddRange(resgen1);
+                results.AddRange(resgen2);
             }
 
             // Vertical cuts
@@ -544,14 +544,14 @@ namespace TetrisOptimization
                     var gen2 = GenerateCuts(bl2);
 
                     // add bl2 to each bl1 partition and add cutLength
-                    var resgen1 = gen1.Select(x => (x.Item1 + cutLength, x.Item2.Concat(new[] { bl2 }).ToList()));
+                    //var resgen1 = gen1.Select(x => (x.Item1 + cutLength, x.Item2.Concat(new[] { bl2 }).ToList()));
 
                     // add bl1 to each bl2 partition and add cutLength
                     var resgen2 = gen2.Select(x => (x.Item1 + cutLength, x.Item2.Concat(new[] { bl1 }).ToList()));
 
                     // how many cuts and for which blocks is this divided into
-                    results.Add((cutLength, new List<Block>() { bl1, bl2 }));
-                    results.AddRange(resgen1);
+                    //results.Add((cutLength, new List<Block>() { bl1, bl2 }));
+                    //results.AddRange(resgen1);
                     results.AddRange(resgen2);
                 }
             }

@@ -27,7 +27,10 @@ namespace TetrisOptimization
 
         public List<(int, List<Block>)> Cuts { get {
             if(cuts is null)
+            {
                 cuts = CuttingRectangle.GenerateCuts(this);
+                cuts.Sort((x, y) => x.Item1.CompareTo(y.Item1));
+            }
             return cuts;
         } }
 

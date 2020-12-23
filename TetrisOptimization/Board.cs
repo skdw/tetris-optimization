@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Buffers.Binary;
 using System.Collections.Generic;
 using System.Linq;
@@ -396,6 +396,8 @@ namespace TetrisOptimization
         /// <returns>Number of cuts made to move the overlapped blocks into blank positions.</returns>
         public int MoveOverlapped(int forceOverrideId)
         {
+            int cutsNumber = 0;
+
             // Find the gaps
             var finding = new FindingGaps(this);
             List<Gap> gaps = finding.FindGaps((0, Size.Y - 1, 0, Size.X - 1));
@@ -407,11 +409,31 @@ namespace TetrisOptimization
             var overlapsBlocks = GetOverlapsBlocks(overlaps);
 
             // Fit the overlapping blocks into the gaps.
-            var (ovBlocks, ovGaps) = CuttingRectangle.ExactFit(gaps, overlapsBlocks, this);
-            var result = CuttingRectangle.UnitCut((ovBlocks, ovGaps), this, 0);
+            (overlapsBlocks, gaps) = CuttingRectangle.ExactFit(gaps, overlapsBlocks, this);
+            // var result = CuttingRectangle.UnitCut((ovBlocks, ovGaps), this, 0);
+
+            // All other blocks
+            foreach(var block in overlapsBlocks)
+            {
+                var cuts = block.Cuts;
+                foreach(var cut in cuts)
+                {
+                    var bls = cut.Item2;
+                    var brd1 = new Board(this);
+                    (overlapsBlocks, gaps) = CuttingRectangle.ExactFit(gaps, bls, brd1);
+                    // not exact fit - czy udało się wrzucić całą resztę do dziur większych?
+                    // bool res = ...
+                    // if(res)
+                    // { this = brd1;
+                    //    cutsNumber += cut.Item1;
+                    //    break; 
+                    // }
+                }
+            }
 
             // [TODO] Replace it with the number of cuts.
-            return Badness(forceOverrideId);
+            //return Badness(forceOverrideId);
+            return cutsNumber;
         }
 
         /// <summary>

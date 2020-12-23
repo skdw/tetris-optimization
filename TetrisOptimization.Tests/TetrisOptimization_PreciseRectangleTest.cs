@@ -27,6 +27,7 @@ namespace TetrisOptimization.UnitTests
             var test = CuttingRectangle.TrimBlock(matrix,true);
             Assert.IsNotNull(test);
         }
+
         [Test]
         public void TestCuttingBlock()
         {
@@ -34,6 +35,59 @@ namespace TetrisOptimization.UnitTests
             var test = CuttingRectangle.GenerateCuts(testBlock);
             Assert.IsNotNull(test);
         }
+
+        [Test]
+        public void TestCuttingBlock2()
+        {
+            bool[,] m = new bool[4, 2];
+            m[0, 0] = true;
+            m[1, 0] = true;
+            m[2, 0] = true;
+            m[3, 0] = true;
+            m[1, 1] = true;
+            Block b = new Block(m);
+            var l = CuttingRectangle.GenerateCuts(b);
+            foreach(var t in l)
+            {
+                int elemsSum = 0;
+                Console.WriteLine($"{t.Item1}​​​​​​​ times:");
+                foreach (Block block in t.Item2)
+                {
+                    var blBoard = new Board(block.Size.Y, block.Size.X);
+                    blBoard.TryToAdd(0, 0, block);
+                    blBoard.Print(true, false, true);
+                    elemsSum += blBoard.CountElems();
+                }
+                Assert.AreEqual(5, elemsSum);
+            }
+        }
+
+        [Test]
+        public void TestCuttingBlock3()
+        {
+            bool[,] m = new bool[3, 3];
+            m[0, 1] = true;
+            m[1, 1] = true;
+            m[2, 1] = true;
+            m[1, 0] = true;
+            m[1, 2] = true;
+            Block b = new Block(m);
+            var l = CuttingRectangle.GenerateCuts(b);
+            foreach(var t in l)
+            {
+                int elemsSum = 0;
+                Console.WriteLine($"{t.Item1}​​​​​​​ times:");
+                foreach (Block block in t.Item2)
+                {
+                    var blBoard = new Board(block.Size.Y, block.Size.X);
+                    blBoard.TryToAdd(0, 0, block);
+                    blBoard.Print(true, false, true);
+                    elemsSum += blBoard.CountElems();
+                }
+                Assert.AreEqual(5, elemsSum);
+            }
+        }
+
         [Test]
         public void TestPreciseRect2()
         {
