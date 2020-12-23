@@ -253,7 +253,7 @@ namespace TetrisOptimization
                     else
                     {
                         // not exact fit - czy uda�o si� wrzuci� ca�� reszt� do dziur wi�kszych?
-                        var res = CuttingRectangle.NotExactFit(gaps, bls, brd1, forceOverrideId);
+                        var res = CuttingRectangle.NotExactFit(tmp_gaps, bls, brd1, forceOverrideId);
                         if (res.Item1)
                         {
                             gaps = tmp_gaps;

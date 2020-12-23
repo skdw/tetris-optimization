@@ -417,7 +417,7 @@ namespace TetrisOptimization
         /// <returns></returns>
         public static bool DoesBlockFit(Block rot, Gap gap)
         {
-            gap.matrix = FindingGaps.PrepareMatrix(gap.size, gap.position, gap.fields);
+            //gap.matrix = FindingGaps.PrepareMatrix(gap.size, gap.position, gap.fields);
             if (rot.matrix.GetLength(0)!= gap.matrix.GetLength(0) || rot.matrix.GetLength(1) != gap.matrix.GetLength(1)) return false;
             for(int i=0;i<gap.matrix.GetLength(0);i++)
             {
@@ -432,7 +432,7 @@ namespace TetrisOptimization
         }
         public static ((int x, int y) position, List<Gap> new_gaps) SmallerBlockFit(Block rot, Gap gap)
         {
-            gap.matrix = FindingGaps.PrepareMatrix(gap.size, gap.position, gap.fields);
+            //gap.matrix = FindingGaps.PrepareMatrix(gap.size, gap.position, gap.fields);
             // if (rot.matrix.GetLength(0) != gap.matrix.GetLength(0) || rot.matrix.GetLength(1) != gap.matrix.GetLength(1)) return false;
             var block_size=rot.Size;
             int x0=0;
@@ -584,6 +584,8 @@ namespace TetrisOptimization
                                 {
                                     newBlocks.Remove(block);
                                     newGaps[gap]++;
+                                    gaps.Remove(gap);
+                                    gaps.AddRange(put.new_gaps);
                                     foreach(var g in put.new_gaps)
                                     {
                                         newGaps.Add(g, 0);
