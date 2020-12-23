@@ -192,13 +192,15 @@ namespace TetrisOptimization
             foreach (var ind_bl in overlappingBlocks)
             {
                 (int index, Block block) = ind_bl;
-                var coords = CommonMethods.DecodeCoords(index, a, b);
-                (int cuts,Block ot) = board.TryToAddCutOutstanding(coords.Item1, coords.Item2, block, force_override_id);
-                cutBlocks.Add(CuttingRectangle.TrimBlock(ot.matrix,false));
-                if (cuts < 0)
-                    return (board, Int32.MaxValue);
-                else
-                    cutsSum += cuts;
+                cutBlocks.Add(block);
+            //     var coords = CommonMethods.DecodeCoords(index, a, b);
+            //     int cuts = board.TryToAdd(coords.Item1, coords.Item2, block, force_override_id);
+            //     // (int cuts, Block ot) = board.TryToAddCutOutstanding(coords.Item1, coords.Item2, block, force_override_id);
+            //     cutBlocks.Add(CuttingRectangle.TrimBlock(ot.matrix,false));
+            //     if (cuts < 0)
+            //         return (board, Int32.MaxValue);
+            //     else
+            //         cutsSum += cuts;
             }
             var res = MoveOverlapped(force_override_id, board, cutBlocks);
             cutsSum += res.Item1;
@@ -210,27 +212,28 @@ namespace TetrisOptimization
         /// </summary>
         /// <param name="forceOverrideId">override id - base of the numeral system</param>
         /// <returns>Number of cuts made to move the overlapped blocks into blank positions.</returns>
-        public (int,Board) MoveOverlapped(int forceOverrideId, Board board,List<Block>? cutBlocks)
+        public (int,Board) MoveOverlapped(int forceOverrideId, Board board, List<Block> cutBlocks)
         {
             int cutsNumber = 0;
 
             // Find the gaps
             var finding = new FindingGaps(board);
             var Size = board.Size;
-            List<Gap> gaps = finding.FindGaps((0, Size.Y - 1, 0, Size.X - 1));
+            List<Gap> gaps = finding.FindGaps((0, Size.Y - 1, 0, Size.X - 1)); // 1x4 + 1x1 zamiast 1x5 !!!
 
             // Get the coords of blank and overlapped points.
-            (var holes, var overlaps) = board.GetHolesAndOverlaps(forceOverrideId);
+            //(var holes, var overlaps) = board.GetHolesAndOverlaps(forceOverrideId);
 
             // Construct consistent blocks from the overlapping points.
-            var overlapsBlocks = board.GetOverlapsBlocks(overlaps);
+            //var overlapsBlocks = board.GetOverlapsBlocks(overlaps);
 
             // Fit the overlapping blocks into the gaps.
-            (overlapsBlocks, gaps) = CuttingRectangle.ExactFit(gaps, overlapsBlocks, board);
+            //(overlapsBlocks, gaps) = CuttingRectangle.ExactFit(gaps, overlapsBlocks, board);
+            //int c1 = overlapsBlocks.Count;
             // var result = CuttingRectangle.UnitCut((ovBlocks, ovGaps), this, 0);
-            overlapsBlocks.AddRange(cutBlocks);
+            //overlapsBlocks.AddRange(cutBlocks);
             // All other blocks
-            foreach (var block in overlapsBlocks)
+            foreach (var block in cutBlocks)
             {
                 var cuts = block.Cuts;
                 foreach (var cut in cuts)
@@ -239,8 +242,8 @@ namespace TetrisOptimization
                     var brd1 = new Board(board);
                     List<Gap> tmp_gaps = new List<Gap>(gaps);
 
-                    (overlapsBlocks, tmp_gaps) = CuttingRectangle.ExactFit(tmp_gaps, bls, brd1);
-                    if(overlapsBlocks.Count==0 && tmp_gaps.Count==0)
+                    (bls, tmp_gaps) = CuttingRectangle.ExactFit(tmp_gaps, bls, brd1);
+                    if(bls.Count==0 && tmp_gaps.Count==0)
                     {
                         gaps = tmp_gaps;
                         board = brd1;
@@ -262,10 +265,7 @@ namespace TetrisOptimization
                     
                 }
             }
-
-            // [TODO] Replace it with the number of cuts.
-            //return Badness(forceOverrideId);
-            return (cutsNumber,board);
+            return (cutsNumber, board);
         }
     }
 }
