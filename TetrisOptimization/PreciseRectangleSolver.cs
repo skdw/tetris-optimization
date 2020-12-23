@@ -125,7 +125,7 @@ namespace TetrisOptimization
                     var board = CheckCombination(i);
                     if (board != null)
                     {
-                        Console.WriteLine($"Number of cuts: {bestLength}");
+                        Console.WriteLine($"Number of cuts: {board.Value.Item2}");
                         return board.Value;
                     }
                 }
