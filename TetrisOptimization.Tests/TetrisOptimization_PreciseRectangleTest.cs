@@ -1,7 +1,5 @@
 using System;
 using System.Collections.Generic;
-using System.IO;
-using System.Threading.Tasks;
 using NUnit.Framework;
 
 namespace TetrisOptimization.UnitTests
@@ -297,6 +295,17 @@ namespace TetrisOptimization.UnitTests
             Assert.AreEqual(2, board.CutsNumber);
             var hash = board.GetHash();
             Assert.AreEqual("80c4cd43cce374da57a17c4e6b305d24b30814c8f1e5e7dd557807fb8679ee89", hash);
+        }
+
+        [Test]
+        public void TestPreciseRectGroup3()
+        {
+            var blocks = new List<(int, Block)>() { (2, new FiveBlock(1)), (1, new FiveBlock(2)) };
+            var solver = new PreciseRectangleSolver(blocks, 5);
+            var board = solver.SolveMeasurePrint(true);
+            Assert.AreEqual(2, board.CutsNumber);
+            var hash = board.GetHash();
+            Assert.AreEqual("5a2d46626bb1053f85241d2d4379b44a868dc769984eb2ef081fb181c912657c", hash);
         }
     }
 }
