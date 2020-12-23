@@ -160,5 +160,21 @@ namespace TetrisOptimization.UnitTests
             var gap = new Gap( (2, 3), (2, 3),new List<(int y, int x)> { (2,3),(2,4),(2,5),(3,3),(3,4)});
             Assert.IsTrue(CuttingRectangle.DoesBlockFit(block, gap));
         }
+        [Test]
+        public void SmallerBlockFitTest()
+        {
+            bool[,] m = new bool[4, 2];
+            m[0, 0] = true;
+            m[1, 0] = true;
+            m[2, 0] = true;
+            m[3, 0] = true;
+            m[1, 1] = true;
+            Block b = new Block(m);
+            List<(int, int)> f = new List<(int, int)>() { (1, 1), (2, 1), (2, 2), (3, 1), (3, 2), (4, 1) };
+            Gap gap = new Gap((4, 2), (1, 1), f);
+            var wynik = CuttingRectangle.SmallerBlockFit(b, gap);
+            Assert.AreEqual(wynik.position, (1, 1));
+            Assert.AreEqual(wynik.new_gaps.Count, 1);
+        }
     }
 }
