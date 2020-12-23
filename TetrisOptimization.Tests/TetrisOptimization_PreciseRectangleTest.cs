@@ -9,13 +9,201 @@ namespace TetrisOptimization.UnitTests
     public class TestPreciseRectangle
     {
         [Test]
-        public void TestPreciseRect1()
+        public void TestPreciseRect01()
         {
             var blocks = new List<(int, Block)>() { (1, new FiveBlock(1)) };
             var solver = new PreciseRectangleSolver(blocks, 5);
             var board = solver.SolveMeasurePrint(true);
+            Assert.AreEqual(0, board.CutsNumber);
             var hash = board.GetHash();
             Assert.AreEqual("c8c362c52a33bdd8c9fa09b44caf5284e23fd17e4976103c51b9f2fadf957033", hash);
+        }
+
+        [Test]
+        public void TestPreciseRect02()
+        {
+            var blocks = new List<(int, Block)>() { (1, new FiveBlock(2)) };
+            var solver = new PreciseRectangleSolver(blocks, 5);
+            var board = solver.SolveMeasurePrint(true);
+            Assert.AreEqual(2, board.CutsNumber);
+            var hash = board.GetHash();
+            Assert.AreEqual("3a795ee993dcfcd47ae2fd7282fae2348dadc51429112235f8375626f9439a0b", hash);
+        }
+
+        [Test]
+        public void TestPreciseRect03()
+        {
+            var blocks = new List<(int, Block)>() { (1, new FiveBlock(3)) };
+            var solver = new PreciseRectangleSolver(blocks, 5);
+            var board = solver.SolveMeasurePrint(true);
+            Assert.AreEqual(2, board.CutsNumber);
+            var hash = board.GetHash();
+            Assert.AreEqual("3a795ee993dcfcd47ae2fd7282fae2348dadc51429112235f8375626f9439a0b", hash);
+        }
+
+        [Test]
+        public void TestPreciseRect04()
+        {
+            var blocks = new List<(int, Block)>() { (1, new FiveBlock(4)) };
+            var solver = new PreciseRectangleSolver(blocks, 5);
+            var board = solver.SolveMeasurePrint(true);
+            Assert.AreEqual(1, board.CutsNumber);
+            var hash = board.GetHash();
+            Assert.AreEqual("0b34ad0511d0a9bb2f8ee6befab4dd933690463abce8935a489305144d6ae693", hash);
+        }
+
+        [Test]
+        public void TestPreciseRect05()
+        {
+            var blocks = new List<(int, Block)>() { (1, new FiveBlock(5)) };
+            var solver = new PreciseRectangleSolver(blocks, 5);
+            var board = solver.SolveMeasurePrint(true);
+            Assert.AreEqual(1, board.CutsNumber);
+            var hash = board.GetHash();
+            Assert.AreEqual("39e62b6bb7269b2fb4a788191d003a795438da21470ea12561520a926bcd6c65", hash);
+        }
+
+        [Test]
+        public void TestPreciseRect06()
+        {
+            var blocks = new List<(int, Block)>() { (1, new FiveBlock(6)) };
+            var solver = new PreciseRectangleSolver(blocks, 5);
+            var board = solver.SolveMeasurePrint(true);
+            Assert.AreEqual(2, board.CutsNumber);
+            var hash = board.GetHash();
+            Assert.AreEqual("39e62b6bb7269b2fb4a788191d003a795438da21470ea12561520a926bcd6c65", hash);
+        }
+
+        [Test]
+        public void TestPreciseRect07()
+        {
+            var blocks = new List<(int, Block)>() { (1, new FiveBlock(7)) };
+            var solver = new PreciseRectangleSolver(blocks, 5);
+            var board = solver.SolveMeasurePrint(true);
+            Assert.AreEqual(2, board.CutsNumber);
+            var hash = board.GetHash();
+            Assert.AreEqual("39e62b6bb7269b2fb4a788191d003a795438da21470ea12561520a926bcd6c65", hash);
+        }
+
+        [Test]
+        public void TestPreciseRect08()
+        {
+            var blocks = new List<(int, Block)>() { (1, new FiveBlock(8)) };
+            var solver = new PreciseRectangleSolver(blocks, 5);
+            var board = solver.SolveMeasurePrint(true);
+            Assert.AreEqual(1, board.CutsNumber);
+            var hash = board.GetHash();
+            Assert.AreEqual("39e62b6bb7269b2fb4a788191d003a795438da21470ea12561520a926bcd6c65", hash);
+        }
+
+        [Test]
+        public void TestPreciseRect09()
+        {
+            var blocks = new List<(int, Block)>() { (1, new FiveBlock(9)) };
+            var solver = new PreciseRectangleSolver(blocks, 5);
+            var board = solver.SolveMeasurePrint(true);
+            Assert.AreEqual(1, board.CutsNumber);
+            var hash = board.GetHash();
+            Assert.AreEqual("39e62b6bb7269b2fb4a788191d003a795438da21470ea12561520a926bcd6c65", hash);
+        }
+
+        [Test]
+        public void TestPreciseRect10()
+        {
+            var blocks = new List<(int, Block)>() { (1, new FiveBlock(10)) };
+            var solver = new PreciseRectangleSolver(blocks, 5);
+            var board = solver.SolveMeasurePrint(true);
+            Assert.AreEqual(1, board.CutsNumber);
+            var hash = board.GetHash();
+            Assert.AreEqual("39e62b6bb7269b2fb4a788191d003a795438da21470ea12561520a926bcd6c65", hash);
+        }
+
+        [Test]
+        public void TestPreciseRect11()
+        {
+            var blocks = new List<(int, Block)>() { (1, new FiveBlock(11)) };
+            var solver = new PreciseRectangleSolver(blocks, 5);
+            var board = solver.SolveMeasurePrint(true);
+            Assert.AreEqual(2, board.CutsNumber);
+            var hash = board.GetHash();
+            Assert.AreEqual("39e62b6bb7269b2fb4a788191d003a795438da21470ea12561520a926bcd6c65", hash);
+        }
+
+        [Test]
+        public void TestPreciseRect12()
+        {
+            var blocks = new List<(int, Block)>() { (1, new FiveBlock(12)) };
+            var solver = new PreciseRectangleSolver(blocks, 5);
+            var board = solver.SolveMeasurePrint(true);
+            Assert.AreEqual(1, board.CutsNumber);
+            var hash = board.GetHash();
+            Assert.AreEqual("39e62b6bb7269b2fb4a788191d003a795438da21470ea12561520a926bcd6c65", hash);
+        }
+
+        [Test]
+        public void TestPreciseRect13()
+        {
+            var blocks = new List<(int, Block)>() { (1, new FiveBlock(13)) };
+            var solver = new PreciseRectangleSolver(blocks, 5);
+            var board = solver.SolveMeasurePrint(true);
+            Assert.AreEqual(2, board.CutsNumber);
+            var hash = board.GetHash();
+            Assert.AreEqual("3a795ee993dcfcd47ae2fd7282fae2348dadc51429112235f8375626f9439a0b", hash);
+        }
+
+        [Test]
+        public void TestPreciseRect14()
+        {
+            var blocks = new List<(int, Block)>() { (1, new FiveBlock(14)) };
+            var solver = new PreciseRectangleSolver(blocks, 5);
+            var board = solver.SolveMeasurePrint(true);
+            Assert.AreEqual(2, board.CutsNumber);
+            var hash = board.GetHash();
+            Assert.AreEqual("389c0e5e125399e4556df695d86d514692456a6b9c2035dec16fd4bdb0df1bf6", hash);
+        }
+
+        [Test]
+        public void TestPreciseRect15()
+        {
+            var blocks = new List<(int, Block)>() { (1, new FiveBlock(15)) };
+            var solver = new PreciseRectangleSolver(blocks, 5);
+            var board = solver.SolveMeasurePrint(true);
+            Assert.AreEqual(1, board.CutsNumber);
+            var hash = board.GetHash();
+            Assert.AreEqual("0b34ad0511d0a9bb2f8ee6befab4dd933690463abce8935a489305144d6ae693", hash);
+        }
+
+        [Test]
+        public void TestPreciseRect16()
+        {
+            var blocks = new List<(int, Block)>() { (1, new FiveBlock(16)) };
+            var solver = new PreciseRectangleSolver(blocks, 5);
+            var board = solver.SolveMeasurePrint(true);
+            Assert.AreEqual(1, board.CutsNumber);
+            var hash = board.GetHash();
+            Assert.AreEqual("0b34ad0511d0a9bb2f8ee6befab4dd933690463abce8935a489305144d6ae693", hash);
+        }
+
+        [Test]
+        public void TestPreciseRect17()
+        {
+            var blocks = new List<(int, Block)>() { (1, new FiveBlock(17)) };
+            var solver = new PreciseRectangleSolver(blocks, 5);
+            var board = solver.SolveMeasurePrint(true);
+            Assert.AreEqual(2, board.CutsNumber);
+            var hash = board.GetHash();
+            Assert.AreEqual("3a795ee993dcfcd47ae2fd7282fae2348dadc51429112235f8375626f9439a0b", hash);
+        }
+
+        [Test]
+        public void TestPreciseRect18()
+        {
+            var blocks = new List<(int, Block)>() { (1, new FiveBlock(18)) };
+            var solver = new PreciseRectangleSolver(blocks, 5);
+            var board = solver.SolveMeasurePrint(true);
+            Assert.AreEqual(2, board.CutsNumber);
+            var hash = board.GetHash();
+            Assert.AreEqual("3a795ee993dcfcd47ae2fd7282fae2348dadc51429112235f8375626f9439a0b", hash);
         }
 
         [Test]
@@ -90,23 +278,14 @@ namespace TetrisOptimization.UnitTests
         }
 
         [Test]
-        public void TestPreciseRect2()
-        {
-            var blocks = new List<(int, Block)>() { (1, new FiveBlock(2)) };
-            var solver = new PreciseRectangleSolver(blocks, 5);
-            var board = solver.SolveMeasurePrint(true);
-            var hash = board.GetHash();
-            Assert.AreEqual("bd258b00971be2a0c1dfd220267823fbc563ae67b963f9bcd3baae1e91fdfbb2", hash);
-        }
-        
-        [Test]
-        public void TestPreciseRect3()
+        public void TestPreciseRectGroup()
         {
             var blocks = new List<(int, Block)>() { (1, new FiveBlock(1)), (1, new FiveBlock(2)) };
             var solver = new PreciseRectangleSolver(blocks, 5);
             var board = solver.SolveMeasurePrint(true);
+            Assert.AreEqual(2, board.CutsNumber);
             var hash = board.GetHash();
-            Assert.AreEqual("908d2df398967a693321dd569ad746988e53ea99b7b37fc9c931fa58f876afac", hash);
+            Assert.AreEqual("215a313dd03e819a430003c9265895e97d0a46ee20982942f755f0c8ed2e6f8b", hash);
         }
     }
 }
