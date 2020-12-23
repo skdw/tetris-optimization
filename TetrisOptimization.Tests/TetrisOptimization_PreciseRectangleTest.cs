@@ -278,7 +278,7 @@ namespace TetrisOptimization.UnitTests
         }
 
         [Test]
-        public void TestPreciseRectGroup()
+        public void TestPreciseRectGroup1()
         {
             var blocks = new List<(int, Block)>() { (1, new FiveBlock(1)), (1, new FiveBlock(2)) };
             var solver = new PreciseRectangleSolver(blocks, 5);
@@ -286,6 +286,17 @@ namespace TetrisOptimization.UnitTests
             Assert.AreEqual(2, board.CutsNumber);
             var hash = board.GetHash();
             Assert.AreEqual("215a313dd03e819a430003c9265895e97d0a46ee20982942f755f0c8ed2e6f8b", hash);
+        }
+
+        [Test]
+        public void TestPreciseRectGroup2()
+        {
+            var blocks = new List<(int, Block)>() { (1, new FiveBlock(11)), (1, new FiveBlock(12)) };
+            var solver = new PreciseRectangleSolver(blocks, 5);
+            var board = solver.SolveMeasurePrint(true);
+            Assert.AreEqual(2, board.CutsNumber);
+            var hash = board.GetHash();
+            Assert.AreEqual("80c4cd43cce374da57a17c4e6b305d24b30814c8f1e5e7dd557807fb8679ee89", hash);
         }
     }
 }
