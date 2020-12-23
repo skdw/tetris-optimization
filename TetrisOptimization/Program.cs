@@ -53,10 +53,7 @@ namespace TetrisOptimization
                 Console.WriteLine("\nCalling the solver: {0}", solverType);
                 BlocksSolver solver = BlocksSolverFactory.GetSolver(solverType, blocks, blockSize);
                 if (printBlocks)
-                {
                     solver.PrintBlocks(MonochromeConsole);
-                    printBlocks = false;
-                }
                 solver.SolveMeasurePrint(MonochromeConsole);
                 if(KeyToPass && lines.Count > 0)
                     if (AskForQuit() == 'q')
@@ -100,13 +97,13 @@ namespace TetrisOptimization
                 Console.WriteLine("Pass an entry from keyboard");
                 Console.WriteLine("Type the blocks size [4-6]:");
                 string blocks = Console.ReadLine();
-                input.Enqueue(blocks);
+                input.Enqueue(blocks.Trim());
                 Console.WriteLine("Type the solver type [ok/hk/op/hp]:");
                 string solverType = Console.ReadLine();
-                input.Enqueue(solverType);
+                input.Enqueue(solverType.Trim());
                 Console.WriteLine("Type the blocks ID-s:");
                 string blocksIds = Console.ReadLine();
-                input.Enqueue(blocksIds);
+                input.Enqueue(blocksIds.Trim());
                 CallAlgorithms(input, true);
                 if (AskForQuit() == 'q')
                     break;

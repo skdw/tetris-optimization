@@ -7,7 +7,6 @@ namespace TetrisOptimization
         static readonly bool[,] I_m = {
             { true, true, true, true, true}
         };
-        //static FiveBlock I = new FiveBlock(I_m, (5, 1));
 
         // 1000
         // 1111
