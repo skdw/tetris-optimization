@@ -227,14 +227,14 @@ namespace TetrisOptimization
         /// <param name="x"></param>
         /// <param name="force_override_id">Null to prevent overriding. Number of blocks to code the block id.</param>
         /// <returns>Number of cuts / -1 if the block is not placed</returns>
-        public int TryToAdd(int y, int x, Block block, int? force_override_id = null)
+        public int TryToAdd(int y, int x, Block block, int? force_override_id = null,bool cut = true)
         {
             //int startElems = CountElems();
             int shortBlockSize = Math.Min(block.Size.X, block.Size.Y);
             int longBlockSize = Math.Max(block.Size.X, block.Size.Y);
             int shortBoardSize = Math.Min(Size.X, Size.Y);
             int longBoardSize = Math.Max(Size.X, Size.Y);
-            if(force_override_id.HasValue && (block.Size.X > shortBoardSize || block.Size.Y > shortBoardSize))
+            if(force_override_id.HasValue && (block.Size.X > shortBoardSize || block.Size.Y > shortBoardSize) && cut)
             {
                 Board board1 = new Board(this);
                 int status = board1.TryToAddCutBlock(y, x, new Block(block), force_override_id.Value);
@@ -281,7 +281,41 @@ namespace TetrisOptimization
             // }
             return 0;
         }
+        public (int,Block) TryToAddCutOutstanding(int y, int x, Block block,int force_override_id)
+        {
+            var blockTemp = new Block(block);
+            var matrixOut = new bool[block.matrix.GetLength(0), block.matrix.GetLength(1)];
+            // Check for errors
+            for (int cy = 0; cy < block.Size.Y; ++cy)
+                for (int cx = 0; cx < block.Size.X; ++cx)
+                    if ((y + cy >= Size.Y) || (x + cx >= Size.X))
+                    {
+                        // Out of the board
+                        if (block.matrix[cy,cx]==true)
+                            matrixOut[cy, cx] = true;
+                    }
+                    else if (B[y + cy, x + cx].HasValue && block.matrix[cy, cx])
+                    {
+                        // Trying to override the block
+                            return (-1,blockTemp);
+                    }
 
+            // Add block to the board
+            int colortmpID = ++_colorId;
+            for (int cy = 0; cy < block.Size.Y; ++cy)
+                for (int cx = 0; cx < block.Size.X; ++cx)
+                    if (cy<block.matrix.GetLength(0) && cx<block.matrix.GetLength(1) && block.matrix[cy, cx] && y + cy < B.GetLength(0) && x + cx < B.GetLength(1))
+                    {
+                        if ( B[y + cy, x + cx].HasValue) // overriding
+                        {
+                            B[y + cy, x + cx] *= force_override_id;
+                            B[y + cy, x + cx] += colortmpID;
+                        }
+                        else // just adding
+                            B[y + cy, x + cx] = colortmpID;
+                    }
+            return (0, new Block(matrixOut));
+        }
         private int TryToAddCutBlock(int y, int x, Block block, int force_override_id)
         {
             //int startElems = CountElems();

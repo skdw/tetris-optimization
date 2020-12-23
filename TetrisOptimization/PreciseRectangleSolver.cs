@@ -101,7 +101,7 @@ namespace TetrisOptimization
                 return null;
             }
             
-            bool concurrent = true;
+            bool concurrent = false;
             if(concurrent)
             {
                 var resultCollection = new ConcurrentBag<(Board, int)?>();
@@ -111,7 +111,10 @@ namespace TetrisOptimization
                         resultCollection.Add(CheckCombination(i)));
                     foreach (var board in resultCollection)
                         if (board != null)
+                        {
+                            Console.WriteLine($"Badness: {bestLength}");
                             return board.Value;
+                        }
                     resultCollection.Clear();
                 }
             }
@@ -120,8 +123,11 @@ namespace TetrisOptimization
                 for(int i = 0; i < combinationsNum; ++i)
                 {
                     var board = CheckCombination(i);
-                    if(board != null)
+                    if (board != null)
+                    {
+                        Console.WriteLine($"Badness: {bestLength}");
                         return board.Value;
+                    }
                 }
             }
 
@@ -171,22 +177,23 @@ namespace TetrisOptimization
                 if (cutsFlag < 0)
                     overlappingBlocks.Add(ind_bl);
             }
-
+            var cutBlocks = new List<Block>();
             // Then force to place the blocks which did not fit earlier
             // (place them on top of previous blocks)
             foreach (var ind_bl in overlappingBlocks)
             {
                 (int index, Block block) = ind_bl;
                 var coords = CommonMethods.DecodeCoords(index, a, b);
-                int cuts = board.TryToAdd(coords.Item1, coords.Item2, block, force_override_id);
+                (int cuts,Block ot) = board.TryToAddCutOutstanding(coords.Item1, coords.Item2, block, force_override_id);
+                cutBlocks.Add(CuttingRectangle.TrimBlock(ot.matrix,false));
                 if (cuts < 0)
                     return (board, Int32.MaxValue);
                 else
                     cutsSum += cuts;
             }
-
-            cutsSum += MoveOverlapped(force_override_id,board);
-            return (board, cutsSum);
+            var res = MoveOverlapped(force_override_id, board, cutBlocks);
+            cutsSum += res.Item1;
+            return (res.Item2, cutsSum);
         }
 
         /// <summary>
@@ -194,7 +201,7 @@ namespace TetrisOptimization
         /// </summary>
         /// <param name="forceOverrideId">override id - base of the numeral system</param>
         /// <returns>Number of cuts made to move the overlapped blocks into blank positions.</returns>
-        public int MoveOverlapped(int forceOverrideId, Board board)
+        public (int,Board) MoveOverlapped(int forceOverrideId, Board board,List<Block>? cutBlocks)
         {
             int cutsNumber = 0;
 
@@ -212,7 +219,7 @@ namespace TetrisOptimization
             // Fit the overlapping blocks into the gaps.
             (overlapsBlocks, gaps) = CuttingRectangle.ExactFit(gaps, overlapsBlocks, board);
             // var result = CuttingRectangle.UnitCut((ovBlocks, ovGaps), this, 0);
-
+            overlapsBlocks.AddRange(cutBlocks);
             // All other blocks
             foreach (var block in overlapsBlocks)
             {
@@ -224,21 +231,32 @@ namespace TetrisOptimization
                     List<Gap> tmp_gaps = new List<Gap>(gaps);
 
                     (overlapsBlocks, tmp_gaps) = CuttingRectangle.ExactFit(tmp_gaps, bls, brd1);
-                    // not exact fit - czy uda³o siê wrzuciæ ca³¹ resztê do dziur wiêkszych?
-                    var res = CuttingRectangle.NotExactFit(gaps, bls, brd1);
-                    if (res.Item1)
+                    if(overlapsBlocks.Count==0 && tmp_gaps.Count==0)
                     {
                         gaps = tmp_gaps;
                         board = brd1;
                         cutsNumber += cut.Item1;
                         break;
                     }
+                    else
+                    {
+                        // not exact fit - czy uda³o siê wrzuciæ ca³¹ resztê do dziur wiêkszych?
+                        var res = CuttingRectangle.NotExactFit(gaps, bls, brd1, forceOverrideId);
+                        if (res.Item1)
+                        {
+                            gaps = tmp_gaps;
+                            board = brd1;
+                            cutsNumber += cut.Item1;
+                            break;
+                        }
+                    }
+                    
                 }
             }
 
             // [TODO] Replace it with the number of cuts.
             //return Badness(forceOverrideId);
-            return cutsNumber;
+            return (cutsNumber,board);
         }
     }
 }

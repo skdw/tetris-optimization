@@ -535,7 +535,27 @@ namespace TetrisOptimization
             }
             return (newBlocks,gps);
         }
-        public static (bool ,List<Gap>) NotExactFit(List<Gap> gaps, List<Block> blocks, Board board)
+        public class CompareBlocks : Comparer<Block>
+        {
+            // Compares by Length, Height, and Width.
+            public override int Compare(Block x, Block y)
+            {
+                int sizex = x.matrix.GetLength(0) * x.matrix.GetLength(1);
+                int sizey = y.matrix.GetLength(0) * y.matrix.GetLength(1);
+                return sizex.CompareTo(sizey);
+            }
+        }
+        public class CompareGaps : Comparer<Gap>
+        {
+            // Compares by Length, Height, and Width.
+            public override int Compare(Gap x, Gap y)
+            {
+                int sizex = x.matrix.GetLength(0) * x.matrix.GetLength(1);
+                int sizey = y.matrix.GetLength(0) * y.matrix.GetLength(1);
+                return sizex.CompareTo(sizey);
+            }
+        }
+        public static (bool ,List<Gap>) NotExactFit(List<Gap> gaps, List<Block> blocks, Board board,int? forceOverrideId)
         {
             var newBlocks = new List<Block>(blocks);
             var newGaps = new Dictionary<Gap, int>();
@@ -544,6 +564,8 @@ namespace TetrisOptimization
                 newGaps.Add(gap, 0);
             }
             bool breakFrom = false;
+            blocks.Sort(new CompareBlocks());
+            gaps.Sort(new CompareGaps());
             //dla kazdego bloku
             foreach (Block block in blocks)
             {
@@ -558,7 +580,7 @@ namespace TetrisOptimization
                             var put = SmallerBlockFit(rot, gap);
                             if (put.position != (-1, -1))
                             {
-                                if (board.TryToAdd(put.position.y, put.position.x, rot)>-1)
+                                if (board.TryToAdd(put.position.y, put.position.x, rot,forceOverrideId,false)>-1)
                                 {
                                     newBlocks.Remove(block);
                                     newGaps[gap]++;
