@@ -36,10 +36,11 @@ namespace TetrisOptimization
                 for (int yAx = 0; yAx <= boarderY; yAx++)
                 {                    
                     var newBoard = new Board(_baseBoard);
+                    //newBoard.Print(true, false, false);
                     (int y1, int y2,int x0, int x1) frame = (yAx + y.y0, yAx + y.y0 + rectangle.y-1,xAx + x.x0, xAx + x.x0 + rectangle.x-1);
                     var achivedCut = CountCuttingLine(newBoard, frame,y,x);
                     //baseBoard.Print();
-                    //newBoard.Print();
+                    //newBoard.Print(true,false,false);
                     if (achivedCut.Item1 < minimalcutting && achivedCut.Item1 > 0 /*&& error!=-1*/)
                     {
                         cutBoard = achivedCut.Item2;
