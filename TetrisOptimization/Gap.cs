@@ -28,5 +28,10 @@ namespace TetrisOptimization
             this.position = position;
             this.fields = fields;
         }
+
+        public void PrepareMatrix()
+        {
+            matrix = FindingGaps.PrepareMatrix(size, position, fields);
+        }
     }
 }

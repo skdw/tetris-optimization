@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace TetrisOptimization
 {
@@ -9,7 +10,6 @@ namespace TetrisOptimization
         public int[] currentFigure,tempFigure;
 
         //wymiary, polozenie ramki
-        //int rectangleX, rectangleY;
         int rectangleWidth,rectangleHeight;
 
         //aktualny kat zegara
@@ -27,7 +27,7 @@ namespace TetrisOptimization
             rectangleHeight = 0;
             currentAngle = 0;
             numPermutation = _numPermutation;
-            multiplier = hmultiplier;
+            multiplier = hmultiplier<10?10:hmultiplier;
         }
 
         public override Board Solve()
@@ -77,11 +77,11 @@ namespace TetrisOptimization
                     if (first) // pierwszy klocek kladziemy na srodku glownego prostokata
                     {
                         //poloz klocek na srodku
-                        bool err = board.TryToAdd(planeY / 2, planeX / 2, blck);
+                        int cuts = board.TryToAdd(planeY / 2, planeX / 2, blck);
                         //jak blad dodawania - wychodzimy
-                        if (err) return (-1,boardFinal);
+                        if (cuts < 0) return (-1, boardFinal);
                         //zaktualizuj wymiary figury
-                        UpdateTempDim(planeX / 2 - blck.matrix.GetLength(0) / 2, planeY / 2 - blck.matrix.GetLength(1) / 2, blck.matrix.GetLength(0) + planeX / 2 - blck.matrix.GetLength(0) / 2, blck.matrix.GetLength(1) + planeY / 2 - blck.matrix.GetLength(1) / 2 + 1);
+                        UpdateTempDim(board,planeX / 2 - blck.matrix.GetLength(0) / 2, planeY / 2 - blck.matrix.GetLength(1) / 2, blck.matrix.GetLength(0) + planeX / 2 - blck.matrix.GetLength(0) / 2, blck.matrix.GetLength(1) + planeY / 2 - blck.matrix.GetLength(1) / 2 + 1);
                         first = !first;
                     }
                     else
@@ -120,54 +120,17 @@ namespace TetrisOptimization
         }
         public (int,int) GetMainRectangleDim()
         {
-            List<Block> firstList = new List<Block>();
-            foreach (var t in blocks)
+            int blocks_count = blocks.Sum(b => b.Item1);
+            int area = blocks_count * blockSize;
+            int sqrt = (int)Math.Sqrt(area);
+            for (int i = sqrt; i > 0; --i)
             {
-                for (int i = 0; i < t.Item1; i++)
-                {
-                    firstList.Add(t.Item2);
-                }
+                int a = i;
+                int b = area / a;
+                if (a * b == area)
+                    return (a, b);
             }
-            int howManyOnes = 0;
-            foreach(Block block in firstList)
-                for (int i = 0; i < block.matrix.GetLength(0); ++i)
-                    for (int j = 0; j < block.matrix.GetLength(1); ++j)
-                        if (block.matrix[i, j])
-                            howManyOnes++;
-            var divs = GetDivisors(howManyOnes);
-            if(divs.Count%2==1)
-                return (divs[(int)Math.Round((double)divs.Count/2)],divs[(int)Math.Round((double)divs.Count/2)]);
-            else
-                 return (divs[divs.Count/2 - 1],divs[divs.Count/2]);
-        }
-        static List<int> GetDivisors(int n)
-        {
-            // Vector to store half
-            // of the divisors
-            var v = new List<int>();
-            var v2 = new List<int>();
-            for (int i = 1;
-                i <= Math.Sqrt(n); i++) {
-                if (n % i == 0) {
-
-                    // check if divisors are equal
-                    if (n / i == i)
-                        v.Add(i);
-                    else
-                    {
-                        v.Add(i);
-
-                        // push the second divisor
-                        // in the vector
-                        v2.Add(n / i);
-                    }
-                }
-            }
-            v2.Reverse();
-            v.AddRange(v2);
-            // The vector will be
-            // printed in reverse
-            return v;
+            return (1, area);
         }
 
         public int GetCircleRadius(int centerX,int centerY)
@@ -187,12 +150,13 @@ namespace TetrisOptimization
         }
 
         //funkcja ktora updatuje wymiary xmin, xmax, ... ostatnio polozonego bloku
-        public void UpdateTempDim(int x, int y, int xmax, int ymax)
+        public void UpdateTempDim(Board board,int x, int y, int xmax, int ymax)
         {
-            tempFigure[0] = x;
-            tempFigure[1] = xmax;
-            tempFigure[2] = y;
-            tempFigure[3] = ymax;
+            var b = board.GetBoundsPublic(true, false);
+            tempFigure[0] = b.minY;
+            tempFigure[1] = b.maxY;
+            tempFigure[2] = b.minX;
+            tempFigure[3] = b.maxX;
         }
         //funkcja ktora updateuje wymiary aktualnej figury na podstawie ostatnio polozonego bloczku
         public void UpdateCurrentDim()
@@ -251,10 +215,10 @@ namespace TetrisOptimization
             while (scanned && howFarFromCenter>=0)
             {
                 //jesli zeskanowalismy ze da sie dodac ale sie nie dodalo to konczymy z bledem
-                bool err1 = board.TryToAdd(start.Item1, start.Item2, block);
-                if (err1) return false;
+                int cuts = board.TryToAdd(start.Item1, start.Item2, block);
+                if (cuts < 0) return false;
                 //updateujemy 
-                UpdateTempDim(start.Item1, start.Item2, start.Item1+block.matrix.GetLength(0), start.Item2+block.matrix.GetLength(1));
+                UpdateTempDim(board, start.Item1, start.Item2, start.Item1+block.matrix.GetLength(0), start.Item2+block.matrix.GetLength(1));
                 //
                 startPrev = start;
                 distPrev = dist;
@@ -268,13 +232,9 @@ namespace TetrisOptimization
                 scanned = board.ScanBoard(start.Item1, start.Item2, block);
 
             }
-            bool err = board.TryToAdd(startPrev.Item1, startPrev.Item2, block);
-            return !err;
+            int cuts2 = board.TryToAdd(startPrev.Item1, startPrev.Item2, block);
+            return cuts2 > -1;
         }
-       
-        
-	
-        
 
     }
    

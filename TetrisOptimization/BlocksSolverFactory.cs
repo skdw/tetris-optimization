@@ -7,6 +7,10 @@ namespace TetrisOptimization
 {
     public static class BlocksSolverFactory
     {
+        private static bool ConcurrentSquare = true;
+
+        private static bool ConcurrentRectangle = false;
+
         private static int ParallelStep = 1000;
 
         private static int HKnumLists = 600;
@@ -26,13 +30,13 @@ namespace TetrisOptimization
             switch (solverType)
             {
                 case "ok":
-                    return new PreciseSquareSolver(blocks, blockSize, ParallelStep);
+                    return new PreciseSquareSolver(blocks, blockSize, ConcurrentSquare, ParallelStep);
                 case "hk":
                     return new HeuristicSquareSolver(blocks, blockSize, HKnumLists, HKpercentage, HKnumPermutation, HPercentageBoardSize);
                 case "op":
-                    return new PreciseRectangleSolver(blocks, blockSize, ParallelStep);
+                    return new PreciseRectangleSolver(blocks, blockSize, ConcurrentRectangle, ParallelStep);
                 case "hp":
-                    return new HeuristicRectangleSolver(blocks, blockSize, HPnumPermutation, HPmultiplier);
+                    return new HeuristicRectangleSolver(blocks, blockSize, HPnumPermutation, HPmultiplier<10?10:HPmultiplier);
                 default:
                     throw new ArgumentException("Unknown solver type");
             }

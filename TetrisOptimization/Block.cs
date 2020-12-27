@@ -1,3 +1,5 @@
+using System.Collections.Generic;
+
 namespace TetrisOptimization
 {
     /// <summary>
@@ -14,6 +16,17 @@ namespace TetrisOptimization
         }
 
         public (int Y, int X) Size { get; }
+
+        private List<(int, List<Block>)> cuts = null;
+
+        public List<(int, List<Block>)> Cuts { get {
+            if(cuts is null)
+            {
+                cuts = CuttingRectangle.GenerateCuts(this);
+                cuts.Sort((x, y) => x.Item1.CompareTo(y.Item1));
+            }
+            return cuts;
+        } }
 
         /// <summary>
         /// Rotates block by 90 degrees

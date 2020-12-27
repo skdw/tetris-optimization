@@ -10,6 +10,9 @@ namespace TetrisOptimization
     {
         public static bool KeyToPass = true;
 
+        // print the numbers instead of colorful blocks in a console which does not support colors
+        public static bool MonochromeConsole = false;
+
         /// <summary>
         /// Call algorithms given lines of input data
         /// </summary>
@@ -50,12 +53,9 @@ namespace TetrisOptimization
                 Console.WriteLine("\nCalling the solver: {0}", solverType);
                 BlocksSolver solver = BlocksSolverFactory.GetSolver(solverType, blocks, blockSize);
                 if (printBlocks)
-                {
-                    solver.PrintBlocks();
-                    printBlocks = false;
-                }
-                solver.SolveMeasurePrint();
-                if (KeyToPass && lines.Count > 0)
+                    solver.PrintBlocks(MonochromeConsole);
+                solver.SolveMeasurePrint(MonochromeConsole);
+                if(KeyToPass && lines.Count > 0)
                     if (AskForQuit() == 'q')
                         break;
             }
@@ -80,7 +80,7 @@ namespace TetrisOptimization
             }
             catch
             {
-                Console.WriteLine($"Cannot read the input file: {path}");
+                Console.WriteLine($"Error raised when calling the algorithm under: {path}");
                 throw;
             }
         }
@@ -97,13 +97,13 @@ namespace TetrisOptimization
                 Console.WriteLine("Pass an entry from keyboard");
                 Console.WriteLine("Type the blocks size [4-6]:");
                 string blocks = Console.ReadLine();
-                input.Enqueue(blocks);
+                input.Enqueue(blocks.Trim());
                 Console.WriteLine("Type the solver type [ok/hk/op/hp]:");
                 string solverType = Console.ReadLine();
-                input.Enqueue(solverType);
+                input.Enqueue(solverType.Trim());
                 Console.WriteLine("Type the blocks ID-s:");
                 string blocksIds = Console.ReadLine();
-                input.Enqueue(blocksIds);
+                input.Enqueue(blocksIds.Trim());
                 CallAlgorithms(input, true);
                 if (AskForQuit() == 'q')
                     break;

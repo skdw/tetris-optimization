@@ -60,7 +60,14 @@ namespace TetrisOptimization
 
         public void generate_list()
         {
-
+            if(numBlocks==1)
+            {
+                EvolutionList.Add(new TetrisList(new List<(int, int)>() { (0, 0) }));
+                bestBoard = new Board(maxBlockSize, maxBlockSize);
+                bestBoard.TryToAdd(0, 0, permutation.blocks[0].Item2);
+                minimalAchivedSize = maxBlockSize;
+                return;
+            }
             for (int i = 0; i < numLists; i++)
             {
                 List<(int x, int rot)> tmp_list = new List<(int, int)>();
@@ -83,13 +90,13 @@ namespace TetrisOptimization
             {
                 int x = arrange[i].Item1;
                 Block b = CommonMethods.GetSpecyficRotation(blocks[i], arrange[i].Item2);
-                bool flag = false;
+                int flag = 0;
                 int y = 0;
                 do
                 {
                     flag = board.TryToAdd(y, x, b);
                     y++;
-                } while (flag);
+                } while (flag < 0);
                 if (x1 > x)
                     x1 = x;
                 if (x2 < b.Size.X + x)

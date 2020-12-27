@@ -1,6 +1,8 @@
 ﻿using System;
-using System.Collections.Generic;
+using System.Buffers.Binary;
 using System.Linq;
+using System.Text;
+using System.Security.Cryptography;
 
 namespace TetrisOptimization
 {
@@ -11,23 +13,56 @@ namespace TetrisOptimization
             B = new int?[y, x];
             Size = (y, x);
         }
+
         public Board(Board b)
         {
             B = b.B.Clone() as int?[,];
             if (B != null)
                 Size = (B.GetLength(0), B.GetLength(1));
+            _colorId = b._colorId;
         }
 
         public readonly int?[,] B;
+
         public int? this[int i, int j]
         {
             get => B[i, j];
             set => B[i, j] = value;
         }
 
-        private (int Y, int X) Size { get; }
+        public (int Y, int X) Size { get; }
 
-        int _colorId = 0;
+        public int CutsNumber { get; set; }
+
+        public int _colorId = 0;
+
+        // Hash algorithm
+        private static SHA256 sha256Hash = SHA256.Create();
+
+        public string GetHash()
+        {
+            var S = Size;            
+            var buffer = new byte[S.X * S.Y * 4];
+            var span = new Span<byte>(buffer);
+            for(int i = 0; i < S.Y; ++i)
+                for(int j = 0; j < S.X; ++j)
+                    BinaryPrimitives.WriteInt32LittleEndian(span.Slice((i * S.X + j) * 4, 4), B[i, j] ?? 0);
+
+            // Convert the input string to a byte array and compute the hash.
+            byte[] data = sha256Hash.ComputeHash(buffer);
+
+            // Create a new Stringbuilder to collect the bytes
+            // and create a string.
+            var sBuilder = new StringBuilder();
+
+            // Loop through each byte of the hashed data
+            // and format each one as a hexadecimal string.
+            for (int i = 0; i < data.Length; i++)
+                sBuilder.Append(data[i].ToString("x2"));
+
+            // Return the hexadecimal string.
+            return sBuilder.ToString();
+        }
 
         /// <summary>
         /// Get ConsoleColor for printing blocks
@@ -50,31 +85,69 @@ namespace TetrisOptimization
         /// </summary>
         /// <param name="cutBounds">Cuts the board's bounds</param>
         /// <param name="forceSquare">Force the board to be a square</param>
-        public void Print(bool cutBounds = true, bool forceSquare = false)
+        public void Print(bool cutBounds = true, bool forceSquare = false, bool monochrome = false)
         {
+            var hash = GetHash();
+            Console.WriteLine($"board SHA256 hash: {hash}");
+
+            if(CountElems() == 0)
+            {
+                Console.WriteLine("All of the board's elements are nulls!");
+                return;
+            }
             var bounds = GetBounds(cutBounds, forceSquare);
             PrintSize(forceSquare, bounds);
+
+            if(bounds.minX < 0 || bounds.minY < 0)
+            {
+                Console.WriteLine("Wrong bounds! {0} {1} {2} {3}", bounds.minY, bounds.maxY, bounds.minX, bounds.maxX);
+                return;
+            }
 
             for (int i = bounds.minY; i < bounds.maxY; ++i)
             {
                 Console.Write($"{i,5}");
                 Console.Write("|");
+                char consoleChar = ' ';
                 for (var j = bounds.minX; j < bounds.maxX; ++j)
                 {
                     try
                     {
                         if (B[i, j].HasValue)
+                        {
                             Console.BackgroundColor = GetColor(B[i, j].Value);
+                            if(monochrome)
+                                consoleChar = B[i, j].Value.ToString().First();
+                            else
+                                consoleChar = ' ';
+                        }
+                        else
+                            consoleChar = ' ';
                     }
                     catch (System.IndexOutOfRangeException)
                     {
                         Console.BackgroundColor = ConsoleColor.Black;
+                        consoleChar = ' ';
                     }
-                    Console.Write("  ");
+                    Console.Write(new String(consoleChar, 2));
                     Console.ResetColor();
                 }
                 Console.Write("|\n");
             }
+        }
+
+        /// <summary>
+        /// Counts the board's elements
+        /// </summary>
+        /// <returns>int</returns>
+        public int CountElems()
+        {
+            int elems = 0;
+            for(int i = 0; i < Size.Y; ++i)
+                for(int j = 0; j < Size.X; ++j)
+                    if(B[i, j].HasValue)
+                        elems++;
+            return elems;
         }
 
         int GetMinYFilled()
@@ -156,9 +229,8 @@ namespace TetrisOptimization
         /// </summary>
         /// <param name="y"></param>
         /// <param name="x"></param>
-        /// <param name="force_override_id">Null to prevent overriding. Number of blocks to code the block id.</param>
-        /// <returns>True if an error occurs</returns>
-        public bool TryToAdd(int y, int x, Block block, int? force_override_id = null)
+        /// <returns>Number of cuts / -1 if the block is not placed</returns>
+        public int TryToAdd(int y, int x, Block block)
         {
             // Check for errors
             for (int cy = 0; cy < block.Size.Y; ++cy)
@@ -166,13 +238,12 @@ namespace TetrisOptimization
                     if ((y + cy >= Size.Y) || (x + cx >= Size.X))
                     {
                         // Out of the board
-                        return true;
+                        return -1;
                     }
                     else if (B[y + cy, x + cx].HasValue && block.matrix[cy, cx])
                     {
                         // Trying to override the block
-                        if (force_override_id is null) // prevent overriding (square)
-                            return true;
+                        return -1;
                     }
 
             // Add block to the board
@@ -180,16 +251,9 @@ namespace TetrisOptimization
             for (int cy = 0; cy < block.Size.Y; ++cy)
                 for (int cx = 0; cx < block.Size.X; ++cx)
                     if (block.matrix[cy, cx])
-                    {
-                        if (B[y + cy, x + cx].HasValue) // overriding
-                        {
-                            B[y + cy, x + cx] *= force_override_id;
-                            B[y + cy, x + cx] += colortmpID;
-                        }
-                        else // just adding
-                            B[y + cy, x + cx] = colortmpID;
-                    }
-            return false;
+                        B[y + cy, x + cx] = colortmpID;
+
+            return 0;
         }
 
         public bool TryToRemove(int y, int x, Block block)
@@ -198,7 +262,6 @@ namespace TetrisOptimization
                 for (int cx = 0; cx < block.Size.X; ++cx)//x
                     if ((y + cy >= Size.Y) || (x + cx >= Size.X))
                     {
-                        //Console.Error.WriteLine("Out of the board");
                         return false;
                     }
             for (int cy = 0; cy < block.Size.Y; ++cy)//y
@@ -214,117 +277,13 @@ namespace TetrisOptimization
                 for (int cx = 0; cx < block.Size.X; ++cx)//x
                     if ((y + cy >= Size.Y) || (x + cx >= Size.X))
                     {
-                        //Console.Error.WriteLine("Out of the board");
                         return false;
                     }
                     else if (B[y + cy, x + cx].HasValue && block.matrix[cy, cx])
                     {
-                        //Console.Error.WriteLine("Trying to override the block");
                         return false;
                     }
             return true;
-        }
-
-        public int Badness()
-        {
-            int sum = 0;
-            for (int i = 0; i < Size.Y; ++i)
-                for (int j = 0; j < Size.X; ++j)
-                    if (B[i, j].HasValue)
-                        sum += B[i, j].Value;
-            return sum;
-        }
-
-        /// <summary>
-        /// Moves overlapped blocks into blank locations
-        /// </summary>
-        /// <param name="forceOverrideId">override id - base of the numeral system</param>
-        public int MoveOverlapped(int forceOverrideId)
-        {
-            var finding = new FindingGaps(this);
-            List<Gap> gaps = finding.FindGaps((0, Size.Y - 1, 0, Size.X - 1));
-
-            var holes = new List<(int, int)>();
-            var overlaps = new List<(int, int, int)>();
-
-            for (int i = 0; i < Size.Y; ++i)
-                for (int j = 0; j < Size.X; ++j)
-                {
-                    if (B[i, j] == null)
-                    {
-                        holes.Add((i, j));
-                    }
-                    while (B[i, j].HasValue && B[i, j].Value > forceOverrideId)
-                    {
-                        overlaps.Add((i, j, B[i, j].Value % forceOverrideId));
-                        B[i, j] /= forceOverrideId;
-                    }
-                }
-
-            List<List<int>> adjacentOverlapsIDs = new List<List<int>>();
-
-            int?[,] overlapsDistances = new int?[overlaps.Count, overlaps.Count];
-            for (int i = 0; i < overlaps.Count; ++i)
-                for (int j = 0; j <= i; ++j)
-                {
-                    overlapsDistances[i, j] = GetDistance(overlaps[i], overlaps[j]);
-
-                    // dist = 1 -> many cells of the same blocks are overlapping
-                    if (overlapsDistances[i, j] <= 1)
-                        adjacentOverlapsIDs.Add(new List<int>() { i, j });
-                }
-
-            for (int i = 1; i < adjacentOverlapsIDs.Count; ++i)
-                for (int j = 0; j < i; ++j)
-                    if (adjacentOverlapsIDs[j].Intersect(adjacentOverlapsIDs[i]).Any())
-                    {
-                        adjacentOverlapsIDs[j].AddRange(adjacentOverlapsIDs[i]);
-                        adjacentOverlapsIDs[i].Clear();
-                    }
-
-            List<List<int>> unionOverlaps = adjacentOverlapsIDs
-                .Where(x => x.Any())
-                .Select(x => x.Distinct())
-                .Select(x => x.ToList())
-                .ToList();
-
-            unionOverlaps.ForEach(x => x.Sort());
-            // min X, Y coords of overlapping cells
-            var minmaxYX = unionOverlaps.Select(ids =>
-                (ids.Min(x => overlaps[x].Item1), (ids.Min(x => overlaps[x].Item2)), ids.Max(x => overlaps[x].Item1), (ids.Max(x => overlaps[x].Item2)))
-                ).ToList();
-
-            List<bool[,]> overlapsMatrices = unionOverlaps
-                .Zip(minmaxYX)
-                .Select(x =>
-                {
-                    var union = x.First;
-                    var minmax = x.Second;
-                    var matrix = new bool[minmax.Item3 - minmax.Item1 + 1, minmax.Item4 - minmax.Item2 + 1];
-                    union?.ForEach(p =>
-                        matrix[overlaps[p].Item1 - minmax.Item1, overlaps[p].Item2 - minmax.Item2] = true);
-                    return matrix;
-                }
-            ).ToList();
-
-            var overlapsBlocks = overlapsMatrices.Select(m => new Block(m)).ToList();
-            var (ovBlocks, ovGaps) = CuttingRectangle.ExactFit(gaps, overlapsBlocks, this);
-            var result = CuttingRectangle.UnitCut((ovBlocks, ovGaps), this, 0);
-            return Badness();
-        }
-
-        /// <summary>
-        /// Gets the distance between two blocks on the board
-        /// </summary>
-        /// <param name="y"></param>
-        /// <param name="b1"></param>
-        /// <param name="y"></param>
-        /// <param name="b2"></param>
-        /// <returns></returns>
-        private static int GetDistance((int y, int x, int id) b1, (int y, int x, int id) b2)
-        {
-            var differentBlocks = b1.id == b2.id ? 0 : 2;
-            return Math.Abs(b1.y - b2.y) + Math.Abs(b1.x - b2.x) + differentBlocks;
         }
     }
 }

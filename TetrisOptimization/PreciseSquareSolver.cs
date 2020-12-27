@@ -14,7 +14,7 @@ namespace TetrisOptimization
     /// </summary>
     public class PreciseSquareSolver : PreciseSolver
     {
-        public PreciseSquareSolver(List<(int, Block)> _blocks, int _blockSize, int _parallelStep) : base(_blocks, _blockSize, _parallelStep)
+        public PreciseSquareSolver(List<(int, Block)> _blocks, int _blockSize, bool _concurrent = true, int _parallelStep = 1) : base(_blocks, _blockSize, _concurrent, _parallelStep)
         {
             forceSquare = true;
         }
@@ -93,18 +93,31 @@ namespace TetrisOptimization
                     }
                     return null;
                 }
-                
-                var resultCollection = new ConcurrentBag<Board?>();
-                for (int k = 0; k < combinationsNum; k += parallelStep)
+
+                if(concurrent)
                 {
-                    Parallel.For(k, k + parallelStep, i => 
-                        resultCollection.Add(CheckCombination(i)));
-                    foreach (var board in resultCollection)
-                        if (board != null)
+                    var resultCollection = new ConcurrentBag<Board?>();
+                    for (int k = 0; k < combinationsNum; k += parallelStep)
+                    {
+                        Parallel.For(k, k + parallelStep, i => 
+                            resultCollection.Add(CheckCombination(i)));
+                        foreach (var board in resultCollection)
+                            if (board != null)
+                                return board;
+                        resultCollection.Clear();
+                    }
+                }
+                else
+                {
+                    for(int i = 0; i < combinationsNum; ++i)
+                    {
+                        var board = CheckCombination(i);
+                        if(board != null)
                             return board;
-                    resultCollection.Clear();
+                    }
                 }
             }
+
             throw new OperationCanceledException("A board should be returned before");
         }
         /// <summary>
@@ -119,8 +132,8 @@ namespace TetrisOptimization
             foreach ((int index, Block block) in perm_block)
             {
                 var coords = CommonMethods.DecodeCoords(index, a, a);
-                bool failure = board.TryToAdd(coords.Item1, coords.Item2, block);
-                if (failure)
+                int flag = board.TryToAdd(coords.Item1, coords.Item2, block);
+                if (flag < 0)
                     return null;
             }
             return board;

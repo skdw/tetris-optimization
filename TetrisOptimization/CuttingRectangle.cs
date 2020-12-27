@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Microsoft.Extensions.FileProviders.Physical;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.CompilerServices;
@@ -38,8 +39,6 @@ namespace TetrisOptimization
                     var newBoard = new Board(_baseBoard);
                     (int y1, int y2,int x0, int x1) frame = (yAx + y.y0, yAx + y.y0 + rectangle.y-1,xAx + x.x0, xAx + x.x0 + rectangle.x-1);
                     var achivedCut = CountCuttingLine(newBoard, frame,y,x);
-                    //baseBoard.Print();
-                    //newBoard.Print();
                     if (achivedCut.Item1 < minimalcutting && achivedCut.Item1 > 0 /*&& error!=-1*/)
                     {
                         cutBoard = achivedCut.Item2;
@@ -69,9 +68,6 @@ namespace TetrisOptimization
             {
                 gap.matrix = FindingGaps.PrepareMatrix(gap.size, gap.position, gap.fields);
             }
-            //dodac klocki ktore sa na zewnatrz ramki
-            //int l = LengthCut(board, frame, x, y, gaps);
-            //trying to fill gaps maby ++ way
             return LengthCut(board, frame, y, x, gaps); ;
         }
         //maja
@@ -215,8 +211,6 @@ namespace TetrisOptimization
         public static (int,Board) LengthCut(Board board, (int y0, int y1, int x0, int x1) frame, (int y0, int y1) y,(int x0,int x1) x, List<Gap> gaps)
         {
             int cuts = 0;
-            //ConsoleColor? lastColor = ConsoleColor.Red;
-            //czym jest x i y?
             List<Block> cutOffBlocks = new List<Block>();
             //przejscie po ramce 
             for(int i=frame.y0;i<=frame.y1;i++)
@@ -267,9 +261,6 @@ namespace TetrisOptimization
                     cuts++;
                 }
             }
-            //Console.WriteLine("board po obcieciu ramki");
-            //board.Print(false,false);
-            //Console.ReadLine();
             ////usuwanie z poza ramki
             for(int a = 0;a<board.B.GetLength(0);a++)
             {
@@ -390,7 +381,7 @@ namespace TetrisOptimization
                     {
                         if(gap.matrix[y- gap.position.y, x- gap.position.x]==1 && unitBlockList.Count>0) //gap 1 jak jest dziura, 0 jak jest klocek
                         {
-                            if (board.TryToAdd(y,x, unitBlockList[0]) == false)
+                            if (board.TryToAdd(y,x, unitBlockList[0]) > -1)
                             {
                                 unitBlockList.RemoveAt(0);
                                 howManyUnitBlocks--;
@@ -416,7 +407,6 @@ namespace TetrisOptimization
         /// <returns></returns>
         public static bool DoesBlockFit(Block rot, Gap gap)
         {
-            gap.matrix = FindingGaps.PrepareMatrix(gap.size, gap.position, gap.fields);
             if (rot.matrix.GetLength(0)!= gap.matrix.GetLength(0) || rot.matrix.GetLength(1) != gap.matrix.GetLength(1)) return false;
             for(int i=0;i<gap.matrix.GetLength(0);i++)
             {
@@ -428,6 +418,65 @@ namespace TetrisOptimization
                 }
             }
             return true;
+        }
+        public static ((int x, int y) position, List<Gap> new_gaps) SmallerBlockFit(Block rot, Gap gap)
+        {
+            var block_size=rot.Size;
+            int x0=0;
+            int x1 = gap.size.x + 1- block_size.X;
+            if (x1 < 0) return ((-1,-1), new List<Gap>());
+            int y0 = 0;
+            int y1 = gap.size.y + 1- block_size.Y;
+            if (y1<0) return ((-1, -1), new List<Gap>());
+            (int x, int y) position = (-1, -1);
+            for(;x0<x1;x0++)
+            {
+                for (;y0<y1;y0++)
+                {
+                    bool if_works = true;
+                    position = (gap.position.x + x0, gap.position.y + y0);
+                    for (int i=0;i<block_size.X;i++)
+                    {
+                        for (int j=0;j<block_size.Y;j++)
+                        {
+                            if(rot.matrix[j,i]&& gap.matrix[j,i]==0)
+                            {
+                                if_works = false;
+                                break;
+                            }
+                        }
+                        if (!if_works) break;
+                    }
+                    if(if_works)
+                    {
+                        List<Gap> new_gaps;
+                        Board b = new Board(gap.size.y, gap.size.x);
+                        bool[,] m = new bool[1, 1];
+                        m[0, 0] = true;
+                        Block blo = new Block(m);
+                        for(int i=0;i<gap.size.x;i++)
+                        {
+                            for(int j=0;j<gap.size.y;j++)
+                            {
+                                if (gap.matrix[j, i] == 0)
+                                    b.TryToAdd(j, i, blo);
+
+                            }
+                        }
+                        b.TryToAdd(y0, x0, rot);
+                        FindingGaps finding= new FindingGaps(b);
+                        new_gaps=finding.FindGaps((0, gap.size.y, 0, gap.size.x));
+                        foreach(var g in new_gaps)
+                        {
+                            g.position = (g.position.y + gap.position.y, g.position.x + gap.position.x);
+                        }
+                        //obszary 4 spójne nowe gapy
+                        return (position, new_gaps);
+
+                    }
+                }
+            }
+            return ((-1,-1),new List<Gap>());
         }
         //maja
         public static (List<Block>,List<Gap>) ExactFit(List<Gap> gaps,List<Block> blocks, Board board)
@@ -450,7 +499,7 @@ namespace TetrisOptimization
                     {
                         if(newGaps[gap]==0 && DoesBlockFit(rot, gap))
                         {
-                            if(board.TryToAdd(gap.position.y, gap.position.x, rot) == false)
+                            if(board.TryToAdd(gap.position.y, gap.position.x, rot) > -1)
                             {
                                 newBlocks.Remove(block);
                                 newGaps[gap]++;
@@ -473,5 +522,230 @@ namespace TetrisOptimization
             }
             return (newBlocks,gps);
         }
+        public class CompareBlocks : Comparer<Block>
+        {
+            // Compares by Length, Height, and Width.
+            public override int Compare(Block x, Block y)
+            {
+                int sizex = x.matrix.GetLength(0) * x.matrix.GetLength(1);
+                int sizey = y.matrix.GetLength(0) * y.matrix.GetLength(1);
+                return sizex.CompareTo(sizey);
+            }
+        }
+        public class CompareGaps : Comparer<Gap>
+        {
+            // Compares by Length, Height, and Width.
+            public override int Compare(Gap x, Gap y)
+            {
+                int sizex = x.matrix.GetLength(0) * x.matrix.GetLength(1);
+                int sizey = y.matrix.GetLength(0) * y.matrix.GetLength(1);
+                return sizex.CompareTo(sizey);
+            }
+        }
+        public static (bool, List<Gap>) NotExactFit(List<Gap> gaps, List<Block> blocks, Board board)
+        {
+            var newBlocks = new List<Block>(blocks);
+            var newGaps = new Dictionary<Gap, int>();
+            foreach (var gap in gaps)
+            {
+                newGaps.Add(gap, 0);
+            }
+            bool breakFrom = false;
+            blocks.Sort(new CompareBlocks());
+            gaps.Sort(new CompareGaps());
+            //dla kazdego bloku
+            foreach (Block block in blocks)
+            {
+                //dla kazdego obrotu
+                for (int i = 0; i < 4; i++)
+                {
+                    Block rot = CommonMethods.GetSpecyficRotation(block, i);
+                    foreach (Gap gap in gaps)
+                    {
+                        if (newGaps[gap] == 0)
+                        {
+                            var put = SmallerBlockFit(rot, gap);
+                            if (put.position != (-1, -1))
+                            {
+                                if (board.TryToAdd(put.position.y, put.position.x, rot)>-1)
+                                {
+                                    newBlocks.Remove(block);
+                                    newGaps[gap]++;
+                                    gaps.Remove(gap);
+                                    gaps.AddRange(put.new_gaps);
+                                    foreach(var g in put.new_gaps)
+                                    {
+                                        newGaps.Add(g, 0);
+                                    }
+                                    breakFrom = true;
+                                    break;
+                                }
+                            }
+                        }
+                    }
+                    if (breakFrom)
+                    {
+                        breakFrom = false;
+                        break;
+                    }
+                }
+            }
+            var gps = new List<Gap>();
+            foreach (var dc in newGaps)
+            {
+                if (dc.Value == 0) gps.Add(dc.Key);
+            }
+            if (newBlocks.Count == 0)
+                return (true, gps);
+            else
+                return (false, gaps);
+        }
+        public static List<(int, List<Block>)> GenerateCuts(Block block)
+        {
+            List<(int, List<Block>)> results = new List<(int, List<Block>)>();
+            results.Add((0, new List<Block>() { block }));
+
+            var s = block.Size;
+
+            if (s.X == 1 && s.Y == 1)
+                return new List<(int, List<Block>)>() { (0, new List<Block>() { block }) };
+
+            // Horizontal cuts
+            for (int y = 1; y < s.Y; ++y)
+            {
+                int cutLength = 0;
+                var mat1 = new bool[y, s.X];
+                for (int i = 0; i < y; ++i)
+                    for (int j = 0; j < s.X; ++j)
+                    {
+                        mat1[i, j] = block.matrix[i, j];
+                    }
+                for (int i = 0; i < s.X; i++)
+                    if (block.matrix[y - 1, i] && block.matrix[y, i])
+                        cutLength++;
+                var bl1 = TrimBlock(mat1, false);
+
+                var mat2 = new bool[s.Y - y, s.X];
+                for (int i = y; i < s.Y; ++i)
+                    for (int j = 0; j < s.X; ++j)
+                        mat2[i - y, j] = block.matrix[i, j];
+                var bl2 = TrimBlock(mat2, false);
+                var gen2 = GenerateCuts(bl2);
+                var resgen2 = gen2.Select(x => (x.Item1 + cutLength, x.Item2.Concat(new[] { bl1 }).ToList()));
+
+                results.AddRange(resgen2);
+            }
+
+            // Vertical cuts
+            for (int x = 1; x < s.X; ++x)
+            {
+                int cutLength = 0;
+                var mat1 = new bool[s.Y, x];
+                for (int i = 0; i < s.Y; ++i)
+                    for (int j = 0; j < s.X - 1; ++j) //changed j<s.X to j<s.X-1
+                    {
+                        if (j < x)//added if so that index doesnt go out of the array
+                            mat1[i, j] = block.matrix[i, j];                        
+                    }
+                for (int i = 0; i < s.Y; i++)
+                    if (block.matrix[i, x] && block.matrix[i, x - 1])
+                        cutLength++;
+                var bl1 = TrimBlock(mat1, true);
+
+                var mat2 = new bool[s.Y, s.X - x];
+                for (int i = 0; i < s.Y; ++i)
+                    for (int j = x; j < s.X; ++j)
+                        mat2[i, j - x] = block.matrix[i, j];
+                var bl2 = TrimBlock(mat2, true);
+                if (bl1.matrix.GetLength(0) > 0 && bl2.matrix.GetLength(1) > 0 && bl1.matrix.GetLength(1) > 0 && bl2.matrix.GetLength(0) > 0)
+                {
+                    var gen2 = GenerateCuts(bl2);
+                    var resgen2 = gen2.Select(x => (x.Item1 + cutLength, x.Item2.Concat(new[] { bl1 }).ToList()));
+
+                    results.AddRange(resgen2);
+                }
+            }
+
+            return results;
+        }
+        public static bool[,] DeleteRow(bool[,] matrix,int row)
+        {
+            var newMatrix = new bool[matrix.GetLength(0) - 1, matrix.GetLength(1)];
+            for (int i = 0; i < newMatrix.GetLength(0); i++)
+            {
+                int k = i >= row ? i+1 : i ;
+                int l = i;
+                for (int j = 0; j < newMatrix.GetLength(1); j++)
+                {
+                    newMatrix[l, j] = matrix[k, j];
+                }
+            }
+            return newMatrix;
+        }
+        public static bool[,] DeleteColumn(bool[,] matrix, int column)
+        {
+            var newMatrix = new bool[matrix.GetLength(0), matrix.GetLength(1)-1];
+            for (int j = 0; j < newMatrix.GetLength(1); j++)
+            {
+                int k = j >= column ? j +1: j ;
+                int l = j;
+                for (int i = 0; i < newMatrix.GetLength(0); i++)
+                {
+                    newMatrix[i, l] = matrix[i, k];
+                }
+            }
+            return newMatrix;
+        }
+        public static Block TrimBlock(bool[,] matrix, bool isVerticalCut)
+        {
+            //po wierszach
+            int stop = 0;
+            while(true)
+            {
+                stop = 0;
+                for (int i = 0; i < matrix.GetLength(0); i++)
+                {
+                    for (int j = 0; j < matrix.GetLength(1); j++)
+                    {
+                        if (matrix[i, j] == true)
+                        {
+                            break;
+                        }
+                        else if (matrix[i, j] == false && j == matrix.GetLength(1) - 1)
+                        {
+                            matrix= DeleteRow(matrix, i);
+                            stop++;
+                        }
+                    }
+                }
+                if (stop == 0) break;
+            }
+
+            //po kolumnach
+            stop = 0;
+            while(true)
+            {
+                stop = 0;
+                for (int j = 0; j < matrix.GetLength(1); j++)
+                {
+                    for (int i = 0; i < matrix.GetLength(0); i++)
+                    {
+                        if (matrix[i, j] == true)
+                        {
+                            break;
+                        }
+                        else if (matrix[i, j] == false && i == matrix.GetLength(0) - 1)
+                        {
+                            matrix = DeleteColumn(matrix, j);
+                            stop++;
+                        }
+                    }
+                }
+                if (stop == 0) break;
+            }
+            
+            return new Block(matrix);
+        }
+
     }
 }
