@@ -19,13 +19,13 @@ $ dotnet test
 
 ## Input parameter - data_file
 
-Each of the algorithms accept a block size, the selected solving algorithm type and the list of blocks ID-s.
+Each of the algorithms accept the block size, the selected solving algorithm type and the list of blocks ID-s.
 
 The input data file follows the specification written in [#17](https://github.com/skdw/tetris-optimization/issues/17) (unfortunately in Polish).
 
 # BlocksSolverFactory configuration
 
-The optimal algorithms, working on consecutive combinations, take a ParallelStep parameter. It indicates how many combinations are being processed simultaneaosuly. After each such step, the result is put in a ConcurrentBag collection, where the most optimal board found is kept. If the optimal solution is not found, the ConcurrentBag collection is cleared and the algorithm moves on to next combinations
+The optimal algorithms, working on consecutive combinations, take the ParallelStep parameter. It indicates how many combinations are being processed simultaneaosuly. After each such step, the result is put in a ConcurrentBag collection, where the most optimal board found is kept. If the optimal solution is not found, the ConcurrentBag collection is cleared and the algorithm moves on to next combinations
 
 The heuristic algorithms accept following additional arguments:
 
