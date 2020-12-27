@@ -2,14 +2,14 @@
 ![.NET Core](https://github.com/skdw/tetris-optimization/workflows/.NET%20Core/badge.svg)
 [![codecov](https://codecov.io/gh/skdw/tetris-optimization/branch/main/graph/badge.svg?token=5VAJVKNU49)](https://codecov.io/gh/skdw/tetris-optimization)
 
-The algorithm arranges tetris puzzles (and other polyominoes) to minimize their area on board. Overlapping is not permitted. 
+The algorithm arranges tetris puzzles (and other polyominoes) to minimize their area on board.
 
 # Usage
 
 #### App run
 
 ```
-$ dotnet run -p TetrisOptimization [data_file] [config_file]
+$ dotnet run -p TetrisOptimization [data_file]
 ```
 
 #### Run tests
@@ -17,18 +17,15 @@ $ dotnet run -p TetrisOptimization [data_file] [config_file]
 $ dotnet test
 ```
 
-## Input parameters
+## Input parameter - data_file
 
-The program is being carried out using parameters indicated in a .json format configuration file and implemented by BlocksSolverFactory class. The parameters are specified for each of the 4 algorithms. Each of the algorithms accepts a block size and a block list (in the configuration file it is a list of numbers, which is turned into a block list by the program).
+Each of the algorithms accept a block size, the selected solving algorithm type and the list of blocks ID-s.
 
-#### data_file
+The input data file follows the specification written in [#17](https://github.com/skdw/tetris-optimization/issues/17) (unfortunately in Polish).
 
-Text file specifying the input blocks and the algorithm selected for each problem. It follows the specification written in
-[#17](https://github.com/skdw/tetris-optimization/issues/17) (unfortunately in Polish).
+# BlocksSolverFactory configuration
 
-#### config_file
-
-The optimal algorithms, working on consecutive combinations, take a ParallelStep parameter from the configuration file. It indicates how many combinations are being processed simultaneaosuly. After each such step, the result is put in a ConcurrentBag collection, where the most optimal board found is kept. If the optimal solution is not found, the ConcurrentBag collection is cleared and the algorithm moves on to next combinations
+The optimal algorithms, working on consecutive combinations, take a ParallelStep parameter. It indicates how many combinations are being processed simultaneaosuly. After each such step, the result is put in a ConcurrentBag collection, where the most optimal board found is kept. If the optimal solution is not found, the ConcurrentBag collection is cleared and the algorithm moves on to next combinations
 
 The heuristic algorithms accept following additional arguments:
 
@@ -42,7 +39,7 @@ The heuristic algorithms accept following additional arguments:
 
 - HPercentageBoardSize - a fraction of max board area, on which the blocks will be put (square heuristic)
 
-# Stages
+# Algorithms
 
 1. Optimal square
 2. Approximately optimal rectangle
